@@ -55,7 +55,7 @@ export function Hero() {
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               Arkenix handles the entire backend of your marketing - your data, 
-              your content, your automations, and your campaigns, so everything runs smoothly.
+              your content, your automations, and your campaigns, so everything runss smoothly.
             </p>
 
             <p
