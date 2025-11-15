@@ -22,11 +22,11 @@ export function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative overflow-hidden bg-gradient-to-br from-[#0A1E3A] to-[#0F355C] text-white pt-12 pb-20 md:pt-16 md:pb-24"
+      className="relative overflow-hidden bg-gradient-to-br from-[#072741] to-[#0a3d5c] text-white pt-12 pb-20 md:pt-16 md:pb-24"
     >
-      {/* Softer premium background glows */}
-      <div className="absolute top-24 right-16 w-72 h-72 bg-[#2C77C2]/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-10 left-10 w-80 h-80 bg-[#72CEDC]/20 rounded-full blur-3xl"></div>
+      {/* Background glows (clean version) */}
+      <div className="absolute top-24 right-16 w-72 h-72 bg-[#348ADC]/15 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-[-20px] left-[-20px] w-72 h-72 bg-[#65C9D4]/10 rounded-full blur-2xl"></div>
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         <div className="grid md:grid-cols-2 gap-16 items-center">
@@ -45,24 +45,24 @@ export function Hero() {
                 Marketing doesn’t fail because of ideas.
               </span>
               <br />
-              <span className="text-[#348ADC]">
+              <span className="text-white">
                 It fails because execution slows down.
               </span>
             </h1>
 
             <p
-              className="text-lg text-gray-300 mb-4 leading-relaxed"
+              className="text-lg text-gray-300 mb-4 leading-relaxed font-semibold"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              Arkenix runs your entire marketing backend —  
-              data, content, automation, and campaign delivery.
+              Arkenix runs your entire marketing backend — data, content,
+              automation, and campaign delivery.
             </p>
 
             <p
-              className="text-lg text-gray-300 mb-8 leading-relaxed"
+              className="text-lg text-gray-300 mb-8 leading-relaxed font-semibold"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              Your ideas. Our execution.
+              You bring the vision. We turn it into results.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
