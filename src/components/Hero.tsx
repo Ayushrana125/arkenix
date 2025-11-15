@@ -49,7 +49,7 @@ export function Hero() {
               className="text-lg text-gray-300 mb-4 leading-relaxed"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              Arkenix runs your entire marketing backend —
+              Arkenix runs your entire marketing backenddddd —
               data, content, automation, and campaign delivery.
             </p>
 
