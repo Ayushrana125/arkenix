@@ -46,23 +46,23 @@ export function Hero() {
               </span>
               <br />
               <span className="text-white">
-                It fails because execution slows down.
+                It fails because of inefficient execution.
               </span>
             </h1>
 
             <p
-              className="text-lg text-gray-300 mb-4 leading-relaxed font-semibold"
+              className="text-lg text-gray-300 mb-4 leading-relaxed font-normal"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              Arkenix runs your entire marketing backend — data, content,
-              automation, and campaign delivery.
+              Arkenix handles the entire backend of your marketing - your data, 
+              your content, your automations, and your campaigns, so everything runs smoothly.
             </p>
 
             <p
               className="text-lg text-gray-300 mb-8 leading-relaxed font-semibold"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              You bring the vision. We turn it into results.
+              You bring the vision. We will make it happen.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
