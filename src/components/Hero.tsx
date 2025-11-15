@@ -22,11 +22,11 @@ export function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative overflow-hidden bg-gradient-to-br from-[#072741] to-[#0a3d5c] text-white py-20 md:py-28"
+      className="relative overflow-hidden bg-gradient-to-br from-[#0A1E3A] to-[#0F355C] text-white pt-12 pb-20 md:pt-16 md:pb-24"
     >
-      {/* Softer background accents */}
-      <div className="absolute top-32 right-10 w-72 h-72 bg-[#348ADC] rounded-full opacity-10 blur-3xl"></div>
-      <div className="absolute bottom-20 left-10 w-72 h-72 bg-[#65C9D4] rounded-full opacity-10 blur-3xl"></div>
+      {/* Softer premium background glows */}
+      <div className="absolute top-24 right-16 w-72 h-72 bg-[#2C77C2]/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-10 left-10 w-80 h-80 bg-[#72CEDC]/20 rounded-full blur-3xl"></div>
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         <div className="grid md:grid-cols-2 gap-16 items-center">
@@ -41,15 +41,20 @@ export function Hero() {
               className="text-4xl md:text-5xl font-semibold mb-6 leading-tight"
               style={{ fontFamily: 'Poppins, sans-serif' }}
             >
-              Marketing doesn’t fail because of ideas. <br />
-              It fails because execution slows down.
+              <span className="text-[#65C9D4]">
+                Marketing doesn’t fail because of ideas.
+              </span>
+              <br />
+              <span className="text-[#348ADC]">
+                It fails because execution slows down.
+              </span>
             </h1>
 
             <p
               className="text-lg text-gray-300 mb-4 leading-relaxed"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              Arkenix runs your entire marketing backenddddd —
+              Arkenix runs your entire marketing backend —  
               data, content, automation, and campaign delivery.
             </p>
 
@@ -69,13 +74,13 @@ export function Hero() {
                 <ArrowRight size={18} />
               </button>
 
-              <button className="border border-white hover:bg-white hover:text-[#072741] px-6 py-3 rounded-lg text-base font-medium transition-all duration-300">
+              <button className="border border-white/70 hover:bg-white hover:text-[#072741] px-6 py-3 rounded-lg text-base font-medium transition-all duration-300">
                 Explore Services
               </button>
             </div>
           </div>
 
-          {/* RIGHT SIDE – CLEAN IMAGE PLACEHOLDER */}
+          {/* RIGHT SIDE – IMAGE PLACEHOLDER */}
           <div
             className={`transition-all duration-1000 delay-300 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
@@ -102,4 +107,3 @@ export function Hero() {
     </section>
   );
 }
-
