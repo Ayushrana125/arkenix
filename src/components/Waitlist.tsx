@@ -83,7 +83,7 @@ export function Waitlist() {
               className="text-3xl font-bold text-[#072741] mb-3"
               style={{ fontFamily: "Poppins, sans-serif" }}
             >
-              Arkenix is Evolving
+              Arkenix is Evolving...
             </h2>
 
             <p
