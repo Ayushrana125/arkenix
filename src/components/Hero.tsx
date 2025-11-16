@@ -95,7 +95,7 @@ export function Hero() {
               {/* Secondary CTA – Clean, Minimalist, Professional */}
               <button
                 onClick={() => {
-                  const el = document.getElementById("waitlist");
+                  const el = document.getElementById("Waitlist");
                   if (el) {
                     el.scrollIntoView({ behavior: "smooth" });
                   }
