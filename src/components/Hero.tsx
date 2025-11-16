@@ -20,10 +20,10 @@ export function Hero() {
   }, []);
 
   const featureImages = [
-    "/icons/data.gif",
-    "/icons/content.gif",
-    "/icons/automation.gif",
-    "/icons/campaign.gif",
+    "/data.gif",
+    "/content.gif",
+    "/automation.gif",
+    "/campaign.gif",
   ];
 
   return (
