@@ -24,14 +24,17 @@ export function Navbar() {
             className="hidden md:flex items-center space-x-10 text-[16px] font-medium"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
+            <a href="#home" className="hover:text-[#65C9D4] transition-colors duration-300">
+              Home
+            </a>
+            <a href="#founder" className="hover:text-[#65C9D4] transition-colors duration-300">
+              About Us
+            </a>
             <a href="#services" className="hover:text-[#65C9D4] transition-colors duration-300">
               Services
             </a>
             <a href="#testimonials" className="hover:text-[#65C9D4] transition-colors duration-300">
               Testimonials
-            </a>
-            <a href="#founder" className="hover:text-[#65C9D4] transition-colors duration-300">
-              About
             </a>
             <a href="#contact" className="hover:text-[#65C9D4] transition-colors duration-300">
               Contact
@@ -58,14 +61,17 @@ export function Navbar() {
             className="md:hidden mt-4 pb-6 pt-2 space-y-6 border-t border-gray-200 text-[16px] font-medium"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
+            <a href="#home" className="block hover:text-[#65C9D4] transition-colors">
+              Home
+            </a>
+            <a href="#founder" className="block hover:text-[#65C9D4] transition-colors">
+              About Us
+            </a>
             <a href="#services" className="block hover:text-[#65C9D4] transition-colors">
               Services
             </a>
             <a href="#testimonials" className="block hover:text-[#65C9D4] transition-colors">
               Testimonials
-            </a>
-            <a href="#founder" className="block hover:text-[#65C9D4] transition-colors">
-              About
             </a>
             <a href="#contact" className="block hover:text-[#65C9D4] transition-colors">
               Contact
