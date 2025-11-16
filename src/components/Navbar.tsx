@@ -15,19 +15,22 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center space-x-8" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <a href="#home" className="hover:text-[#65C9D4] transition-colors duration-300">
+              Home
+            </a>
+            <a href="#founder" className="hover:text-[#65C9D4] transition-colors duration-300">
+              About Me
+            </a>
             <a href="#services" className="hover:text-[#65C9D4] transition-colors duration-300">
               Services
             </a>
             <a href="#testimonials" className="hover:text-[#65C9D4] transition-colors duration-300">
               Testimonials
             </a>
-            <a href="#founder" className="hover:text-[#65C9D4] transition-colors duration-300">
-              About
-            </a>
             <a href="#contact" className="hover:text-[#65C9D4] transition-colors duration-300">
               Contact
             </a>
-            <button onClick={() => setIsModalOpen(true)} className="bg-[#348ADC] hover:bg-[#2a6fb0] px-6 py-2 rounded-lg transition-all duration-300 transform hover:scale-105">
+            <button onClick={() => setIsModalOpen(true)} className="bg-[#65C9D4] hover:bg-[#2a6fb0] px-6 py-2 rounded-lg transition-all duration-300 transform hover:scale-105">
               Get a Quote
             </button>
           </div>
