@@ -37,7 +37,7 @@ export function Navbar() {
               Testimonials
             </a>
             <a href="#contact" className="hover:text-[#65C9D4] transition-colors duration-300">
-              Contact
+              Waitlist
             </a>
 
             {/* Presento-style CTA button */}

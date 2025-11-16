@@ -42,7 +42,7 @@ export function Waitlist() {
   };
 
   return (
-    <section className="w-full bg-[#F3F7FA] py-16 px-6">
+    <section id="Waitlist" className="w-full bg-[#F3F7FA] py-16 px-6">
       <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-10 text-center">
         {/* SUCCESS STATE */}
         {isSubmitted ? (
