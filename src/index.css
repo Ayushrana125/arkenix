@@ -26,3 +26,77 @@ html, body {
 body {
   font-family: 'Inter', sans-serif;
 }
+
+
+/* Arkenix Animated CTA - Added for custom template*/ 
+.arkenix-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 28px;
+  border-radius: 100px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  overflow: hidden;
+  
+  background: rgba(52, 138, 220, 0.15);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  box-shadow: 0 0 18px rgba(101, 201, 212, 0.2);
+  z-index: 1;
+}
+
+.arkenix-cta::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  
+  background: conic-gradient(
+    from 0deg,
+    #348ADC,
+    #65C9D4,
+    #348ADC
+  );
+  
+  animation: spinArkenix 4s linear infinite;
+  z-index: -2;
+  opacity: 0.7;
+}
+
+.arkenix-cta::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: #072741;
+  z-index: -1;
+}
+
+.arkenix-cta:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 28px rgba(101, 201, 212, 0.35);
+}
+
+.arrow-icon {
+  color: #65C9D4;
+  transition: transform 0.3s ease;
+}
+
+.arkenix-cta:hover .arrow-icon {
+  transform: translateX(6px);
+}
+
+@keyframes spinArkenix {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
