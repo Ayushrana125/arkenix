@@ -89,13 +89,13 @@ export function Hero() {
           </div>
 
 
-          {/* RIGHT SIDE – FIXED 2×2 GRID WITH EQUAL SPACING */}
+          {/* RIGHT SIDE – FIXED OUTER + INNER BOX WITH EVEN SPACING */}
           <div
             className={`w-full flex justify-center transition-all duration-1000 delay-300 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
             }`}
           >
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-2 gap-6">
               {featureImages.map((src, i) => (
                 <div
                   key={i}
@@ -114,7 +114,8 @@ export function Hero() {
                     transitionDelay: `${300 + i * 150}ms`,
                   }}
                 >
-                  <div className="w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden bg-[#0d3b55]/40 flex items-center justify-center shadow-inner border border-[#348ADC]/30">
+                  {/* INNER GIF CONTAINER */}
+                  <div className="w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden bg-white shadow-md flex items-center justify-center">
                     <img
                       src={src}
                       alt="feature"
@@ -125,6 +126,7 @@ export function Hero() {
               ))}
             </div>
           </div>
+
 
 
 
