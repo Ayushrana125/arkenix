@@ -45,7 +45,7 @@ export function Hero() {
             }`}
           >
             <h1
-              className="text-4xl md:text-5xl font-semibold mb-6 leading-tight"
+              className="text-3xl md:text-5xl font-semibold mb-5 leading-snug"
               style={{ fontFamily: "Poppins, sans-serif" }}
             >
               <span className="text-[#65C9D4]">
