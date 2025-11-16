@@ -90,38 +90,29 @@ export function Hero() {
 
           {/* RIGHT SIDE – 4-GRID GIF FEATURE CARDS */}
           <div
-            className={`grid grid-cols-2 gap-5 transition-all duration-1000 delay-300 ${
+            className={`grid grid-cols-2 gap-6 transition-all duration-1000 delay-300 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
             }`}
           >
             {featureImages.map((src, i) => (
               <div
                 key={i}
-                className={`
-                  aspect-square        /* makes the card a perfect square */
-                  bg-white/5 
-                  border border-white/20 
-                  rounded-2xl
-                  flex items-center justify-center
-                  backdrop-blur-md
-                  shadow-[0_0_25px_rgba(100,200,255,0.15)]
-                  transition-all duration-700 ease-out
-                  ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
-                `}
-                style={{
-                  transitionDelay: `${300 + i * 150}ms`,
-                }}
+                className={`w-full h-28 md:h-32 bg-white/5 border border-white/20 
+                rounded-xl backdrop-blur-md flex items-center justify-center
+                shadow-[0_0_20px_rgba(100,200,255,0.15)]
+                transition-all duration-700 ease-out
+                ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+                style={{ transitionDelay: `${300 + i * 150}ms` }}
               >
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-[#0d3b55]/40 flex items-center justify-center shadow-inner border border-[#348ADC]/30">
-                  <img
-                    src={src}
-                    alt="feature"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
+                <img
+                  src={src}
+                  alt="feature"
+                  className="w-20 h-20 object-contain drop-shadow-lg"
+                />
               </div>
             ))}
           </div>
+
         </div>
       </div>
 
