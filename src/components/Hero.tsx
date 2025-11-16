@@ -91,8 +91,9 @@ export function Hero() {
 
 
           {/* RIGHT SIDE – TIGHT OUTER BOX + LARGER INNER BOX */}
+          {/* RIGHT SIDE – CLEAN 2×2 PREMIUM GIF GRID */}
           <div
-            className={`grid grid-cols-2 gap-5 transition-all duration-1000 delay-300 ${
+            className={`grid grid-cols-2 gap-6 transition-all duration-1000 delay-300 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
             }`}
           >
@@ -101,29 +102,26 @@ export function Hero() {
                 key={i}
                 className={`
                   aspect-square
-                  bg-white/5
-                  border border-white/20
-                  rounded-xl
-                  p-2                      /* <- Tight outer spacing */
+                  bg-white/10
+                  border border-white/30
+                  rounded-2xl
                   flex items-center justify-center
-                  backdrop-blur-md
-                  shadow-[0_0_20px_rgba(100,200,255,0.12)]
+                  shadow-[0_0_20px_rgba(80,160,220,0.18)]
+                  backdrop-blur-sm
                   transition-all duration-700 ease-out
                   ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
                 `}
                 style={{ transitionDelay: `${300 + i * 150}ms` }}
               >
-                {/* INNER WHITE BOX */}
-                <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-lg flex items-center justify-center shadow-inner border border-[#348ADC]/30">
-                  <img
-                    src={src}
-                    alt="feature"
-                    className="w-[85%] h-[85%] object-contain"
-                  />
-                </div>
+                <img
+                  src={src}
+                  alt="feature"
+                  className="w-24 h-24 md:w-28 md:h-28 object-contain"
+                />
               </div>
             ))}
           </div>
+
 
         </div>
       </div>
