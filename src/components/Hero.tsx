@@ -19,27 +19,34 @@ export function Hero() {
     return () => observer.disconnect();
   }, []);
 
+  const featureImages = [
+    "/icons/data.gif",
+    "/icons/content.gif",
+    "/icons/automation.gif",
+    "/icons/campaign.gif",
+  ];
+
   return (
     <section
       ref={heroRef}
       className="relative overflow-hidden bg-gradient-to-br from-[#072741] to-[#0a3d5c] text-white pt-12 pb-20 md:pt-16 md:pb-24"
     >
-      {/* Background glows (clean version) */}
+      {/* Background glows */}
       <div className="absolute top-24 right-16 w-72 h-72 bg-[#348ADC]/15 rounded-full blur-3xl"></div>
       <div className="absolute bottom-[-20px] left-[-20px] w-72 h-72 bg-[#65C9D4]/10 rounded-full blur-2xl"></div>
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         <div className="grid md:grid-cols-2 gap-16 items-center">
 
-          {/* LEFT SIDE TEXT */}
+          {/* LEFT SIDE */}
           <div
             className={`transition-all duration-1000 ${
-              isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
+              isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
             }`}
           >
             <h1
               className="text-4xl md:text-5xl font-semibold mb-6 leading-tight"
-              style={{ fontFamily: 'Poppins, sans-serif' }}
+              style={{ fontFamily: "Poppins, sans-serif" }}
             >
               <span className="text-[#65C9D4]">
                 Marketing doesn’t fail because of ideas.
@@ -52,15 +59,16 @@ export function Hero() {
 
             <p
               className="text-lg text-gray-300 mb-4 leading-relaxed font-normal"
-              style={{ fontFamily: 'Inter, sans-serif' }}
+              style={{ fontFamily: "Inter, sans-serif" }}
             >
-              Arkenix handles the entire backend of your marketing - your data, 
-              your content, your automations, and your campaigns, so everything runss smoothly.
+              Arkenix handles the entire backend of your marketing - your data,
+              your content, your automations, and your campaigns, so everything
+              runs smoothly.
             </p>
 
             <p
               className="text-lg text-gray-300 mb-8 leading-relaxed font-semibold"
-              style={{ fontFamily: 'Inter, sans-serif' }}
+              style={{ fontFamily: "Inter, sans-serif" }}
             >
               You bring the vision. We will make it happen.
             </p>
@@ -80,20 +88,32 @@ export function Hero() {
             </div>
           </div>
 
-          {/* RIGHT SIDE – IMAGE PLACEHOLDER */}
+          {/* RIGHT SIDE – 4-GRID IMAGE CARDS */}
           <div
-            className={`transition-all duration-1000 delay-300 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+            className={`grid grid-cols-2 gap-4 transition-all duration-1000 delay-300 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
             }`}
           >
-            <div className="w-full h-64 md:h-80 bg-white/10 rounded-xl border border-white/20 flex items-center justify-center backdrop-blur-sm">
-              <span
-                className="text-gray-300 text-lg"
-                style={{ fontFamily: 'Inter, sans-serif' }}
+            {featureImages.map((src, i) => (
+              <div
+                key={i}
+                className={`w-full h-32 md:h-36 bg-white/5 border border-white/20 rounded-xl 
+                backdrop-blur-md flex items-center justify-center
+                shadow-[0_0_20px_rgba(100,200,255,0.15)]
+                transition-all duration-700 ease-out
+                ${isVisible ? `opacity-100 translate-y-0` : `opacity-0 translate-y-6`}
+                `}
+                style={{
+                  transitionDelay: `${300 + i * 150}ms`,
+                }}
               >
-                Add your hero image here
-              </span>
-            </div>
+                <img
+                  src={src}
+                  alt="feature"
+                  className="w-14 h-14 md:w-16 md:h-16 object-contain drop-shadow-lg"
+                />
+              </div>
+            ))}
           </div>
 
         </div>
