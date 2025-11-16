@@ -97,7 +97,7 @@ export function Hero() {
             className={`
               grid grid-cols-2 gap-4
               w-[350px] md:w-[420px]
-              ml-8                     /* <-- MOVE BASKET RIGHT */
+              ml-10                     /* <-- MOVE BASKET RIGHT */
               transition-all duration-1000 delay-300
               ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}
             `}
