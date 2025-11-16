@@ -76,35 +76,42 @@ export function Hero() {
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mt-6">
 
-              {/* Animated Premium Arkenix CTA */}
+              {/* Primary CTA – Premium, Full Width on Mobile */}
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="arkenix-cta w-full sm:w-auto"
-              >
-                <span>Get a Quote</span>
-                <ArrowRight size={18} className="arrow-icon" />
-              </button>
-
-              {/* Improved Explore CTA */}
-              <button
                 className="
-                  text-white/90 hover:text-white
+                  bg-[#348ADC] hover:bg-[#2a6fb0]
+                  text-white
+                  px-6 py-3
+                  rounded-md
                   text-base font-medium
-                  flex items-center justify-center gap-2
                   transition-all duration-300
-                  sm:px-5 sm:py-3
-                  sm:border sm:border-white/20 sm:rounded-md
+                  flex items-center justify-center gap-2
                   w-full sm:w-auto
                 "
               >
-                Explore Services
-                <ArrowRight size={16} className="opacity-70 transition group-hover:translate-x-1" />
+                Get a Quote
               </button>
 
+              {/* Secondary CTA – Clean, Minimalist, Professional */}
+              <button
+                className="
+                  text-white/80 hover:text-white
+                  text-base font-normal
+                  flex items-center justify-center gap-2
+                  transition-all duration-300
+                  underline-offset-4
+                  w-full sm:w-auto
+                "
+              >
+                Explore Services →
+              </button>
             </div>
 
-
           </div>
+
+
+
 
 
           {/* RIGHT SIDE – 2×2 GRID WITH TIGHTER WRAPPER (Option A) */}
