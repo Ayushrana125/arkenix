@@ -73,19 +73,42 @@ export function Hero() {
               You bring the vision. We will make it happen.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mt-6">
+
+              {/* Primary CTA – Premium, Full Width on Mobile */}
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="bg-[#348ADC] hover:bg-[#2a6fb0] text-white px-6 py-3 rounded-lg text-base font-medium transition-all duration-300 flex items-center justify-center gap-2"
+                className="
+                  bg-[#348ADC] hover:bg-[#2a6fb0]
+                  text-white
+                  px-6 py-3
+                  rounded-md
+                  text-base font-medium
+                  transition-all duration-300
+                  flex items-center justify-center gap-2
+                  w-full sm:w-auto
+                "
               >
                 Get a Quote
                 <ArrowRight size={18} />
               </button>
 
-              <button className="border border-white/70 hover:bg-white hover:text-[#072741] px-6 py-3 rounded-lg text-base font-medium transition-all duration-300">
-                Explore Services
+              {/* Secondary CTA – Clean, Minimalist, Professional */}
+              <button
+                className="
+                  text-white/80 hover:text-white
+                  text-base font-normal
+                  flex items-center justify-center gap-2
+                  transition-all duration-300
+                  underline-offset-4
+                  w-full sm:w-auto
+                "
+              >
+                Explore Services →
               </button>
             </div>
+
           </div>
 
 
