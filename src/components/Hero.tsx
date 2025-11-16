@@ -95,12 +95,14 @@ export function Hero() {
           {/* RIGHT SIDE – 2×2 GRID WITH TIGHTER WRAPPER (Option A) */}
           <div
             className={`
-              grid grid-cols-2 gap-4    /* reduced gap (from 5/6 → 4) */
-              w-[280px] md:w-[320px]    /* SHRINK the basket width */
+              grid grid-cols-2 gap-4
+              w-[350px] md:w-[420px]
+              ml-8                     /* <-- MOVE BASKET RIGHT */
               transition-all duration-1000 delay-300
               ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}
             `}
           >
+
             {featureImages.map((src, i) => (
               <div
                 key={i}
