@@ -36,7 +36,7 @@ export function Navbar() {
             <a href="#Waitlist" className="hover:text-[#65C9D4] transition-colors duration-300">
               Testimonials
             </a>
-            <a href="#contact" className="hover:text-[#65C9D4] transition-colors duration-300">
+            <a href="#Waitlist" className="hover:text-[#65C9D4] transition-colors duration-300">
               Contact
             </a>
 
