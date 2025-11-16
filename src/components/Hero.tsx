@@ -89,43 +89,43 @@ export function Hero() {
           </div>
 
 
-          {/* RIGHT SIDE – FIXED OUTER + INNER BOX WITH EVEN SPACING */}
+
+          {/* RIGHT SIDE – FIXED 2×2 GRID WITH OUTER + INNER BOXES */}
           <div
-            className={`w-full flex justify-center transition-all duration-1000 delay-300 ${
+            className={`grid grid-cols-2 gap-6 transition-all duration-1000 delay-300 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
             }`}
           >
-            <div className="grid grid-cols-2 gap-6">
-              {featureImages.map((src, i) => (
-                <div
-                  key={i}
-                  className={`
-                    aspect-square
-                    bg-white/5 
-                    border border-white/20 
-                    rounded-2xl
-                    flex items-center justify-center
-                    backdrop-blur-md
-                    shadow-[0_0_25px_rgba(100,200,255,0.15)]
-                    transition-all duration-700 ease-out
-                    ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
-                  `}
-                  style={{
-                    transitionDelay: `${300 + i * 150}ms`,
-                  }}
-                >
-                  {/* INNER GIF CONTAINER */}
-                  <div className="w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden bg-white shadow-md flex items-center justify-center">
-                    <img
-                      src={src}
-                      alt="feature"
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
+            {featureImages.map((src, i) => (
+              <div
+                key={i}
+                className={`
+                  aspect-square
+                  bg-white/5 
+                  border border-white/20 
+                  rounded-2xl
+                  flex items-center justify-center
+                  backdrop-blur-md
+                  shadow-[0_0_25px_rgba(100,200,255,0.15)]
+                  transition-all duration-700 ease-out
+                  ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
+                `}
+                style={{
+                  transitionDelay: `${300 + i * 150}ms`,
+                }}
+              >
+                {/* INNER WHITE BOX */}
+                <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-xl flex items-center justify-center shadow-inner border border-[#348ADC]/30">
+                  <img
+                    src={src}
+                    alt="feature"
+                    className="w-20 h-20 md:w-24 md:h-24 object-contain"
+                  />
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
+
 
 
 
