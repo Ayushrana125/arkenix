@@ -94,6 +94,12 @@ export function Hero() {
 
               {/* Secondary CTA – Clean, Minimalist, Professional */}
               <button
+                onClick={() => {
+                  const el = document.getElementById("waitlist");
+                  if (el) {
+                    el.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
                 className="
                   text-white/80 hover:text-white
                   text-base font-normal
@@ -105,6 +111,7 @@ export function Hero() {
               >
                 Explore Services →
               </button>
+
             </div>
 
           </div>

@@ -27,13 +27,13 @@ export function Navbar() {
             <a href="#home" className="hover:text-[#65C9D4] transition-colors duration-300">
               Home
             </a>
-            <a href="#founder" className="hover:text-[#65C9D4] transition-colors duration-300">
+            <a href="#Waitlist" className="hover:text-[#65C9D4] transition-colors duration-300">
               About Us
             </a>
-            <a href="#services" className="hover:text-[#65C9D4] transition-colors duration-300">
+            <a href="#Waitlist" className="hover:text-[#65C9D4] transition-colors duration-300">
               Services
             </a>
-            <a href="#testimonials" className="hover:text-[#65C9D4] transition-colors duration-300">
+            <a href="#Waitlist" className="hover:text-[#65C9D4] transition-colors duration-300">
               Testimonials
             </a>
             <a href="#contact" className="hover:text-[#65C9D4] transition-colors duration-300">
@@ -64,16 +64,16 @@ export function Navbar() {
             <a href="#home" className="block hover:text-[#65C9D4] transition-colors">
               Home
             </a>
-            <a href="#founder" className="block hover:text-[#65C9D4] transition-colors">
+            <a href="#Waitlist" className="block hover:text-[#65C9D4] transition-colors">
               About Us
             </a>
-            <a href="#services" className="block hover:text-[#65C9D4] transition-colors">
+            <a href="#Waitlist" className="block hover:text-[#65C9D4] transition-colors">
               Services
             </a>
-            <a href="#testimonials" className="block hover:text-[#65C9D4] transition-colors">
+            <a href="#Waitlist" className="block hover:text-[#65C9D4] transition-colors">
               Testimonials
             </a>
-            <a href="#contact" className="block hover:text-[#65C9D4] transition-colors">
+            <a href="#Waitlist" className="block hover:text-[#65C9D4] transition-colors">
               Contact
             </a>
 
