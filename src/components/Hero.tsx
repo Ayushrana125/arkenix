@@ -104,8 +104,7 @@ export function Hero() {
             </div>
 
 
-
-
+          </div>
 
 
           {/* RIGHT SIDE – 2×2 GRID WITH TIGHTER WRAPPER (Option A) */}
