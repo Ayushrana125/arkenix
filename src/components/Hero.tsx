@@ -76,7 +76,7 @@ export function Hero() {
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="bg-[#348ADC] hover:bg-[#65C9D4] text-white px-6 py-3 rounded-lg text-base font-medium transition-all duration-300 flex items-center justify-center gap-2"
+                className="bg-[#348ADC] hover:bg-[#2a6fb0] text-white px-6 py-3 rounded-lg text-base font-medium transition-all duration-300 flex items-center justify-center gap-2"
               >
                 Get a Quote
                 <ArrowRight size={18} />

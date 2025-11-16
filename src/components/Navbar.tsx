@@ -30,7 +30,7 @@ export function Navbar() {
             <a href="#contact" className="hover:text-[#65C9D4] transition-colors duration-300">
               Contact
             </a>
-            <button onClick={() => setIsModalOpen(true)} className="bg-[#65C9D4] hover:bg-[#2a6fb0] px-6 py-2 rounded-lg transition-all duration-300 transform hover:scale-105">
+            <button onClick={() => setIsModalOpen(true)} className="bg-[#348ADC] hover:bg-[#2a6fb0] px-6 py-2 rounded-lg transition-all duration-300 transform hover:scale-105">
               Get a Quote
             </button>
           </div>
