@@ -89,44 +89,43 @@ export function Hero() {
           </div>
 
 
-          {/* RIGHT SIDE – 4-GRID GIF FEATURE CARDS */}
+          {/* RIGHT SIDE – FIXED 2×2 GRID WITH EQUAL SPACING */}
           <div
-            className={`grid grid-cols-2 gap-5 transition-all duration-1000 delay-300 ${
+            className={`w-full flex justify-center transition-all duration-1000 delay-300 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
             }`}
           >
-            {featureImages.map((src, i) => (
-              <div
-                key={i}
-                className={`
-                  aspect-square 
-                  max-w-[130px] md:max-w-[150px]          /* 👈 outer square smaller */
-                  bg-white/5 
-                  border border-white/20 
-                  rounded-2xl
-                  flex items-center justify-center
-                  backdrop-blur-md
-                  shadow-[0_0_25px_rgba(100,200,255,0.15)]
-                  transition-all duration-700 ease-out
-                  ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
-                `}
-                style={{
-                  transitionDelay: `${300 + i * 150}ms`,
-                }}
-              >
-                <div className="w-24 h-24 md:w-28 md:h-28   /* 👈 inner gif bigger */
-                                rounded-xl overflow-hidden 
-                                bg-[#0d3b55]/40 flex items-center justify-center 
-                                shadow-inner border border-[#348ADC]/30">
-                  <img
-                    src={src}
-                    alt="feature"
-                    className="w-full h-full object-contain"
-                  />
+            <div className="grid grid-cols-2 gap-5">
+              {featureImages.map((src, i) => (
+                <div
+                  key={i}
+                  className={`
+                    aspect-square
+                    bg-white/5 
+                    border border-white/20 
+                    rounded-2xl
+                    flex items-center justify-center
+                    backdrop-blur-md
+                    shadow-[0_0_25px_rgba(100,200,255,0.15)]
+                    transition-all duration-700 ease-out
+                    ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
+                  `}
+                  style={{
+                    transitionDelay: `${300 + i * 150}ms`,
+                  }}
+                >
+                  <div className="w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden bg-[#0d3b55]/40 flex items-center justify-center shadow-inner border border-[#348ADC]/30">
+                    <img
+                      src={src}
+                      alt="feature"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+
 
 
         </div>
