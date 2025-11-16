@@ -117,7 +117,7 @@ export function Hero() {
                 {/* WRAPPER */}
                 <div
                   className="
-                    w-[115px] h-[115px] md:w-[140px] md:h-[140px]
+                    w-[130px] h-[130px] md:w-[155px] md:h-[155px]
                     rounded-2xl
                     border border-[#4aa5ff]/40
                     bg-white/5
@@ -129,7 +129,7 @@ export function Hero() {
                   {/* INNER WHITE BOX */}
                   <div
                     className="
-                      w-[85px] h-[85px] md:w-[105px] md:h-[105px]
+                      w-[100px] h-[100px] md:w-[120px] md:h-[120px]
                       bg-white 
                       rounded-xl
                       shadow-sm
@@ -139,7 +139,7 @@ export function Hero() {
                     <img
                       src={src}
                       alt='feature'
-                      className="w-[70px] h-[70px] md:w-[85px] md:h-[85px] object-contain"
+                      className="w-[85px] h-[85px] md:w-[100px] md:h-[100px] object-contain"
                     />
                   </div>
                 </div>
