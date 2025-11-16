@@ -94,23 +94,25 @@ export function Hero() {
 
           {/* RIGHT SIDE – 2×2 GRID WITH TIGHTER WRAPPER (Option A) */}
           <div
-            className={`grid grid-cols-2 gap-5 transition-all duration-1000 delay-300 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
-            }`}
+            className={`
+              grid grid-cols-2 gap-4    /* reduced gap (from 5/6 → 4) */
+              w-[280px] md:w-[320px]    /* SHRINK the basket width */
+              transition-all duration-1000 delay-300
+              ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}
+            `}
           >
             {featureImages.map((src, i) => (
               <div
                 key={i}
                 className={`
                   aspect-square
-                  bg-transparent
                   flex items-center justify-center
                   transition-all duration-700 ease-out
                   ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
                 `}
                 style={{ transitionDelay: `${300 + i * 150}ms` }}
               >
-                {/* WRAPPER (tighter + visible border + reduced glow) */}
+                {/* WRAPPER */}
                 <div
                   className="
                     w-[115px] h-[115px] md:w-[140px] md:h-[140px]
@@ -122,7 +124,7 @@ export function Hero() {
                     flex items-center justify-center
                   "
                 >
-                  {/* INNER WHITE ROUNDED BOX */}
+                  {/* INNER WHITE BOX */}
                   <div
                     className="
                       w-[85px] h-[85px] md:w-[105px] md:h-[105px]
@@ -134,7 +136,7 @@ export function Hero() {
                   >
                     <img
                       src={src}
-                      alt="feature"
+                      alt='feature'
                       className="w-[70px] h-[70px] md:w-[85px] md:h-[85px] object-contain"
                     />
                   </div>
