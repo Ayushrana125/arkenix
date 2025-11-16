@@ -1,3 +1,18 @@
+/* =========================
+   Global viewport lock — keep this at the very top
+   ========================= */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
+  position: relative;
+}
+
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap');
 
 @tailwind base;

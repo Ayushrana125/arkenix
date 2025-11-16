@@ -9,7 +9,7 @@ import { Navbar } from './components/Navbar';
 
 function App() {
   return (
-    <div className="min-h-screen bg-[#DADFE4]">
+    <div className="min-h-screen bg-[#DADFE4] w-full max-w-full overflow-x-hidden">
       <Navbar />
       <Hero />
       <ServicesSection />
