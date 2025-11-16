@@ -32,8 +32,7 @@ export function Waitlist() {
 
       setIsSubmitted(true);
       setFormData({ name: "", email: "" });
-
-      setTimeout(() => setIsSubmitted(false), 2500);
+      
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Try again.");

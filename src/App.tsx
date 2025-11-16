@@ -15,14 +15,18 @@ function App() {
       <Navbar />
       <Hero />
       <Waitlist />
-      <ServicesSection />
+      {/* <ServicesSection />
       <FullServiceCTA />
       <Testimonials />
       <Contact />
       <Founder />
-      <Footer />
+      <Footer /> */}
     </div>
   );
 }
+
+
+
+
 
 export default App;
