@@ -69,7 +69,7 @@ export function Hero() {
               className="text-lg text-gray-300 mb-8 leading-relaxed font-semibold"
               style={{ fontFamily: "Inter, sans-serif" }}
             >
-              You bring the vision. We will make it happen.
+              You bring the vision. We make it happen.
             </p>
 
 
