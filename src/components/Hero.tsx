@@ -91,29 +91,45 @@ export function Hero() {
 
 
 
-          {/* RIGHT SIDE – CLEAN 2×2 PREMIUM GIF GRID */}
+          {/* RIGHT SIDE – 2×2 GRID WITH INVISIBLE OUTER CONTAINER */}
           <div
-            className={`
-              p-4 md:p-6 
-              rounded-3xl 
-              bg-white/5 
-              border border-white/10 
-              backdrop-blur-sm
-              grid grid-cols-2 gap-6 
-              transition-all duration-1000 delay-300
-              ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}
-            `}
+            className={`grid grid-cols-2 gap-6 transition-all duration-1000 delay-300 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+            }`}
           >
             {featureImages.map((src, i) => (
               <div
                 key={i}
-                className={`aspect-square bg-white/10 border border-white/20 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(80,160,220,0.15)] transition-all duration-700 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+                className="relative aspect-square flex items-center justify-center"
                 style={{ transitionDelay: `${300 + i * 150}ms` }}
               >
-                <img src={src} className="w-24 h-24 md:w-28 md:h-28 object-contain" />
+                {/* GLOW WRAPPER (the loose wrapper around the white GIF box) */}
+                <div className="
+                  absolute inset-0 
+                  rounded-2xl 
+                  border border-blue-400/20 
+                  shadow-[0_0_30px_rgba(100,180,255,0.25)]
+                  pointer-events-none
+                "></div>
+
+                {/* WHITE GIF BOX */}
+                <div className="
+                  w-[70%] h-[70%]
+                  bg-white 
+                  rounded-xl 
+                  flex items-center justify-center 
+                  shadow-md
+                ">
+                  <img
+                    src={src}
+                    alt="feature"
+                    className="w-[70%] h-[70%] object-contain"
+                  />
+                </div>
               </div>
             ))}
           </div>
+
 
 
 
