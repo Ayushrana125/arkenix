@@ -76,40 +76,33 @@ export function Hero() {
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mt-6">
 
-              {/* Primary CTA – Premium, Full Width on Mobile */}
+              {/* Animated Premium Arkenix CTA */}
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="
-                  bg-[#348ADC] hover:bg-[#2a6fb0]
-                  text-white
-                  px-6 py-3
-                  rounded-md
-                  text-base font-medium
-                  transition-all duration-300
-                  flex items-center justify-center gap-2
-                  w-full sm:w-auto
-                "
+                className="arkenix-cta w-full sm:w-auto"
               >
-                Get a Quote
-                <ArrowRight size={18} />
+                <span>Get a Quote</span>
+                <ArrowRight size={18} className="arrow-icon" />
               </button>
 
-              {/* Secondary CTA – Clean, Minimalist, Professional */}
+              {/* Improved Explore CTA */}
               <button
                 className="
-                  text-white/80 hover:text-white
-                  text-base font-normal
+                  text-white/90 hover:text-white
+                  text-base font-medium
                   flex items-center justify-center gap-2
                   transition-all duration-300
-                  underline-offset-4
+                  sm:px-5 sm:py-3
+                  sm:border sm:border-white/20 sm:rounded-md
                   w-full sm:w-auto
                 "
               >
-                Explore Services →
+                Explore Services
+                <ArrowRight size={16} className="opacity-70 transition group-hover:translate-x-1" />
               </button>
+
             </div>
 
-          </div>
 
 
 
