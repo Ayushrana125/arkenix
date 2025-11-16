@@ -90,9 +90,9 @@ export function Hero() {
 
 
 
-          {/* RIGHT SIDE – FIXED 2×2 GRID WITH OUTER + INNER BOXES */}
+          {/* RIGHT SIDE – TIGHT OUTER BOX + LARGER INNER BOX */}
           <div
-            className={`grid grid-cols-2 gap-6 transition-all duration-1000 delay-300 ${
+            className={`grid grid-cols-2 gap-5 transition-all duration-1000 delay-300 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
             }`}
           >
@@ -101,34 +101,29 @@ export function Hero() {
                 key={i}
                 className={`
                   aspect-square
-                  bg-white/5 
-                  border border-white/20 
-                  rounded-2xl
+                  bg-white/5
+                  border border-white/20
+                  rounded-xl
+                  p-2                      /* <- Tight outer spacing */
                   flex items-center justify-center
                   backdrop-blur-md
-                  shadow-[0_0_25px_rgba(100,200,255,0.15)]
+                  shadow-[0_0_20px_rgba(100,200,255,0.12)]
                   transition-all duration-700 ease-out
                   ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
                 `}
-                style={{
-                  transitionDelay: `${300 + i * 150}ms`,
-                }}
+                style={{ transitionDelay: `${300 + i * 150}ms` }}
               >
                 {/* INNER WHITE BOX */}
-                <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-xl flex items-center justify-center shadow-inner border border-[#348ADC]/30">
+                <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-lg flex items-center justify-center shadow-inner border border-[#348ADC]/30">
                   <img
                     src={src}
                     alt="feature"
-                    className="w-20 h-20 md:w-24 md:h-24 object-contain"
+                    className="w-[85%] h-[85%] object-contain"
                   />
                 </div>
               </div>
             ))}
           </div>
-
-
-
-
 
         </div>
       </div>
