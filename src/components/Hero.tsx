@@ -96,7 +96,7 @@ export function Hero() {
           <div
             className={`
               grid grid-cols-2 gap-4
-              w-[350px] md:w-[420px]
+              w-[320px] md:w-[380px]
               ml-12                     /* <-- MOVE BASKET RIGHT */
               transition-all duration-1000 delay-300
               ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}
