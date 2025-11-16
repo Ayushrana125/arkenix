@@ -8,12 +8,12 @@ export function Navbar() {
 
   return (
     <nav className="bg-white text-[#333] sticky top-0 z-50 shadow-md">
-      <div className="max-w-7xl mx-auto px-6 py-5">
+      <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="flex items-center justify-between">
           
           {/* Brand */}
           <div 
-            className="text-3xl font-semibold"
+            className="text-3xl font-bold"
             style={{ fontFamily: 'Poppins, sans-serif', color: '#072741' }}
           >
             Arkenix
@@ -21,7 +21,7 @@ export function Navbar() {
 
           {/* Desktop Menu */}
           <div
-            className="hidden md:flex items-center space-x-10 text-[16px]"
+            className="hidden md:flex items-center space-x-10 text-[16px] font-medium"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             <a href="#services" className="hover:text-[#65C9D4] transition-colors duration-300">
@@ -52,38 +52,25 @@ export function Navbar() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu (FULL, identical to desktop) */}
         {isOpen && (
           <div
-            className="md:hidden mt-4 pb-6 pt-2 space-y-6 border-t border-gray-200"
+            className="md:hidden mt-4 pb-6 pt-2 space-y-6 border-t border-gray-200 text-[16px] font-medium"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            <a
-              href="#services"
-              className="block text-[16px] hover:text-[#65C9D4] transition-colors duration-300"
-            >
+            <a href="#services" className="block hover:text-[#65C9D4] transition-colors">
               Services
             </a>
-            <a
-              href="#testimonials"
-              className="block text-[16px] hover:text-[#65C9D4] transition-colors duration-300"
-            >
+            <a href="#testimonials" className="block hover:text-[#65C9D4] transition-colors">
               Testimonials
             </a>
-            <a
-              href="#founder"
-              className="block text-[16px] hover:text-[#65C9D4] transition-colors duration-300"
-            >
+            <a href="#founder" className="block hover:text-[#65C9D4] transition-colors">
               About
             </a>
-            <a
-              href="#contact"
-              className="block text-[16px] hover:text-[#65C9D4] transition-colors duration-300"
-            >
+            <a href="#contact" className="block hover:text-[#65C9D4] transition-colors">
               Contact
             </a>
 
-            {/* CTA same as desktop */}
             <button
               onClick={() => setIsModalOpen(true)}
               className="bg-[#348ADC] hover:bg-[#2a6fb0] w-full px-6 py-2 rounded-md text-white transition-all duration-300"
@@ -92,7 +79,6 @@ export function Navbar() {
             </button>
           </div>
         )}
-
       </div>
 
       <QuoteModal
