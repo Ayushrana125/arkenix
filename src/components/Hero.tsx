@@ -65,6 +65,7 @@ export function Hero() {
               Arkenix handles the operational side of your marketing.
               We manage your data, content, automations, and campaigns 
               so you can focus on your vision while the execution stays sharp and consistent.
+
             <p
               className="text-lg text-gray-300 mb-8 leading-relaxed font-semibold"
               style={{ fontFamily: "Inter, sans-serif" }}
