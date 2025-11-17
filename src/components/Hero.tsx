@@ -60,11 +60,11 @@ export function Hero() {
               className="text-lg text-gray-300 mb-4 leading-relaxed font-normal"
               style={{ fontFamily: "Inter, sans-serif" }}
             >
-              Arkenix handles the entire backend of your marketing - your data,
-              your content, your automations, and your campaigns, so everything
-              runs smoothly.
+              
             </p>
-
+              Arkenix handles the operational side of your marketing.
+              We manage your data, content, automations, and campaigns 
+              so you can focus on your vision while the execution stays sharp and consistent.
             <p
               className="text-lg text-gray-300 mb-8 leading-relaxed font-semibold"
               style={{ fontFamily: "Inter, sans-serif" }}
