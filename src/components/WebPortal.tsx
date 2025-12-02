@@ -88,12 +88,12 @@ export function WebPortal() {
   return (
     <div className="min-h-screen bg-[#F5F7FA] flex">
       {/* Left Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <aside className="w-64 bg-gradient-to-br from-[#072741] to-[#0a3d5c] border-r border-white/10 flex flex-col">
         {/* Top Logo Section */}
         <div className="p-6">
           <div
-            className="text-2xl font-bold"
-            style={{ fontFamily: 'Poppins, sans-serif', color: '#072741' }}
+            className="text-2xl font-bold text-white"
+            style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             Arkenix
           </div>
@@ -112,7 +112,7 @@ export function WebPortal() {
                   w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
                   ${isActive
                     ? 'bg-[#348ADC] text-white shadow-md shadow-[#348ADC]/20'
-                    : 'text-[#072741] hover:bg-gray-50'
+                    : 'text-white/80 hover:bg-white/10 hover:text-white'
                   }
                 `}
                 style={{ fontFamily: 'Inter, sans-serif' }}
@@ -125,14 +125,14 @@ export function WebPortal() {
         </nav>
 
         {/* Settings and Logout Buttons at Bottom */}
-        <div className="p-4 border-t border-gray-200 space-y-2">
+        <div className="p-4 border-t border-white/10 space-y-2">
           <button
             onClick={() => setActiveMenu('Settings')}
             className={`
               w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
               ${activeMenu === 'Settings'
                 ? 'bg-[#348ADC] text-white shadow-md shadow-[#348ADC]/20'
-                : 'text-[#072741] hover:bg-gray-50'
+                : 'text-white/80 hover:bg-white/10 hover:text-white'
               }
             `}
             style={{ fontFamily: 'Inter, sans-serif' }}
@@ -142,7 +142,7 @@ export function WebPortal() {
           </button>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#072741] hover:bg-red-50 hover:text-red-600"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-white/80 hover:bg-red-500/20 hover:text-red-300"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             <LogOut size={20} />
