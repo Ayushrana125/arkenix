@@ -10,6 +10,8 @@ interface UserData {
   last_name?: string;
   name?: string;
   full_name?: string;
+  company_name?: string;
+  client_id?: string;
   [key: string]: any;
 }
 
@@ -57,6 +59,18 @@ export function WebPortal() {
   const getFirstName = () => {
     if (!userData) return 'User';
     return userData.first_name || 'User';
+  };
+
+  // Get company name
+  const getCompanyName = () => {
+    if (!userData) return '';
+    return userData.company_name || '';
+  };
+
+  // Get client ID
+  const getClientId = () => {
+    if (!userData) return '';
+    return userData.client_id || userData.id || '';
   };
 
   // Get user initials for avatar
@@ -171,6 +185,19 @@ export function WebPortal() {
 
           {/* Right: User Info */}
           <div className="flex items-center gap-3">
+            {getCompanyName() && (
+              <div 
+                className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-full"
+                data-client-id={getClientId()}
+              >
+                <span
+                  className="text-[#072741] font-medium"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  {getCompanyName()}
+                </span>
+              </div>
+            )}
             <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-full">
               <span
                 className="text-[#072741] font-medium"
