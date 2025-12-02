@@ -357,8 +357,7 @@ function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         const { data: tableData, error: fetchError } = await supabase
           .from('clients_user_data')
           .select('*')
-          .eq('client_id', clientId)
-          .order('created_at', { ascending: false });
+          .eq('client_id', clientId);
 
         if (fetchError) {
           throw fetchError;
@@ -431,19 +430,27 @@ function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     );
   }
 
-  // Get column names from the first row
-  const columns = data.length > 0 ? Object.keys(data[0]) : [];
+  // Get all unique column names from all rows to handle varying columns
+  const getAllColumns = () => {
+    const columnSet = new Set<string>();
+    data.forEach((row) => {
+      Object.keys(row).forEach((key) => columnSet.add(key));
+    });
+    return Array.from(columnSet);
+  };
+
+  const columns = getAllColumns();
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 overflow-x-auto">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
+        <table className="w-full border-collapse min-w-full">
           <thead>
-            <tr className="border-b border-gray-200">
+            <tr className="border-b-2 border-gray-300">
               {columns.map((column) => (
                 <th
                   key={column}
-                  className="px-4 py-3 text-left text-sm font-semibold text-[#072741] bg-gray-50"
+                  className="px-4 py-3 text-left text-sm font-semibold text-[#072741] bg-gray-50 whitespace-nowrap"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   {column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -460,7 +467,7 @@ function ClientsDataTable({ clientId }: ClientsDataTableProps) {
                 {columns.map((column) => (
                   <td
                     key={column}
-                    className="px-4 py-3 text-sm text-[#072741]"
+                    className="px-4 py-3 text-sm text-[#072741] whitespace-nowrap"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     {row[column] !== null && row[column] !== undefined
@@ -473,6 +480,11 @@ function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           </tbody>
         </table>
       </div>
+      {data.length > 0 && (
+        <div className="mt-4 text-sm text-[#072741] opacity-60" style={{ fontFamily: 'Inter, sans-serif' }}>
+          Showing {data.length} row{data.length !== 1 ? 's' : ''}
+        </div>
+      )}
     </div>
   );
 }
