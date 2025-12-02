@@ -442,10 +442,10 @@ function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const columns = getAllColumns();
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse min-w-full">
-          <thead>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 min-h-[400px] max-h-[calc(100vh-300px)] flex flex-col">
+      <div className="flex-1 overflow-auto">
+        <table className="w-full border-collapse">
+          <thead className="sticky top-0 bg-gray-50 z-10">
             <tr className="border-b-2 border-gray-300">
               {columns.map((column) => (
                 <th
@@ -481,7 +481,7 @@ function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         </table>
       </div>
       {data.length > 0 && (
-        <div className="mt-4 text-sm text-[#072741] opacity-60" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-[#072741] opacity-60" style={{ fontFamily: 'Inter, sans-serif' }}>
           Showing {data.length} row{data.length !== 1 ? 's' : ''}
         </div>
       )}
