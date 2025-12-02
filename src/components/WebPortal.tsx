@@ -44,6 +44,13 @@ export function WebPortal() {
     return userData.full_name || userData.name || userData.username || 'User';
   };
 
+  // Get first name for greeting
+  const getFirstName = () => {
+    const name = getDisplayName();
+    const parts = name.split(' ');
+    return parts[0] || name;
+  };
+
   // Get user initials for avatar
   const getUserInitials = () => {
     const name = getDisplayName();
@@ -130,15 +137,15 @@ export function WebPortal() {
           {/* Right: User Info */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-full">
-              <div className="w-10 h-10 rounded-full bg-[#348ADC] flex items-center justify-center text-white font-semibold text-sm">
-                {getUserInitials()}
-              </div>
               <span
                 className="text-[#072741] font-medium"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 {getDisplayName()}
               </span>
+              <div className="w-10 h-10 rounded-full bg-[#348ADC] flex items-center justify-center text-white font-semibold text-sm">
+                {getUserInitials()}
+              </div>
             </div>
           </div>
         </header>
@@ -146,12 +153,22 @@ export function WebPortal() {
         {/* Main Content */}
         <main className="flex-1 p-6 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
-            <h1
-              className="text-3xl font-bold text-[#072741] mb-2"
-              style={{ fontFamily: 'Poppins, sans-serif' }}
-            >
-              {activeMenu}
-            </h1>
+            {activeMenu === 'Home' && (
+              <h1
+                className="text-3xl font-bold text-[#072741] mb-2"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              >
+                Hello {getFirstName()}!
+              </h1>
+            )}
+            {activeMenu !== 'Home' && (
+              <h1
+                className="text-3xl font-bold text-[#072741] mb-2"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              >
+                {activeMenu}
+              </h1>
+            )}
             <p
               className="text-[#072741] opacity-60 mb-6"
               style={{ fontFamily: 'Inter, sans-serif' }}
