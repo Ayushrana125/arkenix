@@ -180,33 +180,35 @@ export function WebPortal() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         {/* Top Bar */}
-        <header className="bg-white px-6 py-4 flex items-center justify-between">
+        <header className="bg-white px-6 py-4 flex items-center justify-between flex-shrink-0">
           {/* Left: Company Name */}
-          {getCompanyName() && (
-            <div 
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] rounded-full shadow-lg shadow-[#348ADC]/20"
-              data-client-id={getClientId()}
-            >
-              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-              <span
-                className="text-white font-semibold text-sm tracking-wide"
-                style={{ fontFamily: 'Inter, sans-serif' }}
+          <div className="flex items-center">
+            {getCompanyName() && (
+              <div 
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] rounded-full shadow-lg shadow-[#348ADC]/20"
+                data-client-id={getClientId()}
               >
-                {getCompanyName()}
-              </span>
-            </div>
-          )}
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                <span
+                  className="text-white font-semibold text-sm tracking-wide"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  {getCompanyName()}
+                </span>
+              </div>
+            )}
+          </div>
 
           {/* Right: User Info */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-shrink-0">
             <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-full">
               <span
-                className="text-[#072741] font-medium"
+                className="text-[#072741] font-medium whitespace-nowrap"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 {getDisplayName()}
               </span>
-              <div className="w-10 h-10 rounded-full bg-[#348ADC] flex items-center justify-center text-white font-semibold text-sm">
+              <div className="w-10 h-10 rounded-full bg-[#348ADC] flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                 {getUserInitials()}
               </div>
             </div>
@@ -217,8 +219,8 @@ export function WebPortal() {
         <main className="flex-1 p-6 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
             {/* Header Section */}
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex-1">
+            <div className="flex items-start justify-between mb-6 gap-4">
+              <div className="flex-1 min-w-0">
                 {activeMenu === 'Home' && (
                   <h1
                     className="text-3xl font-bold text-[#072741] mb-2"
@@ -232,7 +234,7 @@ export function WebPortal() {
                     {dataSubPage === 'audiences' && (
                       <button
                         onClick={() => setDataSubPage(null)}
-                        className="text-[#072741] hover:text-[#348ADC] transition-colors"
+                        className="text-[#072741] hover:text-[#348ADC] transition-colors flex-shrink-0"
                       >
                         <ArrowLeft size={24} />
                       </button>
@@ -262,17 +264,17 @@ export function WebPortal() {
 
               {/* Action Buttons - Only show for Data module main page */}
               {activeMenu === 'Data' && dataSubPage === null && (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-shrink-0">
                   <button
                     onClick={() => setIsUploadModalOpen(true)}
-                    className="px-4 py-2 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg transition-all duration-200 font-medium"
+                    className="px-4 py-2 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg transition-all duration-200 font-medium whitespace-nowrap"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     Upload Data
                   </button>
                   <button
                     onClick={() => setDataSubPage('audiences')}
-                    className="px-4 py-2 border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-lg transition-all duration-200 font-medium"
+                    className="px-4 py-2 border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-lg transition-all duration-200 font-medium whitespace-nowrap"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     Manage Audiences
@@ -441,9 +443,18 @@ function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
   const columns = getAllColumns();
 
+  // Calculate max height to show approximately 20 rows (each row ~48px + header ~48px)
+  const maxVisibleRows = 20;
+  const rowHeight = 48;
+  const headerHeight = 48;
+  const maxTableHeight = headerHeight + (maxVisibleRows * rowHeight);
+
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 min-h-[400px] max-h-[calc(100vh-300px)] flex flex-col">
-      <div className="flex-1 overflow-auto">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col">
+      <div 
+        className="overflow-auto border border-gray-200 rounded-lg"
+        style={{ maxHeight: `${maxTableHeight}px` }}
+      >
         <table className="w-full border-collapse">
           <thead className="sticky top-0 bg-gray-50 z-10">
             <tr className="border-b-2 border-gray-300">
@@ -481,7 +492,7 @@ function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         </table>
       </div>
       {data.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-[#072741] opacity-60" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div className="mt-4 text-sm text-[#072741] opacity-60" style={{ fontFamily: 'Inter, sans-serif' }}>
           Showing {data.length} row{data.length !== 1 ? 's' : ''}
         </div>
       )}
