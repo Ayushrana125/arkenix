@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Home, Database, FileText, Mail, Megaphone, Settings, Globe, LogOut } from 'lucide-react';
+import { Home, Database, FileText, Mail, Megaphone, Settings, Globe, LogOut, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { UploadDataModal } from './UploadDataModal';
 
 interface UserData {
   id?: string;
@@ -15,6 +16,8 @@ interface UserData {
 export function WebPortal() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [activeMenu, setActiveMenu] = useState('Home');
+  const [dataSubPage, setDataSubPage] = useState<string | null>(null); // 'main' | 'audiences' | null
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -85,6 +88,14 @@ export function WebPortal() {
     { id: 'Domains', icon: Globe, label: 'Domains' },
   ];
 
+  // Handle menu click - reset sub-page when switching menus
+  const handleMenuClick = (menuId: string) => {
+    setActiveMenu(menuId);
+    if (menuId !== 'Data') {
+      setDataSubPage(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F7FA] flex">
       {/* Left Sidebar */}
@@ -107,7 +118,7 @@ export function WebPortal() {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveMenu(item.id)}
+                onClick={() => handleMenuClick(item.id)}
                 className={`
                   w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
                   ${isActive
@@ -177,48 +188,116 @@ export function WebPortal() {
         {/* Main Content */}
         <main className="flex-1 p-6 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
-            {activeMenu === 'Home' && (
-              <h1
-                className="text-3xl font-bold text-[#072741] mb-2"
-                style={{ fontFamily: 'Poppins, sans-serif' }}
-              >
-                Hello {getFirstName()}!
-              </h1>
-            )}
-            {activeMenu !== 'Home' && (
-              <h1
-                className="text-3xl font-bold text-[#072741] mb-2"
-                style={{ fontFamily: 'Poppins, sans-serif' }}
-              >
-                {activeMenu}
-              </h1>
-            )}
-            <p
-              className="text-[#072741] opacity-60 mb-6"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              {activeMenu === 'Home' && 'Welcome to your dashboard'}
-              {activeMenu === 'Data' && 'Manage your data infrastructure'}
-              {activeMenu === 'Templates' && 'Create and manage templates'}
-              {activeMenu === 'AI Emails' && 'AI-powered email generation'}
-              {activeMenu === 'Campaigns' && 'Manage your marketing campaigns'}
-              {activeMenu === 'Domains' && 'Manage your domains'}
-              {activeMenu === 'Settings' && 'Configure your account settings'}
-            </p>
-
-            {/* Content Area - Placeholder for now */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
-              <div className="flex items-center justify-center h-full">
+            {/* Header Section */}
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex-1">
+                {activeMenu === 'Home' && (
+                  <h1
+                    className="text-3xl font-bold text-[#072741] mb-2"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    Hello {getFirstName()}!
+                  </h1>
+                )}
+                {activeMenu !== 'Home' && (
+                  <div className="flex items-center gap-3">
+                    {dataSubPage === 'audiences' && (
+                      <button
+                        onClick={() => setDataSubPage(null)}
+                        className="text-[#072741] hover:text-[#348ADC] transition-colors"
+                      >
+                        <ArrowLeft size={24} />
+                      </button>
+                    )}
+                    <h1
+                      className="text-3xl font-bold text-[#072741]"
+                      style={{ fontFamily: 'Poppins, sans-serif' }}
+                    >
+                      {dataSubPage === 'audiences' ? 'Manage Audiences' : activeMenu}
+                    </h1>
+                  </div>
+                )}
                 <p
-                  className="text-[#072741] opacity-40 text-center"
+                  className="text-[#072741] opacity-60"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
-                  {activeMenu} content coming soon...
+                  {activeMenu === 'Home' && 'Welcome to your dashboard'}
+                  {activeMenu === 'Data' && dataSubPage !== 'audiences' && 'Manage your data infrastructure'}
+                  {activeMenu === 'Data' && dataSubPage === 'audiences' && 'Upload and create audiences for your campaigns'}
+                  {activeMenu === 'Templates' && 'Create and manage templates'}
+                  {activeMenu === 'AI Emails' && 'AI-powered email generation'}
+                  {activeMenu === 'Campaigns' && 'Manage your marketing campaigns'}
+                  {activeMenu === 'Domains' && 'Manage your domains'}
+                  {activeMenu === 'Settings' && 'Configure your account settings'}
                 </p>
               </div>
+
+              {/* Action Buttons - Only show for Data module main page */}
+              {activeMenu === 'Data' && dataSubPage === null && (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setIsUploadModalOpen(true)}
+                    className="px-4 py-2 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg transition-all duration-200 font-medium"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Upload Data
+                  </button>
+                  <button
+                    onClick={() => setDataSubPage('audiences')}
+                    className="px-4 py-2 border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-lg transition-all duration-200 font-medium"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Manage Audiences
+                  </button>
+                </div>
+              )}
             </div>
+
+            {/* Content Area */}
+            {activeMenu === 'Data' && dataSubPage === 'audiences' ? (
+              <ManageAudiencesView />
+            ) : (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
+                <div className="flex items-center justify-center h-full">
+                  <p
+                    className="text-[#072741] opacity-40 text-center"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    {activeMenu} content coming soon...
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </main>
+
+        {/* Upload Data Modal */}
+        <UploadDataModal
+          isOpen={isUploadModalOpen}
+          onClose={() => setIsUploadModalOpen(false)}
+        />
+      </div>
+    </div>
+  );
+}
+
+// Manage Audiences Component
+function ManageAudiencesView() {
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
+      <div className="flex flex-col items-center justify-center h-full gap-6">
+        <button
+          className="w-full max-w-md px-6 py-4 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-xl transition-all duration-200 font-semibold text-lg"
+          style={{ fontFamily: 'Inter, sans-serif' }}
+        >
+          Upload Audience
+        </button>
+        <button
+          className="w-full max-w-md px-6 py-4 border-2 border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-xl transition-all duration-200 font-semibold text-lg"
+          style={{ fontFamily: 'Inter, sans-serif' }}
+        >
+          Create Audience
+        </button>
       </div>
     </div>
   );
