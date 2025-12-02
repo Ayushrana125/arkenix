@@ -45,6 +45,8 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
         }
       } else if (data) {
         // Login successful - match found
+        // Store user data in localStorage
+        localStorage.setItem('arkenix_user', JSON.stringify(data));
         onClose();
         setFormData({ username: '', password: '' });
         // Call the success callback to navigate to web portal

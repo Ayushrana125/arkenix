@@ -38,12 +38,7 @@ function App() {
       <Route path="/" element={<HomePage />} />
       <Route 
         path="/web-portal" 
-        element={
-          <div className="min-h-screen bg-[#DADFE4] w-full max-w-full overflow-x-hidden">
-            <Navbar onLoginSuccess={handleLoginSuccess} />
-            <WebPortal />
-          </div>
-        } 
+        element={<WebPortal />} 
       />
     </Routes>
   );
