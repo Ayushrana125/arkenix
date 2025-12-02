@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Home, Database, FileText, Mail, Megaphone, Settings } from 'lucide-react';
+import { Home, Database, FileText, Mail, Megaphone, Settings, Globe, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface UserData {
   id?: string;
   username?: string;
+  first_name?: string;
+  last_name?: string;
   name?: string;
   full_name?: string;
   [key: string]: any;
@@ -38,21 +40,28 @@ export function WebPortal() {
     navigate('/');
   };
 
-  // Get display name - try full_name, name, or username
+  // Get full name - concatenate first_name + last_name
   const getDisplayName = () => {
     if (!userData) return 'User';
+    if (userData.first_name && userData.last_name) {
+      return `${userData.first_name} ${userData.last_name}`;
+    }
+    // Fallback to other fields if first_name/last_name not available
     return userData.full_name || userData.name || userData.username || 'User';
   };
 
   // Get first name for greeting
   const getFirstName = () => {
-    const name = getDisplayName();
-    const parts = name.split(' ');
-    return parts[0] || name;
+    if (!userData) return 'User';
+    return userData.first_name || 'User';
   };
 
   // Get user initials for avatar
   const getUserInitials = () => {
+    if (!userData) return 'US';
+    if (userData.first_name && userData.last_name) {
+      return `${userData.first_name[0]}${userData.last_name[0]}`.toUpperCase();
+    }
     const name = getDisplayName();
     const parts = name.split(' ');
     if (parts.length >= 2) {
@@ -61,12 +70,19 @@ export function WebPortal() {
     return name.substring(0, 2).toUpperCase();
   };
 
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('arkenix_user');
+    navigate('/');
+  };
+
   const menuItems = [
     { id: 'Home', icon: Home, label: 'Home' },
     { id: 'Data', icon: Database, label: 'Data' },
     { id: 'Templates', icon: FileText, label: 'Templates' },
     { id: 'AI Emails', icon: Mail, label: 'AI Emails' },
     { id: 'Campaigns', icon: Megaphone, label: 'Campaigns' },
+    { id: 'Domains', icon: Globe, label: 'Domains' },
   ];
 
   return (
@@ -108,8 +124,8 @@ export function WebPortal() {
           })}
         </nav>
 
-        {/* Settings Button at Bottom */}
-        <div className="p-4 border-t border-gray-200">
+        {/* Settings and Logout Buttons at Bottom */}
+        <div className="p-4 border-t border-gray-200 space-y-2">
           <button
             onClick={() => setActiveMenu('Settings')}
             className={`
@@ -123,6 +139,14 @@ export function WebPortal() {
           >
             <Settings size={20} />
             <span className="font-medium">Settings</span>
+          </button>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#072741] hover:bg-red-50 hover:text-red-600"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            <LogOut size={20} />
+            <span className="font-medium">Log Out</span>
           </button>
         </div>
       </aside>
@@ -178,6 +202,7 @@ export function WebPortal() {
               {activeMenu === 'Templates' && 'Create and manage templates'}
               {activeMenu === 'AI Emails' && 'AI-powered email generation'}
               {activeMenu === 'Campaigns' && 'Manage your marketing campaigns'}
+              {activeMenu === 'Domains' && 'Manage your domains'}
               {activeMenu === 'Settings' && 'Configure your account settings'}
             </p>
 
