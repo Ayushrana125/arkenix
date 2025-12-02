@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Home, Database, FileText, Mail, Megaphone, Settings, Globe, LogOut, ArrowLeft } from 'lucide-react';
+import { Home, Database, FileText, Mail, Megaphone, Settings, Globe, LogOut, ArrowLeft, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UploadDataModal } from './UploadDataModal';
+import { supabase } from '../lib/supabase';
 
 interface UserData {
   id?: string;
@@ -283,6 +284,8 @@ export function WebPortal() {
             {/* Content Area */}
             {activeMenu === 'Data' && dataSubPage === 'audiences' ? (
               <ManageAudiencesView />
+            ) : activeMenu === 'Data' && dataSubPage === null ? (
+              <ClientsDataTable clientId={getClientId()} />
             ) : (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
                 <div className="flex items-center justify-center h-full">
@@ -325,6 +328,150 @@ function ManageAudiencesView() {
         >
           Create Audience
         </button>
+      </div>
+    </div>
+  );
+}
+
+// Clients Data Table Component
+interface ClientsDataTableProps {
+  clientId: string;
+}
+
+function ClientsDataTable({ clientId }: ClientsDataTableProps) {
+  const [data, setData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!clientId) {
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const { data: tableData, error: fetchError } = await supabase
+          .from('clients_user_data')
+          .select('*')
+          .eq('client_id', clientId)
+          .order('created_at', { ascending: false });
+
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        setData(tableData || []);
+      } catch (err: any) {
+        console.error('Error fetching data:', err);
+        setError(err.message || 'Failed to load data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [clientId]);
+
+  if (!clientId) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
+        <div className="flex items-center justify-center h-full">
+          <p
+            className="text-[#072741] opacity-40 text-center"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            Client ID not found. Please contact support.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
+        <div className="flex items-center justify-center h-full">
+          <Loader className="animate-spin text-[#348ADC]" size={32} />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
+        <div className="flex items-center justify-center h-full">
+          <p
+            className="text-red-600 text-center"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            Error: {error}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
+        <div className="flex items-center justify-center h-full">
+          <p
+            className="text-[#072741] opacity-40 text-center"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            No data found for this client.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Get column names from the first row
+  const columns = data.length > 0 ? Object.keys(data[0]) : [];
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 overflow-x-auto">
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b border-gray-200">
+              {columns.map((column) => (
+                <th
+                  key={column}
+                  className="px-4 py-3 text-left text-sm font-semibold text-[#072741] bg-gray-50"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  {column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((row, index) => (
+              <tr
+                key={index}
+                className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              >
+                {columns.map((column) => (
+                  <td
+                    key={column}
+                    className="px-4 py-3 text-sm text-[#072741]"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    {row[column] !== null && row[column] !== undefined
+                      ? String(row[column])
+                      : '-'}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
