@@ -2,7 +2,11 @@ import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { LoginModal } from './LoginModal';
 
-export function Navbar() {
+interface NavbarProps {
+  onLoginSuccess?: () => void;
+}
+
+export function Navbar({ onLoginSuccess }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -112,6 +116,7 @@ export function Navbar() {
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={onLoginSuccess}
       />
     </nav>
   );

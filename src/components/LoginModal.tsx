@@ -1,12 +1,14 @@
 import { X, Loader } from 'lucide-react';
 import { useState } from 'react';
+import { supabase } from '../lib/supabase';
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onLoginSuccess?: () => void;
 }
 
-export function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -25,13 +27,32 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setIsLoading(true);
 
     try {
-      // TODO: Implement actual login logic here
-      // For now, just simulate a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simulate login success
-      onClose();
-      setFormData({ username: '', password: '' });
+      // Query the arkenix_clients table to find matching username and password
+      const { data, error: queryError } = await supabase
+        .from('arkenix_clients')
+        .select('*')
+        .eq('username', formData.username)
+        .eq('password', formData.password)
+        .single();
+
+      if (queryError) {
+        // If no row found, Supabase returns an error
+        if (queryError.code === 'PGRST116') {
+          setError('Invalid username or password.');
+        } else {
+          throw queryError;
+        }
+      } else if (data) {
+        // Login successful - match found
+        onClose();
+        setFormData({ username: '', password: '' });
+        // Call the success callback to navigate to web portal
+        if (onLoginSuccess) {
+          onLoginSuccess();
+        }
+      } else {
+        setError('Invalid username or password.');
+      }
     } catch (err) {
       setError('Login failed. Please check your credentials.');
       console.error('Login error:', err);
