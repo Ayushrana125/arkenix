@@ -90,7 +90,7 @@ export function WebPortal() {
       {/* Left Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
         {/* Top Logo Section */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6">
           <div
             className="text-2xl font-bold"
             style={{ fontFamily: 'Poppins, sans-serif', color: '#072741' }}
@@ -154,7 +154,7 @@ export function WebPortal() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         {/* Top Bar */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <header className="bg-white px-6 py-4 flex items-center justify-between">
           {/* Left: Logo (hidden on web portal, but keeping structure) */}
           <div className="w-32"></div>
 
