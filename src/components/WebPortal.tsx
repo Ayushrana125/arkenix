@@ -185,19 +185,6 @@ export function WebPortal() {
 
           {/* Right: User Info */}
           <div className="flex items-center gap-3">
-            {getCompanyName() && (
-              <div 
-                className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-full"
-                data-client-id={getClientId()}
-              >
-                <span
-                  className="text-[#072741] font-medium"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                >
-                  {getCompanyName()}
-                </span>
-              </div>
-            )}
             <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-full">
               <span
                 className="text-[#072741] font-medium"
@@ -218,6 +205,21 @@ export function WebPortal() {
             {/* Header Section */}
             <div className="flex items-start justify-between mb-6">
               <div className="flex-1">
+                {/* Premium Company Name Badge */}
+                {getCompanyName() && activeMenu === 'Home' && (
+                  <div 
+                    className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] rounded-full shadow-lg shadow-[#348ADC]/20"
+                    data-client-id={getClientId()}
+                  >
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    <span
+                      className="text-white font-semibold text-sm tracking-wide"
+                      style={{ fontFamily: 'Inter, sans-serif' }}
+                    >
+                      {getCompanyName()}
+                    </span>
+                  </div>
+                )}
                 {activeMenu === 'Home' && (
                   <h1
                     className="text-3xl font-bold text-[#072741] mb-2"
