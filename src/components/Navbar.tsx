@@ -1,10 +1,10 @@
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
-import { QuoteModal } from './QuoteModal';
+import { LoginModal } from './LoginModal';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   return (
     <nav className="bg-white text-[#333] sticky top-0 z-50 shadow-md">
@@ -40,13 +40,24 @@ export function Navbar() {
               Contact
             </a>
 
-            {/* Presento-style CTA button */}
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-[#348ADC] hover:bg-[#2a6fb0] px-6 py-2 rounded-md text-white transition-all duration-300"
-            >
-              Get a Quote
-            </button>
+            {/* Create Account and Login buttons */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  // TODO: Implement Create Account functionality
+                  alert('Create Account functionality coming soon!');
+                }}
+                className="border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white px-6 py-2 rounded-md transition-all duration-300"
+              >
+                Create Account
+              </button>
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="bg-[#348ADC] hover:bg-[#2a6fb0] px-6 py-2 rounded-md text-white transition-all duration-300"
+              >
+                Login
+              </button>
+            </div>
           </div>
 
           {/* Mobile Hamburger */}
@@ -77,20 +88,30 @@ export function Navbar() {
               Contact
             </a>
 
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-[#348ADC] hover:bg-[#2a6fb0] w-full px-6 py-2 rounded-md text-white transition-all duration-300"
-            >
-              Get a Quote
-            </button>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  // TODO: Implement Create Account functionality
+                  alert('Create Account functionality coming soon!');
+                }}
+                className="border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white w-full px-6 py-2 rounded-md transition-all duration-300"
+              >
+                Create Account
+              </button>
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="bg-[#348ADC] hover:bg-[#2a6fb0] w-full px-6 py-2 rounded-md text-white transition-all duration-300"
+              >
+                Login
+              </button>
+            </div>
           </div>
         )}
       </div>
 
-      <QuoteModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        source="navbar"
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
       />
     </nav>
   );
