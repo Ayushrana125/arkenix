@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
-import { X, Upload, FileSpreadsheet, AlertCircle, CheckCircle2, FileText, Download } from 'lucide-react';
+import { X, Upload, FileSpreadsheet, AlertCircle, CheckCircle2, FileText, Download, Info } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { supabase } from '../lib/supabase';
 
 interface UploadDataPageProps {
   onClose: () => void;
@@ -50,10 +51,12 @@ const PREVIEW_ROWS = 5;
 export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [validRows, setValidRows] = useState<ValidatedRow[]>([]);
   const [errorRows, setErrorRows] = useState<ValidationError[]>([]);
   const [allRows, setAllRows] = useState<any[]>([]);
   const [normalizedHeaders, setNormalizedHeaders] = useState<string[]>([]);
+  const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Parse Excel/CSV file
@@ -309,30 +312,86 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
   };
 
   const preparePayload = () => {
-    // Add client_id to each row (hidden from user, added automatically)
-    return validRows.map(row => ({
-      ...row,
-      client_id: clientId // Automatically added, not visible to user
-    }));
+    // Return validated rows without client_id (Edge Function will add it)
+    return validRows;
   };
 
-  const handleUpload = async () => {
+  // Upload to Supabase Edge Function
+  const handleUploadToSupabase = async () => {
     if (validRows.length === 0) {
-      alert('No valid rows to upload. Please fix the errors and try again.');
+      setToastMessage({ type: 'error', message: 'No valid rows to upload.' });
       return;
     }
 
-    const payload = preparePayload();
-    
-    // TODO: Send to Supabase Edge Function
-    console.log('Uploading payload:', payload);
-    alert(`Ready to upload ${validRows.length} valid rows. Backend integration pending.`);
-    
-    // Reset and close
-    setSelectedFile(null);
-    setValidRows([]);
-    setErrorRows([]);
-    onClose();
+    if (!clientId) {
+      setToastMessage({ type: 'error', message: 'Client ID is missing. Please log in again.' });
+      return;
+    }
+
+    setIsUploading(true);
+    setToastMessage(null);
+
+    try {
+      // Get Supabase URL from environment
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (!supabaseUrl) {
+        throw new Error('Supabase URL is not configured');
+      }
+
+      // Call Edge Function - send rows without client_id (will be added by Edge Function)
+      const response = await fetch(`${supabaseUrl}/functions/v1/import_client_users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          client_id: clientId,
+          rows: validRows, // Send validated rows (client_id will be added by Edge Function)
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Upload failed');
+      }
+
+      if (result.status === 'success') {
+        setToastMessage({
+          type: 'success',
+          message: `Upload complete — ${result.inserted} users imported successfully.`
+        });
+
+        // Reset state after a short delay
+        setTimeout(() => {
+          setSelectedFile(null);
+          setValidRows([]);
+          setErrorRows([]);
+          setAllRows([]);
+          setNormalizedHeaders([]);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+          onClose();
+        }, 2000);
+      } else {
+        throw new Error(result.message || 'Upload failed');
+      }
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      setToastMessage({
+        type: 'error',
+        message: error.message || 'Failed to upload data. Please try again.'
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleUpload = async () => {
+    // Legacy handler - redirects to new handler
+    await handleUploadToSupabase();
   };
 
   const handleRemoveFile = () => {
@@ -585,46 +644,100 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
           </div>
         </div>
 
-        {/* Right Side - Errors & Preview */}
+        {/* Right Side - Success/Errors & Preview */}
         <div className="w-1/2 flex flex-col bg-white">
-          {/* Errors Section */}
+          {/* Success Panel or Errors Section */}
           <div className="flex-1 p-6 overflow-y-auto border-b border-gray-200 bg-[#F5F7FA]">
-            <h3
-              className="text-lg font-semibold text-[#072741] mb-4 flex items-center gap-2"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              <AlertCircle size={20} className="text-red-600" />
-              Validation Errors
-            </h3>
+            {errorRows.length === 0 && validRows.length > 0 ? (
+              // Success Panel
+              <div className="bg-white rounded-xl p-8 shadow-lg border border-green-200">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+                    <CheckCircle2 size={32} className="text-green-600" />
+                  </div>
+                  <h3
+                    className="text-2xl font-bold text-[#072741] mb-2"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    All Good — No Validation Errors
+                  </h3>
+                  <p
+                    className="text-gray-600"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Your file has been validated successfully and is ready to upload.
+                  </p>
+                </div>
 
-            {errorRows.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <CheckCircle2 size={48} className="mx-auto text-green-500 mb-4" />
-                <p style={{ fontFamily: 'Inter, sans-serif' }}>
-                  No errors found. All rows are valid!
-                </p>
+                {/* Info Box */}
+                <div className="bg-gradient-to-r from-[#348ADC]/10 to-[#65C9D4]/10 rounded-lg p-4 mb-6 border border-[#348ADC]/20">
+                  <div className="flex items-center gap-2">
+                    <Info size={18} className="text-[#348ADC] flex-shrink-0" />
+                    <p className="text-sm text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      <span className="font-semibold">Destination Table:</span> clients_user_data
+                    </p>
+                  </div>
+                </div>
+
+                {/* Proceed Button */}
+                <button
+                  id="proceed-upload-button"
+                  onClick={handleUploadToSupabase}
+                  disabled={isUploading}
+                  className="w-full px-6 py-3 bg-[#348ADC] hover:bg-[#2a6fb0] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200 font-semibold shadow-md shadow-[#348ADC]/20 flex items-center justify-center gap-2"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  {isUploading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Uploading…
+                    </>
+                  ) : (
+                    'Proceed to Upload'
+                  )}
+                </button>
               </div>
             ) : (
-              <div className="space-y-2">
-                {errorRows.map((error, index) => (
-                  <div
-                    key={index}
-                    className="bg-red-50 border border-red-200 rounded-lg p-3 shadow-sm"
-                  >
-                    <div className="flex items-start gap-2">
-                      <AlertCircle size={16} className="text-red-600 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-red-900">
-                          Row {error.row} - {error.field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        </p>
-                        <p className="text-sm text-red-700 mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>
-                          {error.message}
-                        </p>
-                      </div>
-                    </div>
+              // Errors Section
+              <>
+                <h3
+                  className="text-lg font-semibold text-[#072741] mb-4 flex items-center gap-2"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  <AlertCircle size={20} className="text-red-600" />
+                  Validation Errors
+                </h3>
+
+                {errorRows.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <FileSpreadsheet size={48} className="mx-auto text-gray-400 mb-4" />
+                    <p style={{ fontFamily: 'Inter, sans-serif' }}>
+                      Upload a file to see validation results
+                    </p>
                   </div>
-                ))}
-              </div>
+                ) : (
+                  <div className="space-y-2">
+                    {errorRows.map((error, index) => (
+                      <div
+                        key={index}
+                        className="bg-red-50 border border-red-200 rounded-lg p-3 shadow-sm"
+                      >
+                        <div className="flex items-start gap-2">
+                          <AlertCircle size={16} className="text-red-600 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-red-900">
+                              Row {error.row} - {error.field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            </p>
+                            <p className="text-sm text-red-700 mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>
+                              {error.message}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -716,16 +829,48 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
           >
             Cancel
           </button>
-          <button
-            onClick={handleUpload}
-            disabled={!selectedFile || isProcessing || validRows.length === 0}
-            className="px-6 py-2.5 bg-[#348ADC] hover:bg-[#2a6fb0] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200 font-medium shadow-md shadow-[#348ADC]/20"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            {isProcessing ? 'Processing...' : `Upload ${validRows.length} Valid Rows`}
-          </button>
+          {errorRows.length > 0 && (
+            <button
+              onClick={handleUpload}
+              disabled={!selectedFile || isProcessing || validRows.length === 0 || isUploading}
+              className="px-6 py-2.5 bg-[#348ADC] hover:bg-[#2a6fb0] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200 font-medium shadow-md shadow-[#348ADC]/20"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              {isProcessing ? 'Processing...' : isUploading ? 'Uploading...' : `Upload ${validRows.length} Valid Rows`}
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5">
+          <div
+            className={`
+              px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]
+              ${toastMessage.type === 'success'
+                ? 'bg-green-50 border border-green-200 text-green-800'
+                : 'bg-red-50 border border-red-200 text-red-800'
+              }
+            `}
+          >
+            {toastMessage.type === 'success' ? (
+              <CheckCircle2 size={20} className="text-green-600 flex-shrink-0" />
+            ) : (
+              <AlertCircle size={20} className="text-red-600 flex-shrink-0" />
+            )}
+            <p className="font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+              {toastMessage.message}
+            </p>
+            <button
+              onClick={() => setToastMessage(null)}
+              className="ml-auto text-gray-400 hover:text-gray-600"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
