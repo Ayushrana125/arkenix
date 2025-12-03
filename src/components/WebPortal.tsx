@@ -180,17 +180,17 @@ export function WebPortal() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col ml-0 md:ml-64">
         {/* Top Bar - Fixed */}
-        <header className="fixed top-0 left-0 md:left-64 right-0 bg-white px-4 sm:px-6 py-4 flex items-center justify-between flex-shrink-0 z-20 border-b border-gray-200">
+        <header className="fixed top-0 left-0 md:left-64 right-0 bg-white px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between flex-shrink-0 z-20 border-b border-gray-200 h-16 sm:h-20">
           {/* Left: Company Name */}
-          <div className="flex items-center min-w-0 flex-1">
+          <div className="flex items-center min-w-0 flex-1 mr-2">
             {getCompanyName() && (
               <div 
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] rounded-full shadow-lg shadow-[#348ADC]/20"
+                className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] rounded-full shadow-lg shadow-[#348ADC]/20"
                 data-client-id={getClientId()}
               >
                 <div className="w-2 h-2 bg-white rounded-full animate-pulse flex-shrink-0"></div>
                 <span
-                  className="text-white font-semibold text-xs sm:text-sm tracking-wide truncate"
+                  className="text-white font-semibold text-xs sm:text-sm tracking-wide truncate max-w-[120px] sm:max-w-none"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   {getCompanyName()}
@@ -200,10 +200,10 @@ export function WebPortal() {
           </div>
 
           {/* Right: User Info */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-2">
-            <div className="flex items-center gap-2 sm:gap-3 bg-gray-50 px-2 sm:px-4 py-2 rounded-full">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 bg-gray-50 px-2 sm:px-4 py-1.5 sm:py-2 rounded-full">
               <span
-                className="text-[#072741] font-medium text-xs sm:text-sm whitespace-nowrap hidden sm:inline"
+                className="text-[#072741] font-medium text-xs sm:text-sm whitespace-nowrap hidden md:inline max-w-[120px] sm:max-w-[150px] truncate"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 {getDisplayName()}
@@ -216,9 +216,9 @@ export function WebPortal() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 pt-20 md:pt-20 pb-6 px-4 sm:px-6 overflow-hidden">
+        <main className="flex-1 pt-16 sm:pt-20 pb-6 px-4 sm:px-6 overflow-hidden">
           <div className="max-w-7xl mx-auto h-full flex flex-col min-h-0">
-            {/* Header Section - Fixed */}
+            {/* Header Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 flex-shrink-0">
               <div className="flex-1 min-w-0">
                 {activeMenu === 'Home' && (
@@ -267,14 +267,14 @@ export function WebPortal() {
                 <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 w-full sm:w-auto">
                   <button
                     onClick={() => setIsUploadModalOpen(true)}
-                    className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg transition-all duration-200 font-medium text-sm sm:text-base whitespace-nowrap"
+                    className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg transition-all duration-200 font-medium text-sm sm:text-base whitespace-nowrap shadow-sm"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     Upload Data
                   </button>
                   <button
                     onClick={() => setDataSubPage('audiences')}
-                    className="flex-1 sm:flex-none px-3 sm:px-4 py-2 border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-lg transition-all duration-200 font-medium text-sm sm:text-base whitespace-nowrap"
+                    className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-lg transition-all duration-200 font-medium text-sm sm:text-base whitespace-nowrap shadow-sm"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     Manage Audiences
