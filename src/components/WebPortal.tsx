@@ -262,7 +262,7 @@ export function WebPortal() {
                 </p>
               </div>
 
-              {/* Action Buttons - Only show for Data module main page */}
+              {/* Action Buttons - Data module main page */}
               {activeMenu === 'Data' && dataSubPage === null && (
                 <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 w-full sm:w-auto">
                   <button
@@ -278,6 +278,30 @@ export function WebPortal() {
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     Manage Audiences
+                  </button>
+                </div>
+              )}
+
+              {/* Action Buttons - Manage Audiences page */}
+              {activeMenu === 'Data' && dataSubPage === 'audiences' && (
+                <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 w-full sm:w-auto">
+                  <button
+                    onClick={() => {
+                      // TODO: Handle Upload Audience action
+                    }}
+                    className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg transition-all duration-200 font-medium text-sm sm:text-base whitespace-nowrap shadow-sm"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Upload Audience
+                  </button>
+                  <button
+                    onClick={() => {
+                      // TODO: Handle Create Audience action
+                    }}
+                    className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-lg transition-all duration-200 font-medium text-sm sm:text-base whitespace-nowrap shadow-sm"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Create Audience
                   </button>
                 </div>
               )}
@@ -322,19 +346,8 @@ export function WebPortal() {
 function ManageAudiencesView() {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
-      <div className="flex flex-col items-center justify-center h-full gap-6">
-        <button
-          className="w-full max-w-md px-6 py-4 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-xl transition-all duration-200 font-semibold text-lg"
-          style={{ fontFamily: 'Inter, sans-serif' }}
-        >
-          Upload Audience
-        </button>
-        <button
-          className="w-full max-w-md px-6 py-4 border-2 border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-xl transition-all duration-200 font-semibold text-lg"
-          style={{ fontFamily: 'Inter, sans-serif' }}
-        >
-          Create Audience
-        </button>
+      <div className="flex items-center justify-center h-full">
+        {/* Blank content area - will be populated later */}
       </div>
     </div>
   );
