@@ -216,7 +216,7 @@ export function WebPortal() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 pt-16 sm:pt-20 pb-6 px-4 sm:px-6 overflow-auto">
+        <main className="flex-1 pt-16 sm:pt-20 pb-6 px-4 sm:px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto h-full flex flex-col min-h-0 overflow-hidden">
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 flex-shrink-0 pt-6 sm:pt-8">
@@ -284,24 +284,27 @@ export function WebPortal() {
             </div>
 
             {/* Content Area - Scrollable table container */}
-            <div className="flex-1 min-h-0">
-              {activeMenu === 'Data' && dataSubPage === 'audiences' ? (
-                <ManageAudiencesView />
-              ) : activeMenu === 'Data' && dataSubPage === null ? (
-                <ClientsDataTable clientId={getClientId()} />
-              ) : (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
-                  <div className="flex items-center justify-center h-full">
-                    <p
-                      className="text-[#072741] opacity-40 text-center"
-                      style={{ fontFamily: 'Inter, sans-serif' }}
-                    >
-                      {activeMenu} content coming soon...
-                    </p>
+            <div className="flex-1 min-h-0 relative">
+              <div className="absolute inset-0 overflow-auto">
+                {activeMenu === 'Data' && dataSubPage === 'audiences' ? (
+                  <ManageAudiencesView />
+                ) : activeMenu === 'Data' && dataSubPage === null ? (
+                  <ClientsDataTable clientId={getClientId()} />
+                ) : (
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
+                    <div className="flex items-center justify-center h-full">
+                      <p
+                        className="text-[#072741] opacity-40 text-center"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {activeMenu} content coming soon...
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
+            
           </div>
         </main>
 
