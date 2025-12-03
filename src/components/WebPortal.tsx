@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Home, Database, FileText, Mail, Megaphone, Settings, Globe, LogOut, ArrowLeft, Loader } from 'lucide-react';
+import { Home, Database, FileText, Mail, Megaphone, Settings, Globe, LogOut, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UploadDataModal } from './UploadDataModal';
-import { supabase } from '../lib/supabase';
+import { ClientsDataTable } from './Data';
 
 interface UserData {
   id?: string;
@@ -113,8 +113,8 @@ export function WebPortal() {
 
   return (
     <div className="min-h-screen bg-[#F5F7FA] flex">
-      {/* Left Sidebar */}
-      <aside className="w-64 bg-gradient-to-br from-[#072741] to-[#0a3d5c] border-r border-white/10 flex flex-col">
+      {/* Left Sidebar - Fixed */}
+      <aside className="fixed left-0 top-0 h-screen w-64 bg-gradient-to-br from-[#072741] to-[#0a3d5c] border-r border-white/10 flex flex-col z-30 overflow-y-auto">
         {/* Top Logo Section */}
         <div className="p-6">
           <div
@@ -178,19 +178,19 @@ export function WebPortal() {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Top Bar */}
-        <header className="bg-white px-6 py-4 flex items-center justify-between flex-shrink-0">
+      <div className="flex-1 flex flex-col ml-0 md:ml-64">
+        {/* Top Bar - Fixed */}
+        <header className="fixed top-0 left-0 md:left-64 right-0 bg-white px-4 sm:px-6 py-4 flex items-center justify-between flex-shrink-0 z-20 border-b border-gray-200">
           {/* Left: Company Name */}
-          <div className="flex items-center">
+          <div className="flex items-center min-w-0 flex-1">
             {getCompanyName() && (
               <div 
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] rounded-full shadow-lg shadow-[#348ADC]/20"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] rounded-full shadow-lg shadow-[#348ADC]/20"
                 data-client-id={getClientId()}
               >
-                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse flex-shrink-0"></div>
                 <span
-                  className="text-white font-semibold text-sm tracking-wide"
+                  className="text-white font-semibold text-xs sm:text-sm tracking-wide truncate"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   {getCompanyName()}
@@ -200,15 +200,15 @@ export function WebPortal() {
           </div>
 
           {/* Right: User Info */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-full">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-2">
+            <div className="flex items-center gap-2 sm:gap-3 bg-gray-50 px-2 sm:px-4 py-2 rounded-full">
               <span
-                className="text-[#072741] font-medium whitespace-nowrap"
+                className="text-[#072741] font-medium text-xs sm:text-sm whitespace-nowrap hidden sm:inline"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 {getDisplayName()}
               </span>
-              <div className="w-10 h-10 rounded-full bg-[#348ADC] flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#348ADC] flex items-center justify-center text-white font-semibold text-xs sm:text-sm flex-shrink-0">
                 {getUserInitials()}
               </div>
             </div>
@@ -216,14 +216,14 @@ export function WebPortal() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 p-6 overflow-y-auto">
-          <div className="max-w-7xl mx-auto">
-            {/* Header Section */}
-            <div className="flex items-start justify-between mb-6 gap-4">
+        <main className="flex-1 pt-20 md:pt-20 pb-6 px-4 sm:px-6 overflow-hidden">
+          <div className="max-w-7xl mx-auto h-full flex flex-col min-h-0">
+            {/* Header Section - Fixed */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 flex-shrink-0">
               <div className="flex-1 min-w-0">
                 {activeMenu === 'Home' && (
                   <h1
-                    className="text-3xl font-bold text-[#072741] mb-2"
+                    className="text-2xl sm:text-3xl font-bold text-[#072741] mb-2"
                     style={{ fontFamily: 'Poppins, sans-serif' }}
                   >
                     Hello {getFirstName()}!
@@ -240,7 +240,7 @@ export function WebPortal() {
                       </button>
                     )}
                     <h1
-                      className="text-3xl font-bold text-[#072741]"
+                      className="text-2xl sm:text-3xl font-bold text-[#072741]"
                       style={{ fontFamily: 'Poppins, sans-serif' }}
                     >
                       {dataSubPage === 'audiences' ? 'Manage Audiences' : activeMenu}
@@ -248,7 +248,7 @@ export function WebPortal() {
                   </div>
                 )}
                 <p
-                  className="text-[#072741] opacity-60"
+                  className="text-sm sm:text-base text-[#072741] opacity-60"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   {activeMenu === 'Home' && 'Welcome to your dashboard'}
@@ -264,17 +264,17 @@ export function WebPortal() {
 
               {/* Action Buttons - Only show for Data module main page */}
               {activeMenu === 'Data' && dataSubPage === null && (
-                <div className="flex items-center gap-3 flex-shrink-0">
+                <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 w-full sm:w-auto">
                   <button
                     onClick={() => setIsUploadModalOpen(true)}
-                    className="px-4 py-2 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg transition-all duration-200 font-medium whitespace-nowrap"
+                    className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg transition-all duration-200 font-medium text-sm sm:text-base whitespace-nowrap"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     Upload Data
                   </button>
                   <button
                     onClick={() => setDataSubPage('audiences')}
-                    className="px-4 py-2 border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-lg transition-all duration-200 font-medium whitespace-nowrap"
+                    className="flex-1 sm:flex-none px-3 sm:px-4 py-2 border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-lg transition-all duration-200 font-medium text-sm sm:text-base whitespace-nowrap"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     Manage Audiences
@@ -283,23 +283,25 @@ export function WebPortal() {
               )}
             </div>
 
-            {/* Content Area */}
-            {activeMenu === 'Data' && dataSubPage === 'audiences' ? (
-              <ManageAudiencesView />
-            ) : activeMenu === 'Data' && dataSubPage === null ? (
-              <ClientsDataTable clientId={getClientId()} />
-            ) : (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
-                <div className="flex items-center justify-center h-full">
-                  <p
-                    className="text-[#072741] opacity-40 text-center"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    {activeMenu} content coming soon...
-                  </p>
+            {/* Content Area - Scrollable table container */}
+            <div className="flex-1 min-h-0">
+              {activeMenu === 'Data' && dataSubPage === 'audiences' ? (
+                <ManageAudiencesView />
+              ) : activeMenu === 'Data' && dataSubPage === null ? (
+                <ClientsDataTable clientId={getClientId()} />
+              ) : (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
+                  <div className="flex items-center justify-center h-full">
+                    <p
+                      className="text-[#072741] opacity-40 text-center"
+                      style={{ fontFamily: 'Inter, sans-serif' }}
+                    >
+                      {activeMenu} content coming soon...
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </main>
 
@@ -335,167 +337,3 @@ function ManageAudiencesView() {
   );
 }
 
-// Clients Data Table Component
-interface ClientsDataTableProps {
-  clientId: string;
-}
-
-function ClientsDataTable({ clientId }: ClientsDataTableProps) {
-  const [data, setData] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!clientId) {
-      setIsLoading(false);
-      return;
-    }
-
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const { data: tableData, error: fetchError } = await supabase
-          .from('clients_user_data')
-          .select('*')
-          .eq('client_id', clientId);
-
-        if (fetchError) {
-          throw fetchError;
-        }
-
-        setData(tableData || []);
-      } catch (err: any) {
-        console.error('Error fetching data:', err);
-        setError(err.message || 'Failed to load data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [clientId]);
-
-  if (!clientId) {
-    return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
-        <div className="flex items-center justify-center h-full">
-          <p
-            className="text-[#072741] opacity-40 text-center"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            Client ID not found. Please contact support.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
-        <div className="flex items-center justify-center h-full">
-          <Loader className="animate-spin text-[#348ADC]" size={32} />
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
-        <div className="flex items-center justify-center h-full">
-          <p
-            className="text-red-600 text-center"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            Error: {error}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (data.length === 0) {
-    return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
-        <div className="flex items-center justify-center h-full">
-          <p
-            className="text-[#072741] opacity-40 text-center"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            No data found for this client.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Get all unique column names from all rows to handle varying columns
-  const getAllColumns = () => {
-    const columnSet = new Set<string>();
-    data.forEach((row) => {
-      Object.keys(row).forEach((key) => columnSet.add(key));
-    });
-    return Array.from(columnSet);
-  };
-
-  const columns = getAllColumns();
-
-  // Calculate max height to show approximately 20 rows (each row ~48px + header ~48px)
-  const maxVisibleRows = 20;
-  const rowHeight = 48;
-  const headerHeight = 48;
-  const maxTableHeight = headerHeight + (maxVisibleRows * rowHeight);
-
-  return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col">
-      <div 
-        className="overflow-auto border border-gray-200 rounded-lg"
-        style={{ maxHeight: `${maxTableHeight}px` }}
-      >
-        <table className="w-full border-collapse">
-          <thead className="sticky top-0 bg-gray-50 z-10">
-            <tr className="border-b-2 border-gray-300">
-              {columns.map((column) => (
-                <th
-                  key={column}
-                  className="px-4 py-3 text-left text-sm font-semibold text-[#072741] bg-gray-50 whitespace-nowrap"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                >
-                  {column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, index) => (
-              <tr
-                key={index}
-                className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-              >
-                {columns.map((column) => (
-                  <td
-                    key={column}
-                    className="px-4 py-3 text-sm text-[#072741] whitespace-nowrap"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    {row[column] !== null && row[column] !== undefined
-                      ? String(row[column])
-                      : '-'}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {data.length > 0 && (
-        <div className="mt-4 text-sm text-[#072741] opacity-60" style={{ fontFamily: 'Inter, sans-serif' }}>
-          Showing {data.length} row{data.length !== 1 ? 's' : ''}
-        </div>
-      )}
-    </div>
-  );
-}
