@@ -110,46 +110,47 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const columns = getAllColumns();
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col h-full min-h-0">
-      {/* Scrollable table container */}
-      <div className="flex-1 min-h-0 overflow-auto border border-gray-200 rounded-lg">
-        <div className="inline-block min-w-full align-middle">
-          <table className="w-full border-collapse">
-            <thead className="sticky top-0 bg-gray-50 z-10">
-              <tr className="border-b-2 border-gray-300">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
+      {/* Responsive scrollable table container */}
+      <div 
+        className="w-full overflow-x-auto overflow-y-auto border border-gray-200 rounded-lg"
+        style={{ maxHeight: 'calc(100vh - 250px)' }}
+      >
+        <table className="w-full border-collapse min-w-full">
+          <thead className="sticky top-0 bg-gray-50 z-10">
+            <tr className="border-b-2 border-gray-300">
+              {columns.map((column) => (
+                <th
+                  key={column}
+                  className="px-3 py-3 sm:px-4 text-left text-xs sm:text-sm font-semibold text-[#072741] bg-gray-50 whitespace-nowrap"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  {column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((row, index) => (
+              <tr
+                key={index}
+                className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              >
                 {columns.map((column) => (
-                  <th
+                  <td
                     key={column}
-                    className="px-3 py-3 sm:px-4 text-left text-xs sm:text-sm font-semibold text-[#072741] bg-gray-50 whitespace-nowrap"
+                    className="px-3 py-3 sm:px-4 text-xs sm:text-sm text-[#072741] whitespace-nowrap"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    {column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </th>
+                    {row[column] !== null && row[column] !== undefined
+                      ? String(row[column])
+                      : '-'}
+                  </td>
                 ))}
               </tr>
-            </thead>
-            <tbody>
-              {data.map((row, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                >
-                  {columns.map((column) => (
-                    <td
-                      key={column}
-                      className="px-3 py-3 sm:px-4 text-xs sm:text-sm text-[#072741] whitespace-nowrap"
-                      style={{ fontFamily: 'Inter, sans-serif' }}
-                    >
-                      {row[column] !== null && row[column] !== undefined
-                        ? String(row[column])
-                        : '-'}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
       {data.length > 0 && (
         <div className="mt-4 text-xs sm:text-sm text-[#072741] opacity-60" style={{ fontFamily: 'Inter, sans-serif' }}>
