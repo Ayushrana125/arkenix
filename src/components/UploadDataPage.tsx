@@ -363,6 +363,9 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
           message: `Upload complete — ${result.inserted} users imported successfully.`
         });
 
+        // Trigger data table refresh
+        window.dispatchEvent(new CustomEvent('refreshDataTable'));
+
         // Reset state after a short delay
         setTimeout(() => {
           setSelectedFile(null);
@@ -667,16 +670,6 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
                   >
                     Your file has been validated successfully and is ready to upload.
                   </p>
-                </div>
-
-                {/* Info Box */}
-                <div className="bg-gradient-to-r from-[#348ADC]/10 to-[#65C9D4]/10 rounded-lg p-4 mb-6 border border-[#348ADC]/20">
-                  <div className="flex items-center gap-2">
-                    <Info size={18} className="text-[#348ADC] flex-shrink-0" />
-                    <p className="text-sm text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
-                      <span className="font-semibold">Destination Table:</span> clients_user_data
-                    </p>
-                  </div>
                 </div>
 
                 {/* Proceed Button */}

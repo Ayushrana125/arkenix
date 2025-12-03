@@ -43,7 +43,25 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       }
     };
 
+    // Initial fetch
     fetchData();
+
+    // Auto-refresh every 2 minutes (120000 ms)
+    const refreshInterval = setInterval(() => {
+      fetchData();
+    }, 120000); // 2 minutes
+
+    // Listen for manual refresh events (triggered after upload)
+    const handleRefresh = () => {
+      fetchData();
+    };
+    window.addEventListener('refreshDataTable', handleRefresh);
+
+    // Cleanup
+    return () => {
+      clearInterval(refreshInterval);
+      window.removeEventListener('refreshDataTable', handleRefresh);
+    };
   }, [clientId]);
 
   if (!clientId) {
