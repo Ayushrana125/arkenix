@@ -113,8 +113,8 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
       {/* Responsive scrollable table container */}
       <div 
-        className="w-full overflow-x-auto overflow-y-auto border border-gray-200 rounded-lg"
-        style={{ maxHeight: 'calc(100vh - 250px)' }}
+        className="w-full h-full overflow-auto border border-gray-200 rounded-lg"
+        style={{ height: 'calc(100vh - 260px)' }}
       >
         <table className="w-full border-collapse min-w-full">
           <thead className="sticky top-0 bg-gray-50 z-10">
