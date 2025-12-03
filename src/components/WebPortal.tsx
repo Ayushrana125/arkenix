@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Home, Database, FileText, Mail, Megaphone, Settings, Globe, LogOut, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { UploadDataModal } from './UploadDataModal';
+import { UploadDataPage } from './UploadDataPage';
 import { ClientsDataTable } from './Data';
 
 interface UserData {
@@ -20,7 +20,7 @@ export function WebPortal() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [activeMenu, setActiveMenu] = useState('Home');
   const [dataSubPage, setDataSubPage] = useState<string | null>(null); // 'main' | 'audiences' | null
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isUploadPageOpen, setIsUploadPageOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -266,7 +266,7 @@ export function WebPortal() {
               {activeMenu === 'Data' && dataSubPage === null && (
                 <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 w-full sm:w-auto">
                   <button
-                    onClick={() => setIsUploadModalOpen(true)}
+                    onClick={() => setIsUploadPageOpen(true)}
                     className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg transition-all duration-200 font-medium text-sm sm:text-base whitespace-nowrap shadow-sm"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
@@ -332,11 +332,13 @@ export function WebPortal() {
           </div>
         </main>
 
-        {/* Upload Data Modal */}
-        <UploadDataModal
-          isOpen={isUploadModalOpen}
-          onClose={() => setIsUploadModalOpen(false)}
-        />
+        {/* Upload Data Page */}
+        {isUploadPageOpen && (
+          <UploadDataPage
+            onClose={() => setIsUploadPageOpen(false)}
+            clientId={getClientId()}
+          />
+        )}
       </div>
     </div>
   );
