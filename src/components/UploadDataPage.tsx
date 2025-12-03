@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { X, Upload, FileSpreadsheet, AlertCircle, CheckCircle2, FileText } from 'lucide-react';
+import { X, Upload, FileSpreadsheet, AlertCircle, CheckCircle2, FileText, Download } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 interface UploadDataPageProps {
@@ -309,9 +309,10 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
   };
 
   const preparePayload = () => {
+    // Add client_id to each row (hidden from user, added automatically)
     return validRows.map(row => ({
       ...row,
-      client_id: clientId
+      client_id: clientId // Automatically added, not visible to user
     }));
   };
 
@@ -345,10 +346,51 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
     }
   };
 
+  // Download sample file
+  const downloadSampleFile = () => {
+    const sampleData = [
+      {
+        first_name: 'John',
+        last_name: 'Doe',
+        title: 'Marketing Manager',
+        official_email: 'john.doe@example.com',
+        mobile_number: '+1234567890',
+        company: 'Acme Corp',
+        industry: 'Technology',
+        user_type: 'lead'
+      },
+      {
+        first_name: 'Jane',
+        last_name: 'Smith',
+        title: 'Sales Director',
+        official_email: 'jane.smith@example.com',
+        mobile_number: '+1987654321',
+        company: 'Tech Solutions',
+        industry: 'Software',
+        user_type: 'prospect'
+      },
+      {
+        first_name: 'Bob',
+        last_name: 'Johnson',
+        title: 'CEO',
+        official_email: 'bob.johnson@example.com',
+        mobile_number: '+1555123456',
+        company: 'Innovation Labs',
+        industry: 'Consulting',
+        user_type: 'user'
+      }
+    ];
+
+    const ws = XLSX.utils.json_to_sheet(sampleData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sample Data');
+    XLSX.writeFile(wb, 'sample_data_upload.xlsx');
+  };
+
   return (
-    <div className="fixed inset-0 z-50 bg-white overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-[#F5F7FA] overflow-hidden">
       {/* Header */}
-      <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between bg-white">
+      <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between bg-white shadow-sm">
         <h2
           className="text-2xl font-bold text-[#072741]"
           style={{ fontFamily: 'Poppins, sans-serif' }}
@@ -365,16 +407,26 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
 
       <div className="flex h-[calc(100vh-73px)]">
         {/* Left Side - Upload Area & Guidelines */}
-        <div className="w-1/2 border-r border-gray-200 p-6 overflow-y-auto bg-gray-50">
+        <div className="w-1/2 border-r border-gray-200 p-6 overflow-y-auto bg-[#F5F7FA]">
           <div className="max-w-2xl mx-auto space-y-6">
             {/* Upload Area */}
             <div>
-              <h3
-                className="text-lg font-semibold text-[#072741] mb-4"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                Upload File
-              </h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3
+                  className="text-lg font-semibold text-[#072741]"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  Upload File
+                </h3>
+                <button
+                  onClick={downloadSampleFile}
+                  className="flex items-center gap-2 px-4 py-2 text-sm border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-lg transition-all duration-200 font-medium"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  <Download size={16} />
+                  Download Sample
+                </button>
+              </div>
               
               <div
                 onDragOver={handleDragOver}
@@ -383,8 +435,8 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
                 className={`
                   border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200
                   ${selectedFile
-                    ? 'border-[#348ADC] bg-[#348ADC]/5'
-                    : 'border-gray-300 hover:border-[#348ADC] hover:bg-white'
+                    ? 'border-[#348ADC] bg-gradient-to-br from-[#348ADC]/10 to-[#65C9D4]/5'
+                    : 'border-gray-300 hover:border-[#348ADC] hover:bg-white shadow-sm hover:shadow-md'
                   }
                 `}
               >
@@ -459,7 +511,7 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
             </div>
 
             {/* Guidelines */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
               <h3
                 className="text-lg font-semibold text-[#072741] mb-4 flex items-center gap-2"
                 style={{ fontFamily: 'Inter, sans-serif' }}
@@ -511,7 +563,7 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
 
             {/* Summary */}
             {selectedFile && !isProcessing && (
-              <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                 <h3
                   className="text-lg font-semibold text-[#072741] mb-4"
                   style={{ fontFamily: 'Inter, sans-serif' }}
@@ -536,7 +588,7 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
         {/* Right Side - Errors & Preview */}
         <div className="w-1/2 flex flex-col bg-white">
           {/* Errors Section */}
-          <div className="flex-1 p-6 overflow-y-auto border-b border-gray-200">
+          <div className="flex-1 p-6 overflow-y-auto border-b border-gray-200 bg-[#F5F7FA]">
             <h3
               className="text-lg font-semibold text-[#072741] mb-4 flex items-center gap-2"
               style={{ fontFamily: 'Inter, sans-serif' }}
@@ -557,7 +609,7 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
                 {errorRows.map((error, index) => (
                   <div
                     key={index}
-                    className="bg-red-50 border border-red-200 rounded-lg p-3"
+                    className="bg-red-50 border border-red-200 rounded-lg p-3 shadow-sm"
                   >
                     <div className="flex items-start gap-2">
                       <AlertCircle size={16} className="text-red-600 mt-0.5 flex-shrink-0" />
@@ -577,7 +629,7 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
           </div>
 
           {/* Preview Section */}
-          <div className="h-64 p-6 border-t border-gray-200 overflow-y-auto bg-gray-50">
+          <div className="h-64 p-6 border-t border-gray-200 overflow-y-auto bg-white">
             <h3
               className="text-lg font-semibold text-[#072741] mb-4"
               style={{ fontFamily: 'Inter, sans-serif' }}
@@ -592,14 +644,14 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
                 </p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto border border-gray-200 rounded-lg">
                 <table className="w-full text-xs border-collapse">
                   <thead>
-                    <tr className="bg-gray-100">
+                    <tr className="bg-gradient-to-r from-[#072741] to-[#0a3d5c]">
                       {normalizedHeaders.map((header) => (
                         <th
                           key={header}
-                          className="px-2 py-2 text-left font-semibold text-[#072741] border border-gray-200"
+                          className="px-2 py-2 text-left font-semibold text-white border border-gray-300"
                           style={{ fontFamily: 'Inter, sans-serif' }}
                         >
                           {header.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -609,7 +661,7 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
                   </thead>
                   <tbody>
                     {allRows.slice(0, PREVIEW_ROWS).map((row, index) => (
-                      <tr key={index} className="border-b border-gray-200">
+                      <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
                         {normalizedHeaders.map((header) => {
                           const rawHeader = Object.keys(allRows[0] || {}).find(
                             h => {
@@ -621,7 +673,7 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
                           return (
                             <td
                               key={header}
-                              className="px-2 py-2 text-gray-700 border border-gray-200"
+                              className="px-2 py-2 text-[#072741] border border-gray-200"
                               style={{ fontFamily: 'Inter, sans-serif' }}
                             >
                               {rawHeader ? (row[rawHeader] || '-') : '-'}
@@ -644,7 +696,7 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
       </div>
 
       {/* Footer Actions */}
-      <div className="border-t border-gray-200 px-6 py-4 bg-white flex items-center justify-between">
+      <div className="border-t border-gray-200 px-6 py-4 bg-white shadow-lg flex items-center justify-between">
         <div className="text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
           {selectedFile && !isProcessing && (
             <>
@@ -652,14 +704,14 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
               {' • '}
               <span className="text-red-600 font-medium">{errorRows.length} errors</span>
               {' • '}
-              <span className="text-gray-600">{allRows.length} total rows</span>
+              <span className="text-[#072741] font-medium">{allRows.length} total rows</span>
             </>
           )}
         </div>
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-2.5 border border-gray-300 text-[#072741] rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium"
+            className="px-6 py-2.5 border border-gray-300 text-[#072741] rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             Cancel
@@ -667,7 +719,7 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
           <button
             onClick={handleUpload}
             disabled={!selectedFile || isProcessing || validRows.length === 0}
-            className="px-6 py-2.5 bg-[#348ADC] hover:bg-[#2a6fb0] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200 font-medium"
+            className="px-6 py-2.5 bg-[#348ADC] hover:bg-[#2a6fb0] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200 font-medium shadow-md shadow-[#348ADC]/20"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             {isProcessing ? 'Processing...' : `Upload ${validRows.length} Valid Rows`}
