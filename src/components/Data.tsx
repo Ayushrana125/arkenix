@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Loader,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Search,
   X,
   Calendar,
@@ -31,6 +32,9 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   // FILTER STATES
   // -----------------------------
   const [globalSearch, setGlobalSearch] = useState('');
+  const [selectedSearchColumns, setSelectedSearchColumns] = useState<string[]>([]); // Empty = all columns
+  const [isSearchColumnDropdownOpen, setIsSearchColumnDropdownOpen] = useState(false);
+  const searchColumnDropdownRef = useRef<HTMLDivElement | null>(null);
   const [selectedUserType, setSelectedUserType] = useState<string>('Prospect'); // Default
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -124,12 +128,32 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   }, [data]);
 
   // ----------------------------------------------------------
-  // DATE PARSE HELPER
+  // DATE PARSE HELPER - Handles ISO 8601 with timezones
   // ----------------------------------------------------------
   const parseDate = (value: string | null | undefined): Date | null => {
     if (!value) return null;
-    const d = new Date(value);
-    return isNaN(d.getTime()) ? null : d;
+    try {
+      // Handle ISO 8601 format with timezone (e.g., "2025-12-02T21:13:56.964185+00:00")
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return null;
+      return d;
+    } catch {
+      return null;
+    }
+  };
+
+  // Get date-only string (YYYY-MM-DD) for comparison
+  const getDateOnly = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Check if a column is a date column
+  const isDateColumn = (columnName: string): boolean => {
+    const lower = columnName.toLowerCase();
+    return lower.includes('date') || lower.includes('registration');
   };
 
   // ----------------------------------------------------------
@@ -157,39 +181,47 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       // 2) GLOBAL SEARCH
       if (globalSearch.trim()) {
         const search = globalSearch.toLowerCase();
+        const columnsToSearch = selectedSearchColumns.length > 0 ? selectedSearchColumns : columns;
         filtered = filtered.filter((row) =>
-          columns.some((col) => {
+          columnsToSearch.some((col) => {
             const v = row[col];
             return v != null && String(v).toLowerCase().includes(search);
           })
         );
       }
 
-      // 3) DATE RANGE FILTER
+      // 3) DATE RANGE FILTER - Works with ISO 8601 dates with timezones
       if (dateFrom || dateTo) {
-        filtered = filtered.filter((row) => {
-          try {
-            const raw = row['registration_date'];
-            const rowDate = parseDate(raw);
-            if (!rowDate) return false;
+        // Find the date column dynamically
+        const dateColumn = columns.find(col => isDateColumn(col));
+        
+        if (dateColumn) {
+          filtered = filtered.filter((row) => {
+            try {
+              const rawValue = row[dateColumn];
+              if (!rawValue) return false; // Skip rows with no date value
+              
+              const rowDate = parseDate(rawValue);
+              if (!rowDate) return false; // Skip invalid dates
 
-            if (dateFrom) {
-              const dFrom = new Date(dateFrom);
-              dFrom.setHours(0, 0, 0, 0);
-              if (rowDate < dFrom) return false;
+              // Get date-only strings for comparison (YYYY-MM-DD)
+              const rowDateOnly = getDateOnly(rowDate);
+
+              // Compare date-only strings (ignores time and timezone)
+              if (dateFrom) {
+                if (rowDateOnly < dateFrom) return false;
+              }
+
+              if (dateTo) {
+                if (rowDateOnly > dateTo) return false;
+              }
+
+              return true;
+            } catch {
+              return true; // Include row if error parsing
             }
-
-            if (dateTo) {
-              const dTo = new Date(dateTo);
-              dTo.setHours(23, 59, 59, 999);
-              if (rowDate > dTo) return false;
-            }
-
-            return true;
-          } catch {
-            return true;
-          }
-        });
+          });
+        }
       }
 
       return filtered;
@@ -201,6 +233,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     data,
     columns,
     globalSearch,
+    selectedSearchColumns,
     selectedUserType,
     dateFrom,
     dateTo,
@@ -305,20 +338,107 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       ------------------------------ */}
       <div className="mb-4 space-y-4">
 
-        {/* GLOBAL SEARCH */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-          <input
-            type="text"
-            placeholder="Search across all columns..."
-            value={globalSearch}
-            onChange={(e) => {
-              setGlobalSearch(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#348ADC] text-sm"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          />
+        {/* GLOBAL SEARCH WITH COLUMN SELECTOR */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder={selectedSearchColumns.length > 0 
+                ? `Search in ${selectedSearchColumns.length} column${selectedSearchColumns.length > 1 ? 's' : ''}...`
+                : "Search across all columns..."}
+              value={globalSearch}
+              onChange={(e) => {
+                setGlobalSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#348ADC] text-sm"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            />
+          </div>
+          
+          {/* Column Selector Dropdown */}
+          <div className="relative" ref={searchColumnDropdownRef}>
+            <button
+              onClick={() => setIsSearchColumnDropdownOpen(!isSearchColumnDropdownOpen)}
+              className={`px-4 py-2 border border-gray-300 rounded-lg text-sm flex items-center gap-2 hover:bg-gray-50 transition-colors ${
+                selectedSearchColumns.length > 0 ? 'bg-[#348ADC]/10 border-[#348ADC] text-[#348ADC]' : 'bg-white text-gray-700'
+              }`}
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              <span className="whitespace-nowrap">
+                {selectedSearchColumns.length === 0 
+                  ? 'Search in: All' 
+                  : `Search in: ${selectedSearchColumns.length}`}
+              </span>
+              <ChevronDown size={16} className={`transition-transform ${isSearchColumnDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {isSearchColumnDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                <div className="p-2">
+                  <div className="flex items-center justify-between mb-2 px-2">
+                    <span className="text-xs font-semibold text-[#072741]">Select Columns</span>
+                    <button
+                      onClick={() => {
+                        setSelectedSearchColumns([]);
+                        setIsSearchColumnDropdownOpen(false);
+                      }}
+                      className="text-xs text-[#348ADC] hover:text-[#2a6fb0]"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                  
+                  <div className="border-b border-gray-200 mb-2"></div>
+                  
+                  <label className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50 rounded cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedSearchColumns.length === 0}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedSearchColumns([]);
+                        }
+                      }}
+                      className="rounded border-gray-300 text-[#348ADC] focus:ring-[#348ADC]"
+                    />
+                    <span className="text-xs text-[#072741] font-medium">All Columns</span>
+                  </label>
+                  
+                  <div className="border-b border-gray-200 my-2"></div>
+                  
+                  <div className="max-h-64 overflow-y-auto">
+                    {columns.map((column) => {
+                      const isSelected = selectedSearchColumns.includes(column);
+                      return (
+                        <label
+                          key={column}
+                          className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50 rounded cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedSearchColumns([...selectedSearchColumns, column]);
+                              } else {
+                                setSelectedSearchColumns(selectedSearchColumns.filter(c => c !== column));
+                              }
+                            }}
+                            className="rounded border-gray-300 text-[#348ADC] focus:ring-[#348ADC]"
+                          />
+                          <span className="text-xs text-[#072741] truncate flex-1">
+                            {column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* USER TYPE CARDS */}
