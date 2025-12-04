@@ -404,10 +404,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const endIndex = startIndex + rowsPerPage;
   const paginatedData = filteredData.slice(startIndex, endIndex);
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [globalSearch, selectedUserType, dateFrom, dateTo, columnFilters]);
+  // Reset to page 1 when filters change (handled in individual filter handlers to avoid infinite loops)
 
   // Handle page changes
   const handlePreviousPage = () => {
@@ -487,7 +484,10 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
             type="text"
             placeholder="Search across all columns..."
             value={globalSearch}
-            onChange={(e) => setGlobalSearch(e.target.value)}
+            onChange={(e) => {
+              setGlobalSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#348ADC] focus:border-transparent text-sm"
             style={{ fontFamily: 'Inter, sans-serif' }}
           />
@@ -498,7 +498,10 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           {['Prospect', 'Lead', 'User'].map((type) => (
             <button
               key={type}
-              onClick={() => setSelectedUserType(type)}
+              onClick={() => {
+                setSelectedUserType(type);
+                setCurrentPage(1);
+              }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 selectedUserType === type
                   ? 'bg-[#348ADC] text-white shadow-md'
@@ -519,7 +522,10 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
             <input
               type="date"
               value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
+              onChange={(e) => {
+                setDateFrom(e.target.value);
+                setCurrentPage(1);
+              }}
               className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-[#348ADC] focus:border-transparent"
               style={{ fontFamily: 'Inter, sans-serif' }}
             />
@@ -529,7 +535,10 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
             <input
               type="date"
               value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
+              onChange={(e) => {
+                setDateTo(e.target.value);
+                setCurrentPage(1);
+              }}
               className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-[#348ADC] focus:border-transparent"
               style={{ fontFamily: 'Inter, sans-serif' }}
             />
@@ -539,6 +548,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               onClick={() => {
                 setDateFrom('');
                 setDateTo('');
+                setCurrentPage(1);
               }}
               className="px-2 py-1 text-xs text-red-600 hover:text-red-700 flex items-center gap-1"
             >
