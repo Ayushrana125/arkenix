@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Loader, ChevronLeft, ChevronRight, Search, ChevronDown, X, Calendar, ArrowUp, ArrowDown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -24,6 +24,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const [dateFrom, setDateFrom] = useState<string>('');
   const [dateTo, setDateTo] = useState<string>('');
   const [columnFilters, setColumnFilters] = useState<Record<string, ColumnFilter>>({});
+  const [columnFiltersVersion, setColumnFiltersVersion] = useState(0);
   const [openFilterDropdown, setOpenFilterDropdown] = useState<string | null>(null);
   
   // Refs for dropdowns
@@ -155,7 +156,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     }
   };
 
-  const columns = getAllColumns();
+  const columns = useMemo(() => getAllColumns(), [data]);
 
   // Get unique values for a column (for dynamic filters)
   const getUniqueValuesForColumn = (column: string): string[] => {
@@ -329,7 +330,17 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     }
   };
 
-  const filteredData = getFilteredData() || [];
+  const filteredData = useMemo(() => {
+    return getFilteredData() || [];
+  }, [
+    data,
+    columns,
+    globalSearch,
+    selectedUserType,
+    dateFrom,
+    dateTo,
+    columnFiltersVersion,
+  ]);
 
   // Handle column filter toggle
   const toggleColumnFilterValue = (column: string, value: string) => {
@@ -351,6 +362,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         },
       };
     });
+    setColumnFiltersVersion((v) => v + 1);
     setCurrentPage(1);
   };
 
@@ -366,6 +378,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         },
       };
     });
+    setColumnFiltersVersion((v) => v + 1);
     setCurrentPage(1);
   };
 
@@ -376,6 +389,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       delete newFilters[column];
       return newFilters;
     });
+    setColumnFiltersVersion((v) => v + 1);
     setOpenFilterDropdown(null);
     setCurrentPage(1);
   };
