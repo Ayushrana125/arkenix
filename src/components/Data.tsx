@@ -194,19 +194,19 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 flex flex-col h-full">
       {/* Responsive scrollable table container */}
       <div 
         className="w-full h-full overflow-auto border border-gray-200 rounded-lg"
-        style={{ height: 'calc(100vh - 320px)' }}
+        style={{ height: 'calc(100vh - 200px)' }}
       >
         <table className="w-full border-collapse min-w-full">
           <thead className="sticky top-0 bg-gray-50 z-10">
-            <tr className="border-b-2 border-gray-300">
+            <tr className="border-b border-gray-200">
               {columns.map((column) => (
                 <th
                   key={column}
-                  className="px-3 py-3 sm:px-4 text-left text-xs sm:text-sm font-semibold text-[#072741] bg-gray-50 whitespace-nowrap"
+                  className="px-3 py-2 text-left text-xs font-medium text-[#072741] bg-gray-50 whitespace-nowrap"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   {column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -223,7 +223,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
                 {columns.map((column) => (
                   <td
                     key={column}
-                    className="px-3 py-3 sm:px-4 text-xs sm:text-sm text-[#072741] whitespace-nowrap"
+                    className="px-3 py-2 text-xs text-[#072741] whitespace-nowrap"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     {row[column] !== null && row[column] !== undefined
@@ -239,9 +239,9 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
       {/* Pagination Controls */}
       {data.length > 0 && (
-        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-3 flex flex-col sm:flex-row items-center justify-between gap-3">
           {/* Page Info */}
-          <div className="text-xs sm:text-sm text-[#072741] opacity-60" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <div className="text-xs text-[#072741] opacity-50" style={{ fontFamily: 'Inter, sans-serif' }}>
             Showing {startIndex + 1} to {Math.min(endIndex, data.length)} of {data.length} row{data.length !== 1 ? 's' : ''}
           </div>
 
@@ -252,14 +252,14 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               <button
                 onClick={handlePreviousPage}
                 disabled={currentPage === 1}
-                className={`px-3 py-2 rounded-lg border transition-all duration-200 flex items-center gap-1 ${
+                className={`px-2.5 py-1.5 rounded-md border transition-all duration-200 flex items-center gap-1 text-xs ${
                   currentPage === 1
                     ? 'border-gray-300 text-gray-400 cursor-not-allowed'
                     : 'border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white'
                 }`}
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                <ChevronLeft size={16} />
+                <ChevronLeft size={14} />
                 <span className="hidden sm:inline">Previous</span>
               </button>
 
@@ -270,7 +270,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
                     key={index}
                     onClick={() => typeof page === 'number' && handlePageClick(page)}
                     disabled={typeof page === 'string'}
-                    className={`px-3 py-2 rounded-lg border transition-all duration-200 text-sm ${
+                    className={`px-2.5 py-1.5 rounded-md border transition-all duration-200 text-xs ${
                       typeof page === 'string'
                         ? 'border-transparent text-gray-400 cursor-default'
                         : page === currentPage
@@ -288,7 +288,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               <button
                 onClick={handleNextPage}
                 disabled={currentPage === totalPages}
-                className={`px-3 py-2 rounded-lg border transition-all duration-200 flex items-center gap-1 ${
+                className={`px-2.5 py-1.5 rounded-md border transition-all duration-200 flex items-center gap-1 text-xs ${
                   currentPage === totalPages
                     ? 'border-gray-300 text-gray-400 cursor-not-allowed'
                     : 'border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white'
@@ -296,7 +296,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 <span className="hidden sm:inline">Next</span>
-                <ChevronRight size={16} />
+                <ChevronRight size={14} />
               </button>
             </div>
           )}
