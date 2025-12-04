@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Loader, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Loader, ChevronLeft, ChevronRight, Search, ChevronDown, X, Calendar, ArrowUp, ArrowDown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface ClientsDataTableProps {
   clientId: string;
+}
+
+interface ColumnFilter {
+  selectedValues: Set<string>;
+  sortDirection: 'asc' | 'desc' | null;
 }
 
 export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
@@ -12,6 +17,17 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 100;
+
+  // Filter states
+  const [globalSearch, setGlobalSearch] = useState('');
+  const [selectedUserType, setSelectedUserType] = useState<string>('Prospect'); // Default to Prospect
+  const [dateFrom, setDateFrom] = useState<string>('');
+  const [dateTo, setDateTo] = useState<string>('');
+  const [columnFilters, setColumnFilters] = useState<Record<string, ColumnFilter>>({});
+  const [openFilterDropdown, setOpenFilterDropdown] = useState<string | null>(null);
+  
+  // Refs for dropdowns
+  const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     if (!clientId) {
@@ -133,11 +149,206 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
   const columns = getAllColumns();
 
-  // Pagination calculations
-  const totalPages = Math.ceil(data.length / rowsPerPage);
+  // Get unique values for a column (for dynamic filters)
+  const getUniqueValuesForColumn = (column: string): string[] => {
+    const values = new Set<string>();
+    data.forEach((row) => {
+      const value = row[column];
+      if (value !== null && value !== undefined && value !== '') {
+        values.add(String(value));
+      }
+    });
+    return Array.from(values).sort();
+  };
+
+  // Check if a column is a date column (registration_date or similar)
+  const isDateColumn = (column: string): boolean => {
+    const lowerColumn = column.toLowerCase();
+    return lowerColumn.includes('date') || lowerColumn.includes('registration');
+  };
+
+  // Parse date string to Date object
+  const parseDate = (dateStr: string | null | undefined): Date | null => {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? null : date;
+  };
+
+  // Apply all filters to data
+  const getFilteredData = (): any[] => {
+    let filtered = [...data];
+
+    // 1. User Type filter
+    if (selectedUserType) {
+      filtered = filtered.filter((row) => {
+        const userType = row.user_type || row.userType || '';
+        return String(userType).toLowerCase() === selectedUserType.toLowerCase();
+      });
+    }
+
+    // 2. Global search filter
+    if (globalSearch.trim()) {
+      const searchTerm = globalSearch.toLowerCase();
+      filtered = filtered.filter((row) => {
+        return columns.some((col) => {
+          const value = row[col];
+          if (value === null || value === undefined) return false;
+          return String(value).toLowerCase().includes(searchTerm);
+        });
+      });
+    }
+
+    // 3. Date range filter (for registration_date or similar)
+    if (dateFrom || dateTo) {
+      filtered = filtered.filter((row) => {
+        const dateColumn = columns.find((col) => isDateColumn(col));
+        if (!dateColumn) return true;
+
+        const rowDate = parseDate(row[dateColumn]);
+        if (!rowDate) return false;
+
+        if (dateFrom) {
+          const fromDate = new Date(dateFrom);
+          fromDate.setHours(0, 0, 0, 0);
+          if (rowDate < fromDate) return false;
+        }
+
+        if (dateTo) {
+          const toDate = new Date(dateTo);
+          toDate.setHours(23, 59, 59, 999);
+          if (rowDate > toDate) return false;
+        }
+
+        return true;
+      });
+    }
+
+    // 4. Column-specific filters
+    Object.entries(columnFilters).forEach(([column, filter]) => {
+      if (filter.selectedValues.size > 0) {
+        filtered = filtered.filter((row) => {
+          const value = row[column];
+          return filter.selectedValues.has(String(value ?? ''));
+        });
+      }
+    });
+
+    // 5. Apply sorting
+    Object.entries(columnFilters).forEach(([column, filter]) => {
+      if (filter.sortDirection) {
+        filtered.sort((a, b) => {
+          const aVal = a[column];
+          const bVal = b[column];
+          
+          // Handle null/undefined
+          if (aVal === null || aVal === undefined) return 1;
+          if (bVal === null || bVal === undefined) return -1;
+
+          // Handle dates
+          if (isDateColumn(column)) {
+            const aDate = parseDate(aVal);
+            const bDate = parseDate(bVal);
+            if (!aDate || !bDate) return 0;
+            return filter.sortDirection === 'asc' 
+              ? aDate.getTime() - bDate.getTime()
+              : bDate.getTime() - aDate.getTime();
+          }
+
+          // Handle strings/numbers
+          const aStr = String(aVal).toLowerCase();
+          const bStr = String(bVal).toLowerCase();
+          
+          if (filter.sortDirection === 'asc') {
+            return aStr.localeCompare(bStr);
+          } else {
+            return bStr.localeCompare(aStr);
+          }
+        });
+      }
+    });
+
+    return filtered;
+  };
+
+  const filteredData = getFilteredData();
+
+  // Handle column filter toggle
+  const toggleColumnFilterValue = (column: string, value: string) => {
+    setColumnFilters((prev) => {
+      const current = prev[column] || { selectedValues: new Set(), sortDirection: null };
+      const newSelectedValues = new Set(current.selectedValues);
+      
+      if (newSelectedValues.has(value)) {
+        newSelectedValues.delete(value);
+      } else {
+        newSelectedValues.add(value);
+      }
+
+      return {
+        ...prev,
+        [column]: {
+          ...current,
+          selectedValues: newSelectedValues,
+        },
+      };
+    });
+    setCurrentPage(1);
+  };
+
+  // Handle column sort
+  const handleColumnSort = (column: string, direction: 'asc' | 'desc') => {
+    setColumnFilters((prev) => {
+      const current = prev[column] || { selectedValues: new Set(), sortDirection: null };
+      return {
+        ...prev,
+        [column]: {
+          ...current,
+          sortDirection: current.sortDirection === direction ? null : direction,
+        },
+      };
+    });
+    setCurrentPage(1);
+  };
+
+  // Clear column filter
+  const clearColumnFilter = (column: string) => {
+    setColumnFilters((prev) => {
+      const newFilters = { ...prev };
+      delete newFilters[column];
+      return newFilters;
+    });
+    setOpenFilterDropdown(null);
+    setCurrentPage(1);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      Object.entries(dropdownRefs.current).forEach(([column, ref]) => {
+        if (ref && !ref.contains(event.target as Node)) {
+          if (openFilterDropdown === column) {
+            setOpenFilterDropdown(null);
+          }
+        }
+      });
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openFilterDropdown]);
+
+  // Pagination calculations (using filtered data)
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const paginatedData = data.slice(startIndex, endIndex);
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [globalSearch, selectedUserType, dateFrom, dateTo, columnFilters]);
 
   // Handle page changes
   const handlePreviousPage = () => {
@@ -195,54 +406,235 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 flex flex-col h-full">
+      {/* Filters Section */}
+      <div className="mb-4 space-y-4">
+        {/* Global Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search across all columns..."
+            value={globalSearch}
+            onChange={(e) => setGlobalSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#348ADC] focus:border-transparent text-sm"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          />
+        </div>
+
+        {/* User Type Filter Cards */}
+        <div className="flex flex-wrap gap-2">
+          {['Prospect', 'Lead', 'User'].map((type) => (
+            <button
+              key={type}
+              onClick={() => setSelectedUserType(type)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                selectedUserType === type
+                  ? 'bg-[#348ADC] text-white shadow-md'
+                  : 'bg-gray-100 text-[#072741] hover:bg-gray-200'
+              }`}
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              {type}
+            </button>
+          ))}
+        </div>
+
+        {/* Registration Date Range Filter */}
+        <div className="flex flex-wrap gap-3 items-center">
+          <div className="flex items-center gap-2">
+            <Calendar size={16} className="text-gray-400" />
+            <span className="text-xs text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>From:</span>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-[#348ADC] focus:border-transparent"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>To:</span>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-[#348ADC] focus:border-transparent"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            />
+          </div>
+          {(dateFrom || dateTo) && (
+            <button
+              onClick={() => {
+                setDateFrom('');
+                setDateTo('');
+              }}
+              className="px-2 py-1 text-xs text-red-600 hover:text-red-700 flex items-center gap-1"
+            >
+              <X size={14} />
+              Clear
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Responsive scrollable table container */}
       <div 
         className="w-full h-full overflow-auto border border-gray-200 rounded-lg"
-        style={{ height: 'calc(100vh - 200px)' }}
+        style={{ height: 'calc(100vh - 350px)' }}
       >
         <table className="w-full border-collapse min-w-full">
           <thead className="sticky top-0 bg-gray-50 z-10">
             <tr className="border-b border-gray-200">
-              {columns.map((column) => (
-                <th
-                  key={column}
-                  className="px-3 py-2 text-left text-xs font-medium text-[#072741] bg-gray-50 whitespace-nowrap"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                >
-                  {column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                </th>
-              ))}
+              {columns.map((column) => {
+                const columnFilter = columnFilters[column];
+                const hasFilter = columnFilter && (columnFilter.selectedValues.size > 0 || columnFilter.sortDirection);
+                const uniqueValues = getUniqueValuesForColumn(column);
+                
+                return (
+                  <th
+                    key={column}
+                    className="px-3 py-2 text-left text-xs font-medium text-[#072741] bg-gray-50 whitespace-nowrap relative"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                      <div className="relative">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenFilterDropdown(openFilterDropdown === column ? null : column);
+                          }}
+                          className={`p-1 rounded hover:bg-gray-200 transition-colors ${
+                            hasFilter ? 'text-[#348ADC]' : 'text-gray-400'
+                          }`}
+                        >
+                          <ChevronDown size={14} />
+                        </button>
+                        
+                        {openFilterDropdown === column && (
+                          <div
+                            ref={(el) => (dropdownRefs.current[column] = el)}
+                            className="absolute right-0 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="p-2 border-b border-gray-200">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-semibold text-[#072741]">Filter & Sort</span>
+                                {hasFilter && (
+                                  <button
+                                    onClick={() => clearColumnFilter(column)}
+                                    className="text-xs text-red-600 hover:text-red-700 flex items-center gap-1"
+                                  >
+                                    <X size={12} />
+                                    Clear
+                                  </button>
+                                )}
+                              </div>
+                              
+                              {/* Sort Options */}
+                              <div className="flex gap-1 mb-2">
+                                <button
+                                  onClick={() => handleColumnSort(column, 'asc')}
+                                  className={`flex-1 px-2 py-1 text-xs rounded border transition-colors flex items-center justify-center gap-1 ${
+                                    columnFilter?.sortDirection === 'asc'
+                                      ? 'bg-[#348ADC] text-white border-[#348ADC]'
+                                      : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                                  }`}
+                                >
+                                  <ArrowUp size={12} />
+                                  Asc
+                                </button>
+                                <button
+                                  onClick={() => handleColumnSort(column, 'desc')}
+                                  className={`flex-1 px-2 py-1 text-xs rounded border transition-colors flex items-center justify-center gap-1 ${
+                                    columnFilter?.sortDirection === 'desc'
+                                      ? 'bg-[#348ADC] text-white border-[#348ADC]'
+                                      : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                                  }`}
+                                >
+                                  <ArrowDown size={12} />
+                                  Desc
+                                </button>
+                              </div>
+                            </div>
+                            
+                            {/* Filter Values */}
+                            {uniqueValues.length > 0 && (
+                              <div className="p-2 max-h-64 overflow-y-auto">
+                                <div className="text-xs font-semibold text-gray-600 mb-2">Filter by value:</div>
+                                {uniqueValues.slice(0, 50).map((value) => {
+                                  const isSelected = columnFilter?.selectedValues.has(value) || false;
+                                  return (
+                                    <label
+                                      key={value}
+                                      className="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded cursor-pointer"
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={() => toggleColumnFilterValue(column, value)}
+                                        className="rounded border-gray-300 text-[#348ADC] focus:ring-[#348ADC]"
+                                      />
+                                      <span className="text-xs text-[#072741] truncate flex-1">{value}</span>
+                                    </label>
+                                  );
+                                })}
+                                {uniqueValues.length > 50 && (
+                                  <div className="text-xs text-gray-500 px-2 py-1">
+                                    Showing first 50 of {uniqueValues.length} values
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((row, index) => (
-              <tr
-                key={startIndex + index}
-                className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-              >
-                {columns.map((column) => (
-                  <td
-                    key={column}
-                    className="px-3 py-2 text-xs text-[#072741] whitespace-nowrap"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    {row[column] !== null && row[column] !== undefined
-                      ? String(row[column])
-                      : '-'}
-                  </td>
-                ))}
+            {paginatedData.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length} className="px-3 py-8 text-center text-sm text-gray-500">
+                  No data matches the current filters.
+                </td>
               </tr>
-            ))}
+            ) : (
+              paginatedData.map((row, index) => (
+                <tr
+                  key={startIndex + index}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                >
+                  {columns.map((column) => (
+                    <td
+                      key={column}
+                      className="px-3 py-2 text-xs text-[#072741] whitespace-nowrap"
+                      style={{ fontFamily: 'Inter, sans-serif' }}
+                    >
+                      {row[column] !== null && row[column] !== undefined
+                        ? String(row[column])
+                        : '-'}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Pagination Controls */}
-      {data.length > 0 && (
+      {filteredData.length > 0 && (
         <div className="mt-3 flex flex-col sm:flex-row items-center justify-between gap-3">
           {/* Page Info */}
           <div className="text-xs text-[#072741] opacity-50" style={{ fontFamily: 'Inter, sans-serif' }}>
-            Showing {startIndex + 1} to {Math.min(endIndex, data.length)} of {data.length} row{data.length !== 1 ? 's' : ''}
+            Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} row{filteredData.length !== 1 ? 's' : ''}
+            {filteredData.length !== data.length && (
+              <span className="ml-2 text-gray-400">(filtered from {data.length} total)</span>
+            )}
           </div>
 
           {/* Pagination Buttons */}
