@@ -138,27 +138,45 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   // Get all unique column names from all rows to handle varying columns
   // Exclude 'id' and 'client_id' as they are internal fields
   const getAllColumns = () => {
+    try {
+      if (!data || data.length === 0) return [];
     const columnSet = new Set<string>();
     data.forEach((row) => {
+        if (row && typeof row === 'object') {
       Object.keys(row).forEach((key) => columnSet.add(key));
+        }
     });
     // Filter out internal columns that shouldn't be displayed
     const allColumns = Array.from(columnSet);
     return allColumns.filter(col => col !== 'id' && col !== 'client_id');
+    } catch (error) {
+      console.error('Error getting columns:', error);
+      return [];
+    }
   };
 
   const columns = getAllColumns();
 
   // Get unique values for a column (for dynamic filters)
   const getUniqueValuesForColumn = (column: string): string[] => {
-    const values = new Set<string>();
-    data.forEach((row) => {
-      const value = row[column];
-      if (value !== null && value !== undefined && value !== '') {
-        values.add(String(value));
-      }
-    });
-    return Array.from(values).sort();
+    try {
+      if (!data || data.length === 0 || !column) return [];
+      const values = new Set<string>();
+      data.forEach((row) => {
+        try {
+          const value = row?.[column];
+          if (value !== null && value !== undefined && value !== '') {
+            values.add(String(value));
+          }
+        } catch {
+          // Skip this row if error
+        }
+      });
+      return Array.from(values).sort();
+    } catch (error) {
+      console.error('Error getting unique values:', error);
+      return [];
+    }
   };
 
   // Check if a column is a date column (registration_date or similar)
@@ -176,101 +194,142 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
   // Apply all filters to data
   const getFilteredData = (): any[] => {
-    let filtered = [...data];
+    try {
+      if (!data || data.length === 0) return [];
+      
+      let filtered = [...data];
 
-    // 1. User Type filter
-    if (selectedUserType) {
-      filtered = filtered.filter((row) => {
-        const userType = row.user_type || row.userType || '';
-        return String(userType).toLowerCase() === selectedUserType.toLowerCase();
-      });
-    }
-
-    // 2. Global search filter
-    if (globalSearch.trim()) {
-      const searchTerm = globalSearch.toLowerCase();
-      filtered = filtered.filter((row) => {
-        return columns.some((col) => {
-          const value = row[col];
-          if (value === null || value === undefined) return false;
-          return String(value).toLowerCase().includes(searchTerm);
-        });
-      });
-    }
-
-    // 3. Date range filter (for registration_date or similar)
-    if (dateFrom || dateTo) {
-      filtered = filtered.filter((row) => {
-        const dateColumn = columns.find((col) => isDateColumn(col));
-        if (!dateColumn) return true;
-
-        const rowDate = parseDate(row[dateColumn]);
-        if (!rowDate) return false;
-
-        if (dateFrom) {
-          const fromDate = new Date(dateFrom);
-          fromDate.setHours(0, 0, 0, 0);
-          if (rowDate < fromDate) return false;
+      // 1. User Type filter (only apply if user_type column exists and has matching data)
+      if (selectedUserType) {
+        const hasUserTypeColumn = columns.some(col => 
+          col.toLowerCase() === 'user_type' || col.toLowerCase() === 'usertype'
+        );
+        
+        if (hasUserTypeColumn) {
+          const beforeFilter = filtered.length;
+          filtered = filtered.filter((row) => {
+            try {
+              const userType = row.user_type || row.userType || row.User_Type || '';
+              return String(userType).toLowerCase() === selectedUserType.toLowerCase();
+            } catch {
+              return true; // Include row if error parsing
+            }
+          });
+          
+          // If filter results in empty data, show all data instead (user type might not exist in data)
+          if (filtered.length === 0 && beforeFilter > 0) {
+            filtered = [...data]; // Reset to show all data
+          }
         }
+      }
 
-        if (dateTo) {
-          const toDate = new Date(dateTo);
-          toDate.setHours(23, 59, 59, 999);
-          if (rowDate > toDate) return false;
-        }
-
-        return true;
-      });
-    }
-
-    // 4. Column-specific filters
-    Object.entries(columnFilters).forEach(([column, filter]) => {
-      if (filter.selectedValues.size > 0) {
+      // 2. Global search filter
+      if (globalSearch.trim()) {
+        const searchTerm = globalSearch.toLowerCase();
         filtered = filtered.filter((row) => {
-          const value = row[column];
-          return filter.selectedValues.has(String(value ?? ''));
-        });
-      }
-    });
-
-    // 5. Apply sorting
-    Object.entries(columnFilters).forEach(([column, filter]) => {
-      if (filter.sortDirection) {
-        filtered.sort((a, b) => {
-          const aVal = a[column];
-          const bVal = b[column];
-          
-          // Handle null/undefined
-          if (aVal === null || aVal === undefined) return 1;
-          if (bVal === null || bVal === undefined) return -1;
-
-          // Handle dates
-          if (isDateColumn(column)) {
-            const aDate = parseDate(aVal);
-            const bDate = parseDate(bVal);
-            if (!aDate || !bDate) return 0;
-            return filter.sortDirection === 'asc' 
-              ? aDate.getTime() - bDate.getTime()
-              : bDate.getTime() - aDate.getTime();
-          }
-
-          // Handle strings/numbers
-          const aStr = String(aVal).toLowerCase();
-          const bStr = String(bVal).toLowerCase();
-          
-          if (filter.sortDirection === 'asc') {
-            return aStr.localeCompare(bStr);
-          } else {
-            return bStr.localeCompare(aStr);
+          try {
+            return columns.some((col) => {
+              const value = row[col];
+              if (value === null || value === undefined) return false;
+              return String(value).toLowerCase().includes(searchTerm);
+            });
+          } catch {
+            return true; // Include row if error
           }
         });
       }
-    });
 
-    return filtered;
+      // 3. Date range filter (for registration_date or similar)
+      if (dateFrom || dateTo) {
+        filtered = filtered.filter((row) => {
+          try {
+            const dateColumn = columns.find((col) => isDateColumn(col));
+            if (!dateColumn) return true;
+
+            const rowDate = parseDate(row[dateColumn]);
+            if (!rowDate) return false;
+
+            if (dateFrom) {
+              const fromDate = new Date(dateFrom);
+              if (isNaN(fromDate.getTime())) return true; // Invalid date, include row
+              fromDate.setHours(0, 0, 0, 0);
+              if (rowDate < fromDate) return false;
+            }
+
+            if (dateTo) {
+              const toDate = new Date(dateTo);
+              if (isNaN(toDate.getTime())) return true; // Invalid date, include row
+              toDate.setHours(23, 59, 59, 999);
+              if (rowDate > toDate) return false;
+            }
+
+            return true;
+          } catch {
+            return true; // Include row if error
+          }
+        });
+      }
+
+      // 4. Column-specific filters
+      Object.entries(columnFilters).forEach(([column, filter]) => {
+        if (filter && filter.selectedValues && filter.selectedValues.size > 0) {
+          filtered = filtered.filter((row) => {
+            try {
+              const value = row[column];
+              return filter.selectedValues.has(String(value ?? ''));
+            } catch {
+              return true; // Include row if error
+            }
+          });
+        }
+      });
+
+      // 5. Apply sorting
+      Object.entries(columnFilters).forEach(([column, filter]) => {
+        if (filter && filter.sortDirection) {
+          try {
+            filtered.sort((a, b) => {
+              const aVal = a[column];
+              const bVal = b[column];
+              
+              // Handle null/undefined
+              if (aVal === null || aVal === undefined) return 1;
+              if (bVal === null || bVal === undefined) return -1;
+
+              // Handle dates
+              if (isDateColumn(column)) {
+                const aDate = parseDate(aVal);
+                const bDate = parseDate(bVal);
+                if (!aDate || !bDate) return 0;
+                return filter.sortDirection === 'asc' 
+                  ? aDate.getTime() - bDate.getTime()
+                  : bDate.getTime() - aDate.getTime();
+              }
+
+              // Handle strings/numbers
+              const aStr = String(aVal).toLowerCase();
+              const bStr = String(bVal).toLowerCase();
+              
+              if (filter.sortDirection === 'asc') {
+                return aStr.localeCompare(bStr);
+              } else {
+                return bStr.localeCompare(aStr);
+              }
+            });
+          } catch {
+            // If sorting fails, continue without sorting
+          }
+        }
+      });
+
+      return filtered;
+    } catch (error) {
+      console.error('Error filtering data:', error);
+      return data; // Return original data if filtering fails
+    }
   };
 
-  const filteredData = getFilteredData();
+  const filteredData = getFilteredData() || [];
 
   // Handle column filter toggle
   const toggleColumnFilterValue = (column: string, value: string) => {
@@ -404,6 +463,19 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     return pages;
   };
 
+  // Early return if no columns (shouldn't happen, but safety check)
+  if (columns.length === 0 && !isLoading && !error && data.length > 0) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 flex flex-col h-full">
+        <div className="flex items-center justify-center h-full">
+          <p className="text-[#072741] opacity-40 text-center" style={{ fontFamily: 'Inter, sans-serif' }}>
+            Unable to display data. Please refresh the page.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 flex flex-col h-full">
       {/* Filters Section */}
@@ -491,11 +563,11 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
                 const uniqueValues = getUniqueValuesForColumn(column);
                 
                 return (
-                  <th
-                    key={column}
+                <th
+                  key={column}
                     className="px-3 py-2 text-left text-xs font-medium text-[#072741] bg-gray-50 whitespace-nowrap relative"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
                     <div className="flex items-center justify-between gap-2">
                       <span>{column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
                       <div className="relative">
@@ -590,7 +662,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
                         )}
                       </div>
                     </div>
-                  </th>
+                </th>
                 );
               })}
             </tr>
@@ -604,22 +676,22 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               </tr>
             ) : (
               paginatedData.map((row, index) => (
-                <tr
-                  key={startIndex + index}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                >
-                  {columns.map((column) => (
-                    <td
-                      key={column}
-                      className="px-3 py-2 text-xs text-[#072741] whitespace-nowrap"
-                      style={{ fontFamily: 'Inter, sans-serif' }}
-                    >
-                      {row[column] !== null && row[column] !== undefined
-                        ? String(row[column])
-                        : '-'}
-                    </td>
-                  ))}
-                </tr>
+              <tr
+                key={startIndex + index}
+                className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              >
+                {columns.map((column) => (
+                  <td
+                    key={column}
+                    className="px-3 py-2 text-xs text-[#072741] whitespace-nowrap"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    {row[column] !== null && row[column] !== undefined
+                      ? String(row[column])
+                      : '-'}
+                  </td>
+                ))}
+              </tr>
               ))
             )}
           </tbody>
