@@ -7,6 +7,8 @@ import {
   Search,
   X,
   Calendar,
+  Mail,
+  Trash2,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -41,6 +43,10 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
   // columnFilters kept for future extension (sorting / filtering)
   const [columnFiltersVersion, setColumnFiltersVersion] = useState(0);
+
+  // Selection state
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // ----------------------------------------------------------
   // FETCH DATA FROM SUPABASE
@@ -292,6 +298,95 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
   const handlePageClick = (page: number) => setCurrentPage(page);
 
+  // ----------------------------------------------------------
+  // SELECTION HANDLERS
+  // ----------------------------------------------------------
+  const toggleUserSelection = (userId: string) => {
+    setSelectedUserIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(userId)) {
+        newSet.delete(userId);
+      } else {
+        newSet.add(userId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedUserIds.size === paginatedData.length) {
+      // Deselect all on current page
+      setSelectedUserIds(new Set());
+    } else {
+      // Select all on current page
+      const allIds = new Set(selectedUserIds);
+      paginatedData.forEach((row) => {
+        if (row.id) {
+          allIds.add(String(row.id));
+        }
+      });
+      setSelectedUserIds(allIds);
+    }
+  };
+
+  // ----------------------------------------------------------
+  // DELETE FUNCTIONALITY
+  // ----------------------------------------------------------
+  const handleDeleteSelected = async () => {
+    if (selectedUserIds.size === 0) {
+      alert('Please select at least one user to delete.');
+      return;
+    }
+
+    const confirmMessage = selectedUserIds.size === 1
+      ? 'Are you sure you want to delete this user? This action cannot be undone.'
+      : `Are you sure you want to delete ${selectedUserIds.size} users? This action cannot be undone.`;
+
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const userIds = Array.from(selectedUserIds);
+      
+      // Call Supabase Edge Function
+      const { data: supabaseData } = await supabase.functions.invoke('delete_client_users', {
+        body: {
+          client_id: clientId,
+          user_ids: userIds,
+        },
+      });
+
+      if (supabaseData?.status === 'success' || supabaseData?.status === 'partial_success') {
+        // Refresh data
+        window.dispatchEvent(new Event('refreshDataTable'));
+        // Clear selection
+        setSelectedUserIds(new Set());
+        alert(`Successfully deleted ${supabaseData.deleted || userIds.length} user(s).`);
+      } else {
+        throw new Error(supabaseData?.message || 'Failed to delete users');
+      }
+    } catch (error: any) {
+      console.error('Delete error:', error);
+      alert(`Error deleting users: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // ----------------------------------------------------------
+  // SEND EMAIL FUNCTIONALITY (Placeholder)
+  // ----------------------------------------------------------
+  const handleSendEmail = () => {
+    if (selectedUserIds.size === 0) {
+      alert('Please select at least one user to send email to.');
+      return;
+    }
+    // TODO: Implement email functionality
+    alert(`Send email to ${selectedUserIds.size} selected user(s) - Feature coming soon!`);
+  };
+
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const maxVisible = 5;
@@ -541,12 +636,55 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       </div>
 
       {/* ------------------------------
+          ACTION BUTTONS
+      ------------------------------ */}
+      {selectedUserIds.size > 0 && (
+        <div className="mb-3 flex items-center gap-3">
+          <button
+            onClick={handleSendEmail}
+            disabled={isDeleting}
+            className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            <Mail size={16} />
+            Send Email {selectedUserIds.size > 1 ? `(${selectedUserIds.size})` : ''}
+          </button>
+          <button
+            onClick={handleDeleteSelected}
+            disabled={isDeleting}
+            className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            <Trash2 size={16} />
+            {isDeleting ? 'Deleting...' : `Delete Selected ${selectedUserIds.size > 1 ? 'Users' : 'User'}`}
+          </button>
+          <span className="text-xs text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+            {selectedUserIds.size} selected
+          </span>
+        </div>
+      )}
+
+      {/* ------------------------------
           TABLE
       ------------------------------ */}
       <div className="w-full h-full overflow-auto border border-gray-200 rounded-lg" style={{ height: 'calc(100vh - 350px)' }}>
         <table className="w-full border-collapse min-w-full">
           <thead className="sticky top-0 bg-gray-50 z-10">
             <tr className="border-b border-gray-200">
+              <th className="px-3 py-2 text-left text-xs font-medium text-[#072741] bg-gray-50 whitespace-nowrap w-12">
+                <input
+                  type="checkbox"
+                  checked={
+                    paginatedData.length > 0 &&
+                    paginatedData.filter((r) => r.id).length > 0 &&
+                    paginatedData
+                      .filter((r) => r.id)
+                      .every((r) => selectedUserIds.has(String(r.id)))
+                  }
+                  onChange={toggleSelectAll}
+                  className="rounded border-gray-300 text-[#348ADC] focus:ring-[#348ADC] cursor-pointer"
+                />
+              </th>
               {columns.map((column) => (
                 <th
                   key={column}
@@ -562,29 +700,44 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           <tbody>
             {paginatedData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-3 py-8 text-center text-sm text-gray-500">
+                <td colSpan={columns.length + 1} className="px-3 py-8 text-center text-sm text-gray-500">
                   No data matches the current filters.
                 </td>
               </tr>
             ) : (
-              paginatedData.map((row, idx) => (
-                <tr
-                  key={idx}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                >
-                  {columns.map((column) => (
-                    <td
-                      key={column}
-                      className="px-3 py-2 text-xs text-[#072741] whitespace-nowrap"
-                      style={{ fontFamily: 'Inter, sans-serif' }}
-                    >
-                      {row[column] !== null && row[column] !== undefined
-                        ? String(row[column])
-                        : '-'}
+              paginatedData.map((row, idx) => {
+                const userId = row.id ? String(row.id) : '';
+                const isSelected = userId && selectedUserIds.has(userId);
+                return (
+                  <tr
+                    key={idx}
+                    className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                      isSelected ? 'bg-blue-50' : ''
+                    }`}
+                  >
+                    <td className="px-3 py-2">
+                      <input
+                        type="checkbox"
+                        checked={!!isSelected}
+                        onChange={() => userId && toggleUserSelection(userId)}
+                        disabled={!userId}
+                        className="rounded border-gray-300 text-[#348ADC] focus:ring-[#348ADC] cursor-pointer disabled:cursor-not-allowed"
+                      />
                     </td>
-                  ))}
-                </tr>
-              ))
+                    {columns.map((column) => (
+                      <td
+                        key={column}
+                        className="px-3 py-2 text-xs text-[#072741] whitespace-nowrap"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {row[column] !== null && row[column] !== undefined
+                          ? String(row[column])
+                          : '-'}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
