@@ -119,11 +119,6 @@ export function WebPortal() {
         className={`fixed left-0 top-0 h-screen bg-gradient-to-br from-[#072741] to-[#0a3d5c] border-r border-white/10 flex flex-col z-30 overflow-y-auto transition-all duration-300 ${
           isSidebarCollapsed ? 'w-16' : 'w-64'
         }`}
-        onMouseEnter={() => {
-          if (isSidebarCollapsed) {
-            setIsSidebarCollapsed(false);
-          }
-        }}
       >
         {/* Top Logo Section */}
         <div className={`p-4 flex items-center justify-between ${isSidebarCollapsed ? 'justify-center' : ''}`}>
