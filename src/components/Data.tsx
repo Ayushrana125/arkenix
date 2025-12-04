@@ -128,14 +128,32 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   }, [data]);
 
   // ----------------------------------------------------------
-  // DATE PARSE HELPER - Handles ISO 8601 with timezones
+  // DATE PARSE HELPER - Handles ISO 8601 with timezones (including incomplete formats)
   // ----------------------------------------------------------
   const parseDate = (value: string | null | undefined): Date | null => {
     if (!value) return null;
     try {
-      // Handle ISO 8601 format with timezone (e.g., "2025-12-02T21:13:56.964185+00:00")
-      const d = new Date(value);
-      if (isNaN(d.getTime())) return null;
+      let dateStr = String(value).trim();
+      
+      // Handle incomplete timezone formats (e.g., "2025-12-02T21:13:56.964185+" or "2025-12-02T21:13:56.964185-")
+      // If it ends with just + or -, append "00:00" to make it valid
+      if (dateStr.endsWith('+') || dateStr.endsWith('-')) {
+        dateStr = dateStr + '00:00';
+      }
+      
+      // Try parsing the date
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) {
+        // If parsing fails, try extracting just the date part (YYYY-MM-DD)
+        const dateMatch = dateStr.match(/^(\d{4}-\d{2}-\d{2})/);
+        if (dateMatch) {
+          const dateOnly = new Date(dateMatch[1] + 'T00:00:00Z');
+          if (!isNaN(dateOnly.getTime())) {
+            return dateOnly;
+          }
+        }
+        return null;
+      }
       return d;
     } catch {
       return null;
@@ -143,10 +161,11 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   };
 
   // Get date-only string (YYYY-MM-DD) for comparison
+  // Uses UTC to avoid timezone conversion issues
   const getDateOnly = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
 
@@ -199,15 +218,28 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           filtered = filtered.filter((row) => {
             try {
               const rawValue = row[dateColumn];
-              if (!rawValue) return false; // Skip rows with no date value
+              if (!rawValue || rawValue === '-' || rawValue === null || rawValue === undefined) {
+                return false; // Skip rows with no date value
+              }
               
               const rowDate = parseDate(rawValue);
-              if (!rowDate) return false; // Skip invalid dates
+              if (!rowDate) {
+                // If parsing fails, try to extract date from string directly
+                const dateMatch = String(rawValue).match(/^(\d{4}-\d{2}-\d{2})/);
+                if (!dateMatch) return false;
+                
+                // Use the extracted date for comparison
+                const extractedDate = dateMatch[1];
+                if (dateFrom && extractedDate < dateFrom) return false;
+                if (dateTo && extractedDate > dateTo) return false;
+                return true;
+              }
 
               // Get date-only strings for comparison (YYYY-MM-DD)
               const rowDateOnly = getDateOnly(rowDate);
 
               // Compare date-only strings (ignores time and timezone)
+              // dateFrom and dateTo are already in YYYY-MM-DD format from the date input
               if (dateFrom) {
                 if (rowDateOnly < dateFrom) return false;
               }
@@ -217,8 +249,10 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               }
 
               return true;
-            } catch {
-              return true; // Include row if error parsing
+            } catch (err) {
+              // Log error for debugging but don't break the filter
+              console.warn('Date filter error:', err, row[dateColumn]);
+              return false; // Exclude row if error parsing
             }
           });
         }
