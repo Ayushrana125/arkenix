@@ -453,7 +453,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
         <div className="flex items-center justify-center h-full">
           <p className="text-[#072741] opacity-40 text-center" style={{ fontFamily: 'Inter, sans-serif' }}>
-            No data found for this client.
+            Upload data to get started.
           </p>
         </div>
       </div>
