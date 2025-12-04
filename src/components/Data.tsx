@@ -11,7 +11,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
+  const rowsPerPage = 100;
 
   useEffect(() => {
     if (!clientId) {
