@@ -641,35 +641,42 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           </div>
 
           {/* RIGHT SIDE — ACTION BUTTONS */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
 
-            <button
-              onClick={handleSendEmail}
-              disabled={selectedUserIds.size === 0}
-              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              <Mail size={16} />
-              Send Email
-            </button>
-
-            <button
-              onClick={handleDeleteSelected}
-              disabled={selectedUserIds.size === 0}
-              className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              <Trash2 size={16} />
-              Delete User
-            </button>
-
+            {/* SELECTED COUNT (moved left, subtle premium styling) */}
             {selectedUserIds.size > 0 && (
-              <span className="text-xs text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <span 
+                className="text-xs text-gray-500 pr-2"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
                 {selectedUserIds.size} selected
               </span>
             )}
 
+            {/* SEND EMAIL — smaller, premium buttons */}
+            <button
+              onClick={handleSendEmail}
+              disabled={selectedUserIds.size === 0}
+              className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-md text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              <Mail size={14} />
+              Send Email
+            </button>
+
+            {/* DELETE USER */}
+            <button
+              onClick={handleDeleteSelected}
+              disabled={selectedUserIds.size === 0}
+              className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              <Trash2 size={14} />
+              Delete User
+            </button>
+
           </div>
+
 
         </div>
 
