@@ -576,9 +576,10 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
             <button
               key={type}
               onClick={() => {
-                setSelectedUserType(type);
+                setSelectedUserType((prev) => (prev === type ? '' : type));
                 setCurrentPage(1);
               }}
+
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 selectedUserType === type
                   ? 'bg-[#348ADC] text-white shadow-md'
