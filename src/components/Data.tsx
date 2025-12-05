@@ -661,7 +661,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <Mail size={14} />
-              Send Email
+              Send Emails
             </button>
 
             {/* DELETE USER */}
@@ -672,7 +672,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <Trash2 size={14} />
-              Delete User
+              Delete Users
             </button>
 
           </div>
