@@ -465,7 +465,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       {/* ------------------------------
           FILTERS SECTION
       ------------------------------ */}
-      <div className="mb-4 space-y-4 relative">
+      <div className="mb-4 space-y-4">
 
         {/* GLOBAL SEARCH WITH COLUMN SELECTOR */}
         <div className="flex gap-2">
@@ -576,11 +576,9 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
             <button
               key={type}
               onClick={() => {
-                setSelectedUserType((prev) => prev === type ? '' : type);
+                setSelectedUserType(type);
                 setCurrentPage(1);
               }}
-                
-
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 selectedUserType === type
                   ? 'bg-[#348ADC] text-white shadow-md'
@@ -594,75 +592,91 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         </div>
 
         {/* DATE RANGE FILTER */}
-        <div className="flex flex-wrap items-center gap-3">
 
-        {/* LEFT SIDE FILTERS */}
-          <Calendar size={16} className="text-gray-400" />
-          <span className="text-xs text-gray-600">From:</span>
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={(e) => {
-              setDateFrom(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="px-3 py-1.5 border border-gray-300 rounded-md text-xs"
-          />
-        </div>
+        <div className="flex flex-wrap items-center gap-3 justify-between">
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-600">To:</span>
-          <input
-            type="date"
-            value={dateTo}
-            onChange={(e) => {
-              setDateTo(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="px-3 py-1.5 border border-gray-300 rounded-md text-xs"
-          />
-        </div>
+          {/* LEFT SIDE — DATE FILTERS */}
+          <div className="flex items-center gap-3">
 
-        {(dateFrom || dateTo) && (
-          <button
-            onClick={() => {
-              setDateFrom('');
-              setDateTo('');
-              setCurrentPage(1);
-            }}
-            className="px-2 py-1 text-xs text-red-600 flex items-center gap-1"
-          >
-            <X size={14} /> Clear
-          </button>
-        )}
+            <div className="flex items-center gap-2">
+              <Calendar size={16} className="text-gray-400" />
+              <span className="text-xs text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>From:</span>
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => {
+                  setDateFrom(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-[#348ADC]"
+              />
+            </div>
 
-        {/* RIGHT SIDE ACTION BUTTONS */}
-        {selectedUserIds.size > 0 && (
-          <div className="ml-auto flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>To:</span>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => {
+                  setDateTo(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-[#348ADC]"
+              />
+            </div>
+
+            {(dateFrom || dateTo) && (
+              <button
+                onClick={() => {
+                  setDateFrom('');
+                  setDateTo('');
+                  setCurrentPage(1);
+                }}
+                className="px-2 py-1 text-xs text-red-600 hover:text-red-700 flex items-center gap-1"
+              >
+                <X size={14} /> Clear
+              </button>
+            )}
+
+          </div>
+
+          {/* RIGHT SIDE — ACTION BUTTONS */}
+          <div className="flex items-center gap-3">
 
             <button
               onClick={handleSendEmail}
-              className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-md text-xs flex items-center gap-1"
+              disabled={selectedUserIds.size === 0}
+              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              <Mail size={14} />
+              <Mail size={16} />
               Send Email
             </button>
 
             <button
               onClick={handleDeleteSelected}
-              className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md text-xs flex items-center gap-1"
+              disabled={selectedUserIds.size === 0}
+              className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              <Trash2 size={14} />
+              <Trash2 size={16} />
               Delete User
             </button>
 
-            <span className="text-xs text-gray-500">{selectedUserIds.size} selected</span>
+            {selectedUserIds.size > 0 && (
+              <span className="text-xs text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+                {selectedUserIds.size} selected
+              </span>
+            )}
+
           </div>
-        )}
+
         </div>
 
 
+      </div>
 
+      
 
       {/* ------------------------------
           TABLE
@@ -814,4 +828,3 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     </div>
   );
 }
-
