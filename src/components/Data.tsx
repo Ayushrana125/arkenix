@@ -594,78 +594,73 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         </div>
 
         {/* DATE RANGE FILTER */}
-        <div className="flex flex-wrap gap-3 items-center">
-          <div className="flex items-center gap-2">
-            <Calendar size={16} className="text-gray-400" />
-            <span className="text-xs text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>From:</span>
-            <input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => {
-                setDateFrom(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-[#348ADC]"
-            />
-          </div>
+        <div className="flex flex-wrap items-center gap-3">
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>To:</span>
-            <input
-              type="date"
-              value={dateTo}
-              onChange={(e) => {
-                setDateTo(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-[#348ADC]"
-            />
-          </div>
+        {/* LEFT SIDE FILTERS */}
+          <Calendar size={16} className="text-gray-400" />
+          <span className="text-xs text-gray-600">From:</span>
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => {
+              setDateFrom(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-3 py-1.5 border border-gray-300 rounded-md text-xs"
+          />
+        </div>
 
-          {(dateFrom || dateTo) && (
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-600">To:</span>
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => {
+              setDateTo(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-3 py-1.5 border border-gray-300 rounded-md text-xs"
+          />
+        </div>
+
+        {(dateFrom || dateTo) && (
+          <button
+            onClick={() => {
+              setDateFrom('');
+              setDateTo('');
+              setCurrentPage(1);
+            }}
+            className="px-2 py-1 text-xs text-red-600 flex items-center gap-1"
+          >
+            <X size={14} /> Clear
+          </button>
+        )}
+
+        {/* RIGHT SIDE ACTION BUTTONS */}
+        {selectedUserIds.size > 0 && (
+          <div className="ml-auto flex items-center gap-2">
+
             <button
-              onClick={() => {
-                setDateFrom('');
-                setDateTo('');
-                setCurrentPage(1);
-              }}
-              className="px-2 py-1 text-xs text-red-600 hover:text-red-700 flex items-center gap-1"
+              onClick={handleSendEmail}
+              className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-md text-xs flex items-center gap-1"
             >
-              <X size={14} /> Clear
+              <Mail size={14} />
+              Send Email
             </button>
-          )}
+
+            <button
+              onClick={handleDeleteSelected}
+              className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md text-xs flex items-center gap-1"
+            >
+              <Trash2 size={14} />
+              Delete User
+            </button>
+
+            <span className="text-xs text-gray-500">{selectedUserIds.size} selected</span>
+          </div>
+        )}
         </div>
-      </div>
 
-      {/* ------------------------------
-          ACTION BUTTONS
-      ------------------------------ */}
-      {selectedUserIds.size > 0 && (
-        <div className="absolute right-0 -top-2 flex items-center gap-2 z-20">
-
-          <button
-            onClick={handleSendEmail}
-            disabled={isDeleting}
-            className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-md text-xs font-medium flex items-center gap-1 shadow-sm disabled:opacity-50"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            <Mail size={14} />
-            Send Email {selectedUserIds.size > 1 ? `(${selectedUserIds.size})` : ''}
-          </button>
-
-          <button
-            onClick={handleDeleteSelected}
-            disabled={isDeleting}
-            className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md text-xs font-medium flex items-center gap-1 disabled:opacity-50"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            <Trash2 size={14} />
-            {isDeleting ? 'Deleting...' : `Delete ${selectedUserIds.size > 1 ? 'Users' : 'User'}`}
-          </button>
-
-          <span className="text-xs text-gray-500">{selectedUserIds.size} selected</span>
-        </div>
-      )}
 
 
 
