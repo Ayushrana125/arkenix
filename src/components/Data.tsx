@@ -465,7 +465,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       {/* ------------------------------
           FILTERS SECTION
       ------------------------------ */}
-      <div className="mb-4 space-y-4">
+      <div className="mb-4 space-y-4 relative">
 
         {/* GLOBAL SEARCH WITH COLUMN SELECTOR */}
         <div className="flex gap-2">
@@ -641,36 +641,32 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           ACTION BUTTONS
       ------------------------------ */}
       {selectedUserIds.size > 0 && (
-        <div className="mb-3 flex items-center justify-end gap-2 w-full">
+        <div className="absolute right-0 -top-2 flex items-center gap-2 z-20">
 
-          {/* SEND EMAIL */}
           <button
             onClick={handleSendEmail}
             disabled={isDeleting}
-            className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-md text-xs font-medium transition-all flex items-center gap-1 shadow-sm disabled:opacity-50"
+            className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-md text-xs font-medium flex items-center gap-1 shadow-sm disabled:opacity-50"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             <Mail size={14} />
             Send Email {selectedUserIds.size > 1 ? `(${selectedUserIds.size})` : ''}
           </button>
 
-          {/* DELETE USER */}
           <button
             onClick={handleDeleteSelected}
             disabled={isDeleting}
-            className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md text-xs font-medium transition-all flex items-center gap-1 disabled:opacity-50"
+            className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md text-xs font-medium flex items-center gap-1 disabled:opacity-50"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             <Trash2 size={14} />
             {isDeleting ? 'Deleting...' : `Delete ${selectedUserIds.size > 1 ? 'Users' : 'User'}`}
           </button>
 
-          <span className="text-xs text-gray-500">
-            {selectedUserIds.size} selected
-          </span>
-
+          <span className="text-xs text-gray-500">{selectedUserIds.size} selected</span>
         </div>
       )}
+
 
 
       {/* ------------------------------
