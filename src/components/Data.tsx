@@ -576,9 +576,11 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
             <button
               key={type}
               onClick={() => {
-                setSelectedUserType(type);
+                setSelectedUserType((prev) => prev === type ? '' : type);
                 setCurrentPage(1);
               }}
+                
+
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 selectedUserType === type
                   ? 'bg-[#348ADC] text-white shadow-md'
@@ -639,30 +641,37 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           ACTION BUTTONS
       ------------------------------ */}
       {selectedUserIds.size > 0 && (
-        <div className="mb-3 flex items-center gap-3">
+        <div className="mb-3 flex items-center justify-end gap-2 w-full">
+
+          {/* SEND EMAIL */}
           <button
             onClick={handleSendEmail}
             disabled={isDeleting}
-            className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-md text-xs font-medium transition-all flex items-center gap-1 shadow-sm disabled:opacity-50"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            <Mail size={16} />
+            <Mail size={14} />
             Send Email {selectedUserIds.size > 1 ? `(${selectedUserIds.size})` : ''}
           </button>
+
+          {/* DELETE USER */}
           <button
             onClick={handleDeleteSelected}
             disabled={isDeleting}
-            className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md text-xs font-medium transition-all flex items-center gap-1 disabled:opacity-50"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            <Trash2 size={16} />
-            {isDeleting ? 'Deleting...' : `Delete Selected ${selectedUserIds.size > 1 ? 'Users' : 'User'}`}
+            <Trash2 size={14} />
+            {isDeleting ? 'Deleting...' : `Delete ${selectedUserIds.size > 1 ? 'Users' : 'User'}`}
           </button>
-          <span className="text-xs text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+
+          <span className="text-xs text-gray-500">
             {selectedUserIds.size} selected
           </span>
+
         </div>
       )}
+
 
       {/* ------------------------------
           TABLE
