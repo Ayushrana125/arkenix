@@ -44,7 +44,7 @@ const HEADER_NORMALIZATIONS: { [key: string]: string } = {
   'phone number': 'mobile_number',
 };
 
-const MAX_ROWS = 10000;
+const MAX_ROWS = 100000;
 const MAX_STRING_LENGTH = 255;
 const PREVIEW_ROWS = 5;
 
