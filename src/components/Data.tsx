@@ -37,7 +37,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const [selectedSearchColumns, setSelectedSearchColumns] = useState<string[]>([]); // Empty = all columns
   const [isSearchColumnDropdownOpen, setIsSearchColumnDropdownOpen] = useState(false);
   const searchColumnDropdownRef = useRef<HTMLDivElement | null>(null);
-  const [selectedUserType, setSelectedUserType] = useState<string>('Prospect'); // Default
+  const [selectedUserType, setSelectedUserType] = useState<string>('');  // Default
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
