@@ -245,18 +245,21 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
       }
     };
 
-    // Check if we have cached counts
-    const cachedCounts = sessionStorage.getItem(`dashboard_counts_${clientId}`);
-    if (cachedCounts && contactCounts.total === 0) {
-      // Load from cache immediately (no animation on switch)
-      const counts = JSON.parse(cachedCounts);
-      setContactCounts(counts);
-      setIsDataLoaded(true);
-      setIsLoading(false);
-      setShouldAnimateCounters(false);
-    } else if (contactCounts.total === 0) {
-      // First load - fetch and animate
-      fetchContactCounts();
+    // Only fetch if counts are zero
+    if (contactCounts.total === 0) {
+      // Check if we have cached counts (only for page switches, not after data changes)
+      const cachedCounts = sessionStorage.getItem(`dashboard_counts_${clientId}`);
+      if (cachedCounts) {
+        // Load from cache immediately (no animation on switch)
+        const counts = JSON.parse(cachedCounts);
+        setContactCounts(counts);
+        setIsDataLoaded(true);
+        setIsLoading(false);
+        setShouldAnimateCounters(false);
+      } else {
+        // First load or after data change - fetch fresh data
+        fetchContactCounts();
+      }
     }
 
     // Listen for user upload events (triggers animation)
