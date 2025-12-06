@@ -211,68 +211,29 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
     const fetchContactCounts = async () => {
       try {
-        // Progressive loading: Fetch all data in batches, show first batch immediately
-        let allData: any[] = [];
-        let from = 0;
-        const batchSize = 1000;
-        let hasMore = true;
-        let isFirstBatch = true;
+        // First, get total count and breakdown using aggregation
+        const { data: allData, error } = await supabase
+          .from('clients_user_data')
+          .select('user_type')
+          .eq('client_id', clientId);
 
-        while (hasMore) {
-          const { data: batchData, error } = await supabase
-            .from('clients_user_data')
-            .select('user_type')
-            .eq('client_id', clientId)
-            .range(from, from + batchSize - 1);
+        if (error) throw error;
 
-          if (error) throw error;
-
-          if (batchData && batchData.length > 0) {
-            allData = [...allData, ...batchData];
-            
-            // Show first batch immediately
-            if (isFirstBatch) {
-              const counts = {
-                total: batchData.length,
-                prospect: batchData.filter(item => item.user_type?.toLowerCase() === 'prospect').length,
-                lead: batchData.filter(item => item.user_type?.toLowerCase() === 'lead').length,
-                user: batchData.filter(item => item.user_type?.toLowerCase() === 'user').length
-              };
-              setContactCounts(counts);
-              setIsDataLoaded(true);
-              setIsLoading(false);
-              if (!hasInitialLoad) {
-                setShouldAnimateCounters(true);
-                setHasInitialLoad(true);
-                sessionStorage.setItem('dashboardAnimated', 'true');
-              }
-              isFirstBatch = false;
-            } else {
-              // Update counts progressively
-              const counts = {
-                total: allData.length,
-                prospect: allData.filter(item => item.user_type?.toLowerCase() === 'prospect').length,
-                lead: allData.filter(item => item.user_type?.toLowerCase() === 'lead').length,
-                user: allData.filter(item => item.user_type?.toLowerCase() === 'user').length
-              };
-              setContactCounts(counts);
-            }
-            
-            from += batchSize;
-            hasMore = batchData.length === batchSize;
-          } else {
-            hasMore = false;
-          }
-        }
-
-        // Final update with all data
-        const finalCounts = {
-          total: allData.length,
-          prospect: allData.filter(item => item.user_type?.toLowerCase() === 'prospect').length,
-          lead: allData.filter(item => item.user_type?.toLowerCase() === 'lead').length,
-          user: allData.filter(item => item.user_type?.toLowerCase() === 'user').length
+        const counts = {
+          total: allData?.length || 0,
+          prospect: allData?.filter(item => item.user_type?.toLowerCase() === 'prospect').length || 0,
+          lead: allData?.filter(item => item.user_type?.toLowerCase() === 'lead').length || 0,
+          user: allData?.filter(item => item.user_type?.toLowerCase() === 'user').length || 0
         };
-        setContactCounts(finalCounts);
+
+        setContactCounts(counts);
+        setIsDataLoaded(true);
+        setIsLoading(false);
+        if (!hasInitialLoad) {
+          setShouldAnimateCounters(true);
+          setHasInitialLoad(true);
+          sessionStorage.setItem('dashboardAnimated', 'true');
+        }
       } catch (error) {
         console.error('Error fetching contact counts:', error);
         // Set fallback data on error

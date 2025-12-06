@@ -117,7 +117,6 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       } catch (err: any) {
         console.error('Error fetching data:', err);
         setError(err.message || 'Failed to load data');
-      } finally {
         setIsLoading(false);
       }
     };
