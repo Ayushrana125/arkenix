@@ -125,7 +125,7 @@ const MeetingsTable = () => (
   <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
     <div className="flex justify-between items-center mb-8">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-[#348ADC] to-[#65C9D4] rounded-2xl flex items-center justify-center">
+        <div className="w-10 h-10 bg-[#072741] rounded-2xl flex items-center justify-center">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
             <line x1="16" y1="2" x2="16" y2="6"/>
