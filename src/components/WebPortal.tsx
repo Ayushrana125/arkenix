@@ -3,6 +3,7 @@ import { Home, Database, FileText, Mail, Megaphone, Settings, Globe, LogOut, Arr
 import { useNavigate } from 'react-router-dom';
 import { UploadDataPage } from './UploadDataPage';
 import { ClientsDataTable } from './Data';
+import { Dashboard } from './Dashboard';
 
 interface UserData {
   id?: string;
@@ -376,7 +377,9 @@ export function WebPortal() {
             {/* Content Area - Scrollable table container */}
             <div className="flex-1 min-h-0 relative">
               <div className="absolute inset-0 overflow-auto">
-                {activeMenu === 'Data' && dataSubPage === 'audiences' ? (
+                {activeMenu === 'Home' ? (
+                  <Dashboard />
+                ) : activeMenu === 'Data' && dataSubPage === 'audiences' ? (
                   <ManageAudiencesView />
                 ) : activeMenu === 'Data' && dataSubPage === null ? (
                   <ClientsDataTable clientId={getClientId()} />
