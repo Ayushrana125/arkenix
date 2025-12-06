@@ -53,44 +53,6 @@ const mockData = {
 };
 
 // Reusable Components
-const HeroStatCard = ({ title, value, subtitle, breakdown }: any) => (
-  <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-200">
-    <h3 className="text-lg font-semibold text-gray-700 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {title}
-    </h3>
-    <div className="text-4xl font-bold text-[#072741] mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
-      {typeof value === 'number' ? value.toLocaleString() : value}
-    </div>
-    {subtitle && (
-      <p className="text-sm text-gray-500 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-        {subtitle}
-      </p>
-    )}
-    {breakdown && (
-      <div className="flex gap-6 mt-4 text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-        <span className="font-medium">Prospect: {breakdown.prospect.toLocaleString()}</span>
-        <span className="font-medium">Lead: {breakdown.lead.toLocaleString()}</span>
-        <span className="font-medium">User: {breakdown.user.toLocaleString()}</span>
-      </div>
-    )}
-  </div>
-);
-
-const SecondaryStatCard = ({ title, value, subtitle }: any) => (
-  <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-    <h3 className="text-sm font-medium text-gray-600 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {title}
-    </h3>
-    <div className="text-2xl font-bold text-[#072741] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-      {typeof value === 'number' ? value.toLocaleString() : value}
-    </div>
-    {subtitle && (
-      <p className="text-xs text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-        {subtitle}
-      </p>
-    )}
-  </div>
-);
 
 const ChartCard = ({ title, children, size = 'normal' }: any) => (
   <div className={`bg-white rounded-xl shadow-sm border border-gray-200 ${
@@ -177,33 +139,130 @@ const ActivityItem = ({ text, time }: any) => (
 export function Dashboard() {
   return (
     <div className="space-y-10 p-6 max-w-7xl mx-auto">
-      {/* Section 1 - Hero Metrics (Large Cards) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <HeroStatCard 
-          title="Total Contacts" 
-          value={mockData.summaryCards.totalContacts.value}
-          breakdown={mockData.summaryCards.totalContacts.breakdown}
-        />
-        <HeroStatCard 
-          title="Emails Sent" 
-          value={mockData.summaryCards.emailsSent.value}
-          subtitle={mockData.summaryCards.emailsSent.subtitle}
-        />
-        <HeroStatCard 
-          title="WhatsApp Messages Sent" 
-          value={mockData.summaryCards.whatsappSent.value}
-          subtitle={mockData.summaryCards.whatsappSent.subtitle}
-        />
-        <HeroStatCard 
-          title="AI Emails Generated" 
-          value={mockData.summaryCards.aiEmails.value}
-          subtitle={mockData.summaryCards.aiEmails.subtitle}
-        />
-        <HeroStatCard 
-          title="Upcoming Meetings" 
-          value={mockData.summaryCards.upcomingMeetings.value}
-          subtitle={mockData.summaryCards.upcomingMeetings.subtitle}
-        />
+      {/* Section 1 - Hero Metrics (Modern SaaS Layout) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Primary Hero Card - Total Contacts */}
+        <div className="lg:col-span-5">
+          <div className="bg-gradient-to-br from-[#348ADC] to-[#65C9D4] rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-medium opacity-90 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Total Contacts
+                </h3>
+                <div className="text-5xl font-bold mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  {mockData.summaryCards.totalContacts.value.toLocaleString()}
+                </div>
+              </div>
+              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
+              <div>
+                <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  {mockData.summaryCards.totalContacts.breakdown.prospect.toLocaleString()}
+                </div>
+                <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Prospects</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  {mockData.summaryCards.totalContacts.breakdown.lead.toLocaleString()}
+                </div>
+                <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Leads</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  {mockData.summaryCards.totalContacts.breakdown.user.toLocaleString()}
+                </div>
+                <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Users</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Secondary Cards Grid */}
+        <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Emails Sent */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </div>
+              <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+                This Week
+              </span>
+            </div>
+            <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>Emails Sent</h3>
+            <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              {mockData.summaryCards.emailsSent.value.toLocaleString()}
+            </div>
+          </div>
+
+          {/* WhatsApp Messages */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#25d366" strokeWidth="2">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                </svg>
+              </div>
+              <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+                This Week
+              </span>
+            </div>
+            <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>WhatsApp Messages</h3>
+            <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              {mockData.summaryCards.whatsappSent.value.toLocaleString()}
+            </div>
+          </div>
+
+          {/* AI Emails Generated */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2">
+                  <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+              </div>
+              <span className="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+                AI Usage
+              </span>
+            </div>
+            <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>AI Emails Generated</h3>
+            <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              {mockData.summaryCards.aiEmails.value.toLocaleString()}
+            </div>
+          </div>
+
+          {/* Upcoming Meetings */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </div>
+              <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+                Dec 15, 2024
+              </span>
+            </div>
+            <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>Upcoming Meetings</h3>
+            <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              {mockData.summaryCards.upcomingMeetings.value}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Section 2 - Meetings Table */}
