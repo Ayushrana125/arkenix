@@ -145,7 +145,7 @@ const MeetingsTable = () => (
       {mockData.upcomingMeetings.map((meeting, index) => (
         <div key={index} className="flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-100/50 rounded-2xl transition-all duration-200 group">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-semibold text-sm">
+            <div className="w-10 h-10 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
               {meeting.name.split(' ').map(n => n[0]).join('')}
             </div>
             <div>
@@ -506,8 +506,8 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 bg-[#072741]/10 rounded-xl flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#072741" strokeWidth="2">
+            <div className="w-8 h-8 bg-[#072741] rounded-xl flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                 <circle cx="12" cy="10" r="3"/>
               </svg>
@@ -536,8 +536,8 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
         <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 bg-[#072741]/10 rounded-xl flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#072741" strokeWidth="2">
+            <div className="w-8 h-8 bg-[#072741] rounded-xl flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="2" y1="12" x2="22" y2="12"/>
                 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
