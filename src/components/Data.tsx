@@ -506,21 +506,28 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
     setIsSaving(true);
     try {
-      const { error } = await supabase
-        .from('clients_user_data')
-        .update(editedUserData)
-        .eq('id', editedUserData.id)
-        .eq('client_id', clientId);
+      // Call Supabase Edge Function
+      const { data: supabaseData, error } = await supabase.functions.invoke('update_client_user', {
+        body: {
+          client_id: clientId,
+          user_id: editedUserData.id,
+          user_data: editedUserData,
+        },
+      });
 
       if (error) throw error;
 
-      // Refresh data
-      window.dispatchEvent(new Event('refreshDataTable'));
-      setIsUpdatePanelOpen(false);
-      setEditedUserData({});
-      setOriginalUserData({});
-      setSelectedUserIds(new Set());
-      alert('User updated successfully!');
+      if (supabaseData?.status === 'success') {
+        // Refresh data
+        window.dispatchEvent(new Event('refreshDataTable'));
+        setIsUpdatePanelOpen(false);
+        setEditedUserData({});
+        setOriginalUserData({});
+        setSelectedUserIds(new Set());
+        alert('User updated successfully!');
+      } else {
+        throw new Error(supabaseData?.message || 'Failed to update user');
+      }
     } catch (error: any) {
       console.error('Update error:', error);
       alert(`Error updating user: ${error.message || 'Unknown error'}`);
