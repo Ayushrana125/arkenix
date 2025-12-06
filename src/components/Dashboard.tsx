@@ -201,7 +201,9 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
   });
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [shouldAnimateCounters, setShouldAnimateCounters] = useState(false);
-  const [hasInitialLoad, setHasInitialLoad] = useState(false);
+  const [hasInitialLoad, setHasInitialLoad] = useState(() => {
+    return sessionStorage.getItem('dashboardAnimated') === 'true';
+  });
 
   useEffect(() => {
     if (!clientId) return;
@@ -227,6 +229,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
         if (!hasInitialLoad) {
           setShouldAnimateCounters(true);
           setHasInitialLoad(true);
+          sessionStorage.setItem('dashboardAnimated', 'true');
         }
       } catch (error) {
         console.error('Error fetching contact counts:', error);
@@ -236,6 +239,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
         if (!hasInitialLoad) {
           setShouldAnimateCounters(true);
           setHasInitialLoad(true);
+          sessionStorage.setItem('dashboardAnimated', 'true');
         }
       }
     };
@@ -247,9 +251,8 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
       setIsDataLoaded(false);
       setShouldAnimateCounters(false);
       setTimeout(() => {
-        fetchContactCounts().then(() => {
-          setShouldAnimateCounters(true);
-        });
+        fetchContactCounts();
+        setShouldAnimateCounters(true);
       }, 100);
     };
 
@@ -273,6 +276,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
       setIsDataLoaded(true);
       setShouldAnimateCounters(true);
       setHasInitialLoad(true);
+      sessionStorage.setItem('dashboardAnimated', 'true');
     }
   }, [clientId]);
   return (
