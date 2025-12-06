@@ -3,10 +3,16 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { supabase } from '../lib/supabase';
 
 // Animated Counter Hook
-const useAnimatedCounter = (target: number, duration: number = 1500) => {
+const useAnimatedCounter = (target: number, shouldAnimate: boolean, duration: number = 1500) => {
   const [count, setCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {
+    if (!shouldAnimate) {
+      setCount(target);
+      return;
+    }
+
     if (target === 0) {
       setCount(0);
       return;
@@ -29,22 +35,23 @@ const useAnimatedCounter = (target: number, duration: number = 1500) => {
         requestAnimationFrame(animate);
       } else {
         setCount(target);
+        setHasAnimated(true);
       }
     };
 
     const timer = setTimeout(() => {
       requestAnimationFrame(animate);
-    }, 100); // Small delay for better UX
+    }, 100);
 
     return () => clearTimeout(timer);
-  }, [target, duration]);
+  }, [target, shouldAnimate, duration]);
 
   return count;
 };
 
 // Animated Counter Component
-const AnimatedCounter = ({ value, duration = 1500 }: { value: number; duration?: number }) => {
-  const animatedValue = useAnimatedCounter(value, duration);
+const AnimatedCounter = ({ value, shouldAnimate, duration = 1500 }: { value: number; shouldAnimate: boolean; duration?: number }) => {
+  const animatedValue = useAnimatedCounter(value, shouldAnimate, duration);
   return <>{animatedValue.toLocaleString()}</>;
 };
 
@@ -193,6 +200,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
     user: 0
   });
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [shouldAnimateCounters, setShouldAnimateCounters] = useState(false);
 
   useEffect(() => {
     if (!clientId) return;
@@ -215,11 +223,13 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
         setContactCounts(counts);
         setIsDataLoaded(true);
+        setShouldAnimateCounters(true);
       } catch (error) {
         console.error('Error fetching contact counts:', error);
         // Set fallback data on error
         setContactCounts({ total: 8260, prospect: 3200, lead: 2800, user: 2260 });
         setIsDataLoaded(true);
+        setShouldAnimateCounters(true);
       }
     };
 
@@ -228,7 +238,8 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
     // Listen for data refresh events
     const handleRefresh = () => {
       setIsDataLoaded(false);
-      fetchContactCounts();
+      setShouldAnimateCounters(false);
+      setTimeout(() => fetchContactCounts(), 100);
     };
     window.addEventListener('refreshDataTable', handleRefresh);
 
@@ -242,6 +253,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
     if (!clientId) {
       setContactCounts({ total: 8260, prospect: 3200, lead: 2800, user: 2260 });
       setIsDataLoaded(true);
+      setShouldAnimateCounters(true);
     }
   }, [clientId]);
   return (
@@ -257,7 +269,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
                   Total Contacts
                 </h3>
                 <div className="text-5xl font-bold mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  <AnimatedCounter value={isDataLoaded ? contactCounts.total : 0} duration={2000} />
+                  <AnimatedCounter value={contactCounts.total} shouldAnimate={shouldAnimateCounters} duration={2000} />
                 </div>
               </div>
               <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -272,19 +284,19 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
             <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  <AnimatedCounter value={isDataLoaded ? contactCounts.prospect : 0} duration={1800} />
+                  <AnimatedCounter value={contactCounts.prospect} shouldAnimate={shouldAnimateCounters} duration={1800} />
                 </div>
                 <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Prospects</div>
               </div>
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  <AnimatedCounter value={isDataLoaded ? contactCounts.lead : 0} duration={1600} />
+                  <AnimatedCounter value={contactCounts.lead} shouldAnimate={shouldAnimateCounters} duration={1600} />
                 </div>
                 <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Leads</div>
               </div>
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  <AnimatedCounter value={isDataLoaded ? contactCounts.user : 0} duration={1400} />
+                  <AnimatedCounter value={contactCounts.user} shouldAnimate={shouldAnimateCounters} duration={1400} />
                 </div>
                 <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Users</div>
               </div>
@@ -309,7 +321,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
             </div>
             <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>Emails Sent</h3>
             <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              <AnimatedCounter value={mockData.summaryCards.emailsSent.value} duration={1200} />
+              <AnimatedCounter value={mockData.summaryCards.emailsSent.value} shouldAnimate={shouldAnimateCounters} duration={1200} />
             </div>
           </div>
 
@@ -327,7 +339,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
             </div>
             <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>WhatsApp Messages</h3>
             <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              <AnimatedCounter value={mockData.summaryCards.whatsappSent.value} duration={1000} />
+              <AnimatedCounter value={mockData.summaryCards.whatsappSent.value} shouldAnimate={shouldAnimateCounters} duration={1000} />
             </div>
           </div>
 
@@ -345,7 +357,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
             </div>
             <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>AI Emails Generated</h3>
             <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              <AnimatedCounter value={mockData.summaryCards.aiEmails.value} duration={800} />
+              <AnimatedCounter value={mockData.summaryCards.aiEmails.value} shouldAnimate={shouldAnimateCounters} duration={800} />
             </div>
           </div>
 
@@ -366,7 +378,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
             </div>
             <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>Upcoming Meetings</h3>
             <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              <AnimatedCounter value={mockData.summaryCards.upcomingMeetings.value} duration={600} />
+              <AnimatedCounter value={mockData.summaryCards.upcomingMeetings.value} shouldAnimate={shouldAnimateCounters} duration={600} />
             </div>
           </div>
         </div>
@@ -390,7 +402,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
           </div>
           <div className="mb-8">
             <div className="text-5xl font-bold text-[#072741] mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              <AnimatedCounter value={mockData.dataCompleteness.overall} duration={1500} />%
+              <AnimatedCounter value={mockData.dataCompleteness.overall} shouldAnimate={shouldAnimateCounters} duration={1500} />%
             </div>
             <p className="text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
               Overall Score
