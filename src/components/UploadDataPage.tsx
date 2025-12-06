@@ -32,7 +32,6 @@ const ALLOWED_HEADERS = [
 const HEADER_NORMALIZATIONS: { [key: string]: string } = {
   'firstname': 'first_name',
   'first name': 'first_name',
-  'firstname': 'first_name',
   'lastname': 'last_name',
   'last name': 'last_name',
   'email': 'official_email',
