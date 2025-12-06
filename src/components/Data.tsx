@@ -78,7 +78,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         // Fetch all data in batches to handle 20K+ rows
         let allData: any[] = [];
         let from = 0;
-        const batchSize = 10000;
+        const batchSize = 1000;
         let hasMore = true;
 
         while (hasMore) {
