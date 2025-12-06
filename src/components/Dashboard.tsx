@@ -2,6 +2,52 @@ import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { supabase } from '../lib/supabase';
 
+// Animated Counter Hook
+const useAnimatedCounter = (target: number, duration: number = 1500) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (target === 0) {
+      setCount(0);
+      return;
+    }
+
+    const startTime = Date.now();
+    const startValue = 0;
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Easing function for smooth animation
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      const currentValue = Math.floor(startValue + (target - startValue) * easeOutQuart);
+      
+      setCount(currentValue);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setCount(target);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      requestAnimationFrame(animate);
+    }, 100); // Small delay for better UX
+
+    return () => clearTimeout(timer);
+  }, [target, duration]);
+
+  return count;
+};
+
+// Animated Counter Component
+const AnimatedCounter = ({ value, duration = 1500 }: { value: number; duration?: number }) => {
+  const animatedValue = useAnimatedCounter(value, duration);
+  return <>{animatedValue.toLocaleString()}</>;
+};
+
 // Mock Data
 const mockData = {
   summaryCards: {
@@ -141,11 +187,12 @@ interface DashboardProps {
 
 export function Dashboard({ clientId }: DashboardProps = {}) {
   const [contactCounts, setContactCounts] = useState({
-    total: 8260,
-    prospect: 3200,
-    lead: 2800,
-    user: 2260
+    total: 0,
+    prospect: 0,
+    lead: 0,
+    user: 0
   });
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useEffect(() => {
     if (!clientId) return;
@@ -167,20 +214,35 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
         };
 
         setContactCounts(counts);
+        setIsDataLoaded(true);
       } catch (error) {
         console.error('Error fetching contact counts:', error);
+        // Set fallback data on error
+        setContactCounts({ total: 8260, prospect: 3200, lead: 2800, user: 2260 });
+        setIsDataLoaded(true);
       }
     };
 
     fetchContactCounts();
 
     // Listen for data refresh events
-    const handleRefresh = () => fetchContactCounts();
+    const handleRefresh = () => {
+      setIsDataLoaded(false);
+      fetchContactCounts();
+    };
     window.addEventListener('refreshDataTable', handleRefresh);
 
     return () => {
       window.removeEventListener('refreshDataTable', handleRefresh);
     };
+  }, [clientId]);
+
+  // Initialize with fallback data if no clientId
+  useEffect(() => {
+    if (!clientId) {
+      setContactCounts({ total: 8260, prospect: 3200, lead: 2800, user: 2260 });
+      setIsDataLoaded(true);
+    }
   }, [clientId]);
   return (
     <div className="space-y-10 p-6 max-w-7xl mx-auto">
@@ -195,7 +257,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
                   Total Contacts
                 </h3>
                 <div className="text-5xl font-bold mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  {contactCounts.total.toLocaleString()}
+                  <AnimatedCounter value={isDataLoaded ? contactCounts.total : 0} duration={2000} />
                 </div>
               </div>
               <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -210,19 +272,19 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
             <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  {contactCounts.prospect.toLocaleString()}
+                  <AnimatedCounter value={isDataLoaded ? contactCounts.prospect : 0} duration={1800} />
                 </div>
                 <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Prospects</div>
               </div>
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  {contactCounts.lead.toLocaleString()}
+                  <AnimatedCounter value={isDataLoaded ? contactCounts.lead : 0} duration={1600} />
                 </div>
                 <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Leads</div>
               </div>
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  {contactCounts.user.toLocaleString()}
+                  <AnimatedCounter value={isDataLoaded ? contactCounts.user : 0} duration={1400} />
                 </div>
                 <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Users</div>
               </div>
@@ -247,7 +309,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
             </div>
             <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>Emails Sent</h3>
             <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              {mockData.summaryCards.emailsSent.value.toLocaleString()}
+              <AnimatedCounter value={mockData.summaryCards.emailsSent.value} duration={1200} />
             </div>
           </div>
 
@@ -265,7 +327,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
             </div>
             <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>WhatsApp Messages</h3>
             <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              {mockData.summaryCards.whatsappSent.value.toLocaleString()}
+              <AnimatedCounter value={mockData.summaryCards.whatsappSent.value} duration={1000} />
             </div>
           </div>
 
@@ -283,7 +345,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
             </div>
             <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>AI Emails Generated</h3>
             <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              {mockData.summaryCards.aiEmails.value.toLocaleString()}
+              <AnimatedCounter value={mockData.summaryCards.aiEmails.value} duration={800} />
             </div>
           </div>
 
@@ -304,7 +366,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
             </div>
             <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>Upcoming Meetings</h3>
             <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              {mockData.summaryCards.upcomingMeetings.value}
+              <AnimatedCounter value={mockData.summaryCards.upcomingMeetings.value} duration={600} />
             </div>
           </div>
         </div>
@@ -328,7 +390,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
           </div>
           <div className="mb-8">
             <div className="text-5xl font-bold text-[#072741] mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              {mockData.dataCompleteness.overall}%
+              <AnimatedCounter value={mockData.dataCompleteness.overall} duration={1500} />%
             </div>
             <p className="text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
               Overall Score
