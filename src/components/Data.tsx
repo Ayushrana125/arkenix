@@ -182,6 +182,62 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   };
 
   // ----------------------------------------------------------
+  // FUZZY MATCH HELPER - Levenshtein distance for typo tolerance
+  // ----------------------------------------------------------
+  const levenshteinDistance = (str1: string, str2: string): number => {
+    const len1 = str1.length;
+    const len2 = str2.length;
+    const matrix: number[][] = [];
+
+    for (let i = 0; i <= len1; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= len2; j++) {
+      matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= len1; i++) {
+      for (let j = 1; j <= len2; j++) {
+        const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j - 1] + cost
+        );
+      }
+    }
+    return matrix[len1][len2];
+  };
+
+  const fuzzyMatch = (searchTerm: string, value: string): boolean => {
+    const search = searchTerm.toLowerCase();
+    const val = value.toLowerCase();
+
+    // Exact substring match (fastest)
+    if (val.includes(search)) return true;
+
+    // For short terms (<=3 chars), require exact match to avoid false positives
+    if (search.length <= 3) return false;
+
+    // Split value into words and check fuzzy match against each word
+    const words = val.split(/\s+/);
+    for (const word of words) {
+      if (word.length < 3) continue;
+      
+      // Calculate allowed distance based on word length
+      const maxDistance = search.length <= 5 ? 1 : 2;
+      const distance = levenshteinDistance(search, word);
+      
+      if (distance <= maxDistance) return true;
+      
+      // Also check if search term is a substring of the word (partial match)
+      if (word.includes(search) || search.includes(word)) return true;
+    }
+
+    return false;
+  };
+
+  // ----------------------------------------------------------
   // APPLY ALL FILTERS SAFELY
   // ----------------------------------------------------------
   const filteredData = useMemo(() => {
@@ -203,7 +259,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         });
       }
 
-      // 2) GLOBAL SEARCH - Smart multi-term search
+      // 2) GLOBAL SEARCH - Smart multi-term search with fuzzy matching
       if (globalSearch.trim()) {
         const searchTerms = globalSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
         const columnsToSearch = selectedSearchColumns.length > 0 ? selectedSearchColumns : columns;
@@ -213,7 +269,8 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           return searchTerms.every((term) =>
             columnsToSearch.some((col) => {
               const v = row[col];
-              return v != null && String(v).toLowerCase().includes(term);
+              if (v == null) return false;
+              return fuzzyMatch(term, String(v));
             })
           );
         });
