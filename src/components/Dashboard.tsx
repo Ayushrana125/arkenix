@@ -292,17 +292,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
     };
   }, [clientId, contactCounts.total]);
 
-  // Initialize with fallback data if no clientId
-  useEffect(() => {
-    if (!clientId) {
-      setContactCounts({ total: 8260, prospect: 3200, lead: 2800, user: 2260 });
-      setIsDataLoaded(true);
-      setIsLoading(false);
-      setShouldAnimateCounters(true);
-      setHasInitialLoad(true);
-      sessionStorage.setItem('dashboardAnimated', 'true');
-    }
-  }, [clientId]);
+
   return (
     <div className="space-y-10 p-6 max-w-7xl mx-auto">
       {/* Section 1 - Hero Metrics (Modern SaaS Layout) */}
