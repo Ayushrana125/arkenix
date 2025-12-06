@@ -250,8 +250,27 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   }, [clientId, data.length]);
 
   // ----------------------------------------------------------
-  // NORMALIZE ALL COLUMN NAMES SAFELY
+  // NORMALIZE ALL COLUMN NAMES SAFELY WITH ORDERING
   // ----------------------------------------------------------
+  const columnOrder = [
+    "usercode",
+    "first_name",
+    "last_name",
+    "title",
+    "department",
+    "official_email",
+    "mobile_number",
+    "company",
+    "industry",
+    "user_type",
+    "date_of_birth",
+    "city",
+    "state_province",
+    "country",
+    "meeting_datetime",
+    "registration_date",
+  ];
+
   const getAllColumns = () => {
     try {
       if (!Array.isArray(data) || data.length === 0) return [];
@@ -260,17 +279,32 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       for (const row of data) {
         if (row && typeof row === 'object') {
           for (const key of Object.keys(row)) {
-            colSet.add(key);
+            if (key !== 'id' && key !== 'client_id') {
+              colSet.add(key);
+            }
           }
         }
       }
 
       const allColumns = Array.from(colSet);
+      const ordered: string[] = [];
+      const remaining: string[] = [];
 
-      // remove internal fields
-      return allColumns.filter(
-        (c) => c !== 'id' && c !== 'client_id'
-      );
+      // Add columns in specified order
+      columnOrder.forEach(col => {
+        if (allColumns.includes(col)) {
+          ordered.push(col);
+        }
+      });
+
+      // Add any remaining columns not in the order list
+      allColumns.forEach(col => {
+        if (!columnOrder.includes(col)) {
+          remaining.push(col);
+        }
+      });
+
+      return [...ordered, ...remaining];
     } catch (err) {
       console.error('Column generation failed:', err);
       return [];
