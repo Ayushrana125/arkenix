@@ -62,8 +62,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const [originalUserData, setOriginalUserData] = useState<any>({});
   const [isSaving, setIsSaving] = useState(false);
 
-  // Loading quotes
-  const [currentQuote, setCurrentQuote] = useState(0);
+  // Loading quotes - initialize with random quote
   const quotes = [
     "Every outreach is a new opportunity.",
     "Momentum closes more deals than talent.",
@@ -142,9 +141,12 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     "Treat every client as long-term, not transactional."
   ];
 
+  const [currentQuote, setCurrentQuote] = useState(() => Math.floor(Math.random() * quotes.length));
+
   // Rotate quotes while loading - random selection
   useEffect(() => {
     if (isLoading) {
+      setCurrentQuote(Math.floor(Math.random() * quotes.length));
       const interval = setInterval(() => {
         setCurrentQuote(Math.floor(Math.random() * quotes.length));
       }, 5000);
@@ -802,20 +804,42 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px] flex items-center justify-center">
-        <div className="text-center space-y-6 max-w-md">
-          <Loader className="animate-spin text-[#348ADC] mx-auto" size={40} />
-          <div className="space-y-2">
-            <p 
-              className="text-[#072741] text-lg font-medium transition-opacity duration-500"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-              key={currentQuote}
-            >
-              "{quotes[currentQuote]}"
-            </p>
-            <p className="text-gray-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
-              Loading your data...
-            </p>
+      <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[500px] flex items-center justify-center relative overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#348ADC]/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#65C9D4]/5 rounded-full blur-3xl"></div>
+        
+        <div className="text-center space-y-8 max-w-xl relative z-10">
+          {/* Animated loader with glow effect */}
+          <div className="relative inline-block">
+            <div className="absolute inset-0 bg-[#348ADC]/20 rounded-full blur-xl animate-pulse"></div>
+            <Loader className="animate-spin text-[#348ADC] relative" size={48} strokeWidth={2.5} />
+          </div>
+          
+          {/* Quote section */}
+          <div className="space-y-4 px-6">
+            <div className="relative">
+              <svg className="absolute -top-2 -left-4 w-8 h-8 text-[#348ADC]/20" fill="currentColor" viewBox="0 0 32 32">
+                <path d="M10 8c-3.3 0-6 2.7-6 6v10h10V14H8c0-1.1.9-2 2-2V8zm12 0c-3.3 0-6 2.7-6 6v10h10V14h-6c0-1.1.9-2 2-2V8z"/>
+              </svg>
+              <p 
+                className="text-[#072741] text-xl font-semibold leading-relaxed transition-all duration-700 ease-in-out"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+                key={currentQuote}
+              >
+                {quotes[currentQuote]}
+              </p>
+            </div>
+            
+            {/* Loading text with animated dots */}
+            <div className="flex items-center justify-center gap-2 text-gray-500 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <span>Loading your data</span>
+              <span className="flex gap-1">
+                <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+              </span>
+            </div>
           </div>
         </div>
       </div>
