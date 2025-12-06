@@ -226,8 +226,8 @@ export function WebPortal() {
         <header className={`fixed top-0 right-0 bg-white px-4 sm:px-5 py-2.5 flex items-center justify-between flex-shrink-0 z-20 border-b border-gray-200 h-14 transition-all duration-300 ${
           isSidebarCollapsed ? 'left-16' : 'left-0 md:left-64'
         }`}>
-          {/* Left: Company Name */}
-          <div className="flex items-center min-w-0 flex-1 mr-2">
+          {/* Left: Company Name & Add Team Members */}
+          <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
             {getCompanyName() && (
               <div 
                 className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] rounded-full shadow-lg shadow-[#348ADC]/20"
@@ -242,6 +242,22 @@ export function WebPortal() {
                 </span>
               </div>
             )}
+            <button
+              onClick={() => {
+                // TODO: Handle Add Team Members action
+                alert('Add Team Members functionality coming soon!');
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 hover:border-[#348ADC] hover:bg-gray-50 rounded-full transition-all duration-200 shadow-sm flex-shrink-0"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#348ADC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <line x1="19" y1="8" x2="19" y2="14"></line>
+                <line x1="22" y1="11" x2="16" y2="11"></line>
+              </svg>
+              <span className="text-xs font-medium text-[#348ADC] hidden sm:inline">Add Team Members</span>
+            </button>
           </div>
 
           {/* Right: User Info */}
