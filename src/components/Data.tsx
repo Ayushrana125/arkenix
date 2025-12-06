@@ -27,6 +27,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const [data, setData] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFullyLoaded, setIsFullyLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -125,6 +126,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
         // Final update with all data
         setData(allData);
+        setIsFullyLoaded(true);
       } catch (err: any) {
         console.error('Error fetching data:', err);
         setError(err.message || 'Failed to load data');
@@ -140,6 +142,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     const handleRefresh = () => {
       setData([]);
       setTotalCount(null);
+      setIsFullyLoaded(false);
       fetchData();
     };
     window.addEventListener('refreshDataTable', handleRefresh);
@@ -880,7 +883,13 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           <button
             onClick={() => {
               const hasFilters = selectedUserType || globalSearch.trim() || dateFrom || dateTo;
-              const dataToExport = hasFilters ? filteredData : data;
+              const dataToExport = (hasFilters ? filteredData : data).map(row => {
+                const cleanRow: any = {};
+                columns.forEach(col => {
+                  cleanRow[col] = row[col];
+                });
+                return cleanRow;
+              });
               const ws = XLSX.utils.json_to_sheet(dataToExport);
               
               // Style headers - bold and blue
@@ -898,9 +907,10 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               XLSX.utils.book_append_sheet(wb, ws, 'Data');
               XLSX.writeFile(wb, `data_export_${new Date().toISOString().split('T')[0]}.csv`);
             }}
-            className="px-3 py-1.5 border border-gray-300 text-gray-600 hover:border-[#348ADC] hover:text-[#348ADC] hover:bg-[#348ADC]/5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all duration-200"
+            disabled={!isFullyLoaded}
+            className="px-3 py-1.5 border border-gray-300 text-gray-600 hover:border-[#348ADC] hover:text-[#348ADC] hover:bg-[#348ADC]/5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ fontFamily: 'Inter, sans-serif' }}
-            title="Download filtered data as CSV"
+            title={!isFullyLoaded ? "Loading data..." : "Download filtered data as CSV"}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
