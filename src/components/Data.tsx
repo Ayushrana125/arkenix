@@ -24,6 +24,7 @@ interface ColumnFilter {
 
 export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const [data, setData] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,6 +75,15 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       try {
         setIsLoading(true);
         setError(null);
+
+        // First, get total count quickly
+        const { count, error: countError } = await supabase
+          .from('clients_user_data')
+          .select('*', { count: 'exact', head: true })
+          .eq('client_id', clientId);
+
+        if (countError) throw countError;
+        setTotalCount(count || 0);
 
         // Progressive loading: Fetch all data in batches, show first batch immediately
         let allData: any[] = [];
@@ -1083,7 +1093,10 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           <div className="text-xs text-[#072741] opacity-50" style={{ fontFamily: 'Inter, sans-serif' }}>
             Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} rows
             {filteredData.length !== data.length && (
-              <span className="ml-2 text-gray-400">(filtered from {data.length} total)</span>
+              <span className="ml-2 text-gray-400">(filtered from {totalCount !== null ? totalCount : data.length} total)</span>
+            )}
+            {totalCount !== null && data.length < totalCount && filteredData.length === data.length && (
+              <span className="ml-2 text-gray-400">(loading {totalCount} total...)</span>
             )}
           </div>
 

@@ -211,19 +211,35 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
     const fetchContactCounts = async () => {
       try {
-        // First, get total count and breakdown using aggregation
-        const { data: allData, error } = await supabase
-          .from('clients_user_data')
-          .select('user_type')
-          .eq('client_id', clientId);
+        // Fetch all data in batches to get accurate count
+        let allData: any[] = [];
+        let from = 0;
+        const batchSize = 1000;
+        let hasMore = true;
 
-        if (error) throw error;
+        while (hasMore) {
+          const { data: batchData, error } = await supabase
+            .from('clients_user_data')
+            .select('user_type')
+            .eq('client_id', clientId)
+            .range(from, from + batchSize - 1);
+
+          if (error) throw error;
+
+          if (batchData && batchData.length > 0) {
+            allData = [...allData, ...batchData];
+            from += batchSize;
+            hasMore = batchData.length === batchSize;
+          } else {
+            hasMore = false;
+          }
+        }
 
         const counts = {
-          total: allData?.length || 0,
-          prospect: allData?.filter(item => item.user_type?.toLowerCase() === 'prospect').length || 0,
-          lead: allData?.filter(item => item.user_type?.toLowerCase() === 'lead').length || 0,
-          user: allData?.filter(item => item.user_type?.toLowerCase() === 'user').length || 0
+          total: allData.length,
+          prospect: allData.filter(item => item.user_type?.toLowerCase() === 'prospect').length,
+          lead: allData.filter(item => item.user_type?.toLowerCase() === 'lead').length,
+          user: allData.filter(item => item.user_type?.toLowerCase() === 'user').length
         };
 
         setContactCounts(counts);
