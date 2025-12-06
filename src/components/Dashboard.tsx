@@ -211,40 +211,28 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
     const fetchContactCounts = async () => {
       try {
-        // Fetch all data in batches to get accurate count
-        let allData: any[] = [];
-        let from = 0;
-        const batchSize = 1000;
-        let hasMore = true;
-
-        while (hasMore) {
-          const { data: batchData, error } = await supabase
-            .from('clients_user_data')
-            .select('user_type')
-            .eq('client_id', clientId)
-            .range(from, from + batchSize - 1);
-
-          if (error) throw error;
-
-          if (batchData && batchData.length > 0) {
-            allData = [...allData, ...batchData];
-            from += batchSize;
-            hasMore = batchData.length === batchSize;
-          } else {
-            hasMore = false;
-          }
-        }
+        // Use fast COUNT aggregation queries
+        const [totalResult, prospectResult, leadResult, userResult] = await Promise.all([
+          supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId),
+          supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId).ilike('user_type', 'prospect'),
+          supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId).ilike('user_type', 'lead'),
+          supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId).ilike('user_type', 'user')
+        ]);
 
         const counts = {
-          total: allData.length,
-          prospect: allData.filter(item => item.user_type?.toLowerCase() === 'prospect').length,
-          lead: allData.filter(item => item.user_type?.toLowerCase() === 'lead').length,
-          user: allData.filter(item => item.user_type?.toLowerCase() === 'user').length
+          total: totalResult.count || 0,
+          prospect: prospectResult.count || 0,
+          lead: leadResult.count || 0,
+          user: userResult.count || 0
         };
 
         setContactCounts(counts);
         setIsDataLoaded(true);
         setIsLoading(false);
+        
+        // Cache counts in sessionStorage
+        sessionStorage.setItem(`dashboard_counts_${clientId}`, JSON.stringify(counts));
+        
         if (!hasInitialLoad) {
           setShouldAnimateCounters(true);
           setHasInitialLoad(true);
@@ -252,25 +240,28 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
         }
       } catch (error) {
         console.error('Error fetching contact counts:', error);
-        // Set fallback data on error
-        setContactCounts({ total: 8260, prospect: 3200, lead: 2800, user: 2260 });
         setIsDataLoaded(true);
         setIsLoading(false);
-        if (!hasInitialLoad) {
-          setShouldAnimateCounters(true);
-          setHasInitialLoad(true);
-          sessionStorage.setItem('dashboardAnimated', 'true');
-        }
       }
     };
 
-    // Only fetch if counts are zero (first load)
-    if (contactCounts.total === 0) {
+    // Check if we have cached counts
+    const cachedCounts = sessionStorage.getItem(`dashboard_counts_${clientId}`);
+    if (cachedCounts && contactCounts.total === 0) {
+      // Load from cache immediately (no animation on switch)
+      const counts = JSON.parse(cachedCounts);
+      setContactCounts(counts);
+      setIsDataLoaded(true);
+      setIsLoading(false);
+      setShouldAnimateCounters(false);
+    } else if (contactCounts.total === 0) {
+      // First load - fetch and animate
       fetchContactCounts();
     }
 
     // Listen for user upload events (triggers animation)
     const handleUserUpload = () => {
+      sessionStorage.removeItem(`dashboard_counts_${clientId}`);
       setIsDataLoaded(false);
       setShouldAnimateCounters(false);
       setTimeout(() => {
@@ -281,6 +272,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
     // Listen for regular refresh events (no animation)
     const handleRefresh = () => {
+      sessionStorage.removeItem(`dashboard_counts_${clientId}`);
       fetchContactCounts();
     };
     window.addEventListener('refreshDataTable', handleRefresh);

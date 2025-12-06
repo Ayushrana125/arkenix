@@ -124,6 +124,12 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
         // Final update with all data
         setData(allData);
+        
+        // Cache data in sessionStorage
+        sessionStorage.setItem(`data_table_${clientId}`, JSON.stringify(allData));
+        if (count !== null) {
+          sessionStorage.setItem(`data_count_${clientId}`, JSON.stringify(count));
+        }
       } catch (err: any) {
         console.error('Error fetching data:', err);
         setError(err.message || 'Failed to load data');
@@ -131,13 +137,29 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       }
     };
 
-    // Only fetch if data is empty (first load)
-    if (data.length === 0) {
+    // Check if we have cached data
+    const cachedData = sessionStorage.getItem(`data_table_${clientId}`);
+    const cachedCount = sessionStorage.getItem(`data_count_${clientId}`);
+    
+    if (cachedData && cachedCount && data.length === 0) {
+      // Load from cache immediately (no fetch on switch)
+      const parsedData = JSON.parse(cachedData);
+      const parsedCount = JSON.parse(cachedCount);
+      setData(parsedData);
+      setTotalCount(parsedCount);
+      setIsLoading(false);
+    } else if (data.length === 0) {
+      // First load - fetch data
       fetchData();
     }
 
-    const handleRefresh = () => fetchData();
+    const handleRefresh = () => {
+      sessionStorage.removeItem(`data_table_${clientId}`);
+      sessionStorage.removeItem(`data_count_${clientId}`);
+      fetchData();
+    };
     window.addEventListener('refreshDataTable', handleRefresh);
+    window.addEventListener('userDataUploaded', handleRefresh);
 
     // Add User event listener
     const handleOpenAddUser = () => handleAddUser();
@@ -145,6 +167,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
     return () => {
       window.removeEventListener('refreshDataTable', handleRefresh);
+      window.removeEventListener('userDataUploaded', handleRefresh);
       window.removeEventListener('openAddUser', handleOpenAddUser);
     };
   }, [clientId, data.length]);
