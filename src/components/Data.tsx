@@ -62,7 +62,95 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const [originalUserData, setOriginalUserData] = useState<any>({});
   const [isSaving, setIsSaving] = useState(false);
 
+  // Loading quotes
+  const [currentQuote, setCurrentQuote] = useState(0);
+  const quotes = [
+    "Every outreach is a new opportunity.",
+    "Momentum closes more deals than talent.",
+    "Follow-ups create fortunes.",
+    "Pipeline is built, not found.",
+    "People buy clarity.",
+    "Sales is trust at scale.",
+    "Rejection is data, not failure.",
+    "Great salespeople listen more than they talk.",
+    "Speed matters. Consistency matters more.",
+    "A simple offer converts faster.",
+    "Conversations create conversions.",
+    "Outreach rewards discipline.",
+    "The next 'yes' is closer than you think.",
+    "Small actions build big pipelines.",
+    "You can't control results—only effort.",
+    "Sell solutions, not features.",
+    "Every 'no' sharpens the next pitch.",
+    "Confidence is your closing tool.",
+    "Clear value wins meetings.",
+    "Know your customer better than they do.",
+    "Follow-up is where trust is built.",
+    "Good sales feel like guidance.",
+    "Persistence beats perfection.",
+    "Sales success is a daily practice.",
+    "Start with the problem, not the product.",
+    "Clarity cuts through noise.",
+    "The message is the strategy.",
+    "Relevance beats reach every time.",
+    "People buy stories, not stats.",
+    "Marketing is compounding trust.",
+    "Speak to problems, not products.",
+    "Emotion drives action.",
+    "Simple messages spread faster.",
+    "Content is your digital handshake.",
+    "Positioning creates demand.",
+    "Consistency builds brand memory.",
+    "Intent > impressions.",
+    "Creativity with data wins.",
+    "Right audience, right moment.",
+    "Brand is the promise you keep.",
+    "Good marketing feels like help.",
+    "Show outcomes, not features.",
+    "Your story is your differentiator.",
+    "Marketing is psychology at scale.",
+    "Unique beats perfect.",
+    "People remember how you made them feel.",
+    "Speak their language, not yours.",
+    "Insight drives powerful messaging.",
+    "Awareness starts. Experience converts.",
+    "A clear brand attracts the right customers.",
+    "Clients value ease above everything.",
+    "Clear communication is a service.",
+    "Trust is built in small moments.",
+    "Serve like a partner, not a vendor.",
+    "Responsiveness shows respect.",
+    "Clients remember experiences, not deliverables.",
+    "Under-promise. Over-deliver.",
+    "Be reliable enough to recommend.",
+    "Solve fast, communicate faster.",
+    "Consistency builds loyalty.",
+    "Clients buy confidence, not complexity.",
+    "Great relationships scale revenue.",
+    "Set expectations. Then exceed them.",
+    "Make working with you feel effortless.",
+    "Your attitude becomes your reputation.",
+    "Value builds trust. Trust builds business.",
+    "Partnerships grow when communication flows.",
+    "Good service is remembered long after the invoice.",
+    "Empathy strengthens relationships.",
+    "Clients want clarity, not jargon.",
+    "Keep promises small and delivery strong.",
+    "Professionalism is a competitive edge.",
+    "Happy clients bring new clients.",
+    "Consistency beats brilliance.",
+    "Treat every client as long-term, not transactional."
+  ];
 
+  // Rotate quotes while loading - random selection
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setCurrentQuote(Math.floor(Math.random() * quotes.length));
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [isLoading]);
 
   // ----------------------------------------------------------
   // FETCH DATA FROM SUPABASE
@@ -714,9 +802,21 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
-        <div className="flex items-center justify-center h-full">
-          <Loader className="animate-spin text-[#348ADC]" size={32} />
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px] flex items-center justify-center">
+        <div className="text-center space-y-6 max-w-md">
+          <Loader className="animate-spin text-[#348ADC] mx-auto" size={40} />
+          <div className="space-y-2">
+            <p 
+              className="text-[#072741] text-lg font-medium transition-opacity duration-500"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+              key={currentQuote}
+            >
+              "{quotes[currentQuote]}"
+            </p>
+            <p className="text-gray-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
+              Loading your data...
+            </p>
+          </div>
         </div>
       </div>
     );
