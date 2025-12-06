@@ -314,9 +314,15 @@ export function WebPortal() {
                       // Trigger Add User functionality in Data component
                       window.dispatchEvent(new CustomEvent('openAddUser'));
                     }}
-                    className="flex-1 sm:flex-none px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm"
+                    className="flex-1 sm:flex-none px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm flex items-center gap-2"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <line x1="19" y1="8" x2="19" y2="14"></line>
+                      <line x1="22" y1="11" x2="16" y2="11"></line>
+                    </svg>
                     Add User
                   </button>
                   <button
