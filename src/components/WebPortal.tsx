@@ -378,7 +378,7 @@ export function WebPortal() {
             <div className="flex-1 min-h-0 relative">
               <div className="absolute inset-0 overflow-auto">
                 {activeMenu === 'Home' ? (
-                  <Dashboard />
+                  <Dashboard clientId={getClientId()} />
                 ) : activeMenu === 'Data' && dataSubPage === 'audiences' ? (
                   <ManageAudiencesView />
                 ) : activeMenu === 'Data' && dataSubPage === null ? (

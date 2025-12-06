@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { supabase } from '../lib/supabase';
 
 // Mock Data
 const mockData = {
@@ -134,7 +135,53 @@ const ProgressBar = ({ label, percentage }: any) => (
 
 
 
-export function Dashboard() {
+interface DashboardProps {
+  clientId?: string;
+}
+
+export function Dashboard({ clientId }: DashboardProps = {}) {
+  const [contactCounts, setContactCounts] = useState({
+    total: 8260,
+    prospect: 3200,
+    lead: 2800,
+    user: 2260
+  });
+
+  useEffect(() => {
+    if (!clientId) return;
+
+    const fetchContactCounts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('clients_user_data')
+          .select('user_type')
+          .eq('client_id', clientId);
+
+        if (error) throw error;
+
+        const counts = {
+          total: data?.length || 0,
+          prospect: data?.filter(item => item.user_type?.toLowerCase() === 'prospect').length || 0,
+          lead: data?.filter(item => item.user_type?.toLowerCase() === 'lead').length || 0,
+          user: data?.filter(item => item.user_type?.toLowerCase() === 'user').length || 0
+        };
+
+        setContactCounts(counts);
+      } catch (error) {
+        console.error('Error fetching contact counts:', error);
+      }
+    };
+
+    fetchContactCounts();
+
+    // Listen for data refresh events
+    const handleRefresh = () => fetchContactCounts();
+    window.addEventListener('refreshDataTable', handleRefresh);
+
+    return () => {
+      window.removeEventListener('refreshDataTable', handleRefresh);
+    };
+  }, [clientId]);
   return (
     <div className="space-y-10 p-6 max-w-7xl mx-auto">
       {/* Section 1 - Hero Metrics (Modern SaaS Layout) */}
@@ -148,7 +195,7 @@ export function Dashboard() {
                   Total Contacts
                 </h3>
                 <div className="text-5xl font-bold mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  {mockData.summaryCards.totalContacts.value.toLocaleString()}
+                  {contactCounts.total.toLocaleString()}
                 </div>
               </div>
               <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -163,19 +210,19 @@ export function Dashboard() {
             <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  {mockData.summaryCards.totalContacts.breakdown.prospect.toLocaleString()}
+                  {contactCounts.prospect.toLocaleString()}
                 </div>
                 <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Prospects</div>
               </div>
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  {mockData.summaryCards.totalContacts.breakdown.lead.toLocaleString()}
+                  {contactCounts.lead.toLocaleString()}
                 </div>
                 <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Leads</div>
               </div>
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  {mockData.summaryCards.totalContacts.breakdown.user.toLocaleString()}
+                  {contactCounts.user.toLocaleString()}
                 </div>
                 <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Users</div>
               </div>
