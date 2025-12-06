@@ -531,7 +531,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
       if (supabaseData?.status === 'success') {
         // Refresh data
-        window.dispatchEvent(new Event('refreshDataTable'));
+        window.dispatchEvent(new Event('userDataUploaded'));
         setIsUpdatePanelOpen(false);
         setEditedUserData({});
         setOriginalUserData({});
@@ -609,7 +609,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       if (error) throw error;
 
       if (supabaseData?.status === 'success') {
-        window.dispatchEvent(new Event('refreshDataTable'));
+        window.dispatchEvent(new Event('userDataUploaded'));
         setIsAddPanelOpen(false);
         setNewUserData({});
         alert('User added successfully!');

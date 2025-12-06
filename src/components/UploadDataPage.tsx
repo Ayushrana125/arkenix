@@ -362,8 +362,8 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
           message: `Upload complete — ${result.inserted} users imported successfully.`
         });
 
-        // Trigger data table refresh
-        window.dispatchEvent(new CustomEvent('refreshDataTable'));
+        // Trigger data table refresh with animation
+        window.dispatchEvent(new CustomEvent('userDataUploaded'));
 
         // Reset state after a short delay
         setTimeout(() => {

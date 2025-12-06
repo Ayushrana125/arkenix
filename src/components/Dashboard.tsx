@@ -201,6 +201,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
   });
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [shouldAnimateCounters, setShouldAnimateCounters] = useState(false);
+  const [hasInitialLoad, setHasInitialLoad] = useState(false);
 
   useEffect(() => {
     if (!clientId) return;
@@ -223,28 +224,45 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
         setContactCounts(counts);
         setIsDataLoaded(true);
-        setShouldAnimateCounters(true);
+        if (!hasInitialLoad) {
+          setShouldAnimateCounters(true);
+          setHasInitialLoad(true);
+        }
       } catch (error) {
         console.error('Error fetching contact counts:', error);
         // Set fallback data on error
         setContactCounts({ total: 8260, prospect: 3200, lead: 2800, user: 2260 });
         setIsDataLoaded(true);
-        setShouldAnimateCounters(true);
+        if (!hasInitialLoad) {
+          setShouldAnimateCounters(true);
+          setHasInitialLoad(true);
+        }
       }
     };
 
     fetchContactCounts();
 
-    // Listen for data refresh events
-    const handleRefresh = () => {
+    // Listen for user upload events (triggers animation)
+    const handleUserUpload = () => {
       setIsDataLoaded(false);
       setShouldAnimateCounters(false);
-      setTimeout(() => fetchContactCounts(), 100);
+      setTimeout(() => {
+        fetchContactCounts().then(() => {
+          setShouldAnimateCounters(true);
+        });
+      }, 100);
+    };
+
+    // Listen for regular refresh events (no animation)
+    const handleRefresh = () => {
+      fetchContactCounts();
     };
     window.addEventListener('refreshDataTable', handleRefresh);
+    window.addEventListener('userDataUploaded', handleUserUpload);
 
     return () => {
       window.removeEventListener('refreshDataTable', handleRefresh);
+      window.removeEventListener('userDataUploaded', handleUserUpload);
     };
   }, [clientId]);
 
@@ -254,6 +272,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
       setContactCounts({ total: 8260, prospect: 3200, lead: 2800, user: 2260 });
       setIsDataLoaded(true);
       setShouldAnimateCounters(true);
+      setHasInitialLoad(true);
     }
   }, [clientId]);
   return (
