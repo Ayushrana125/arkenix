@@ -10,6 +10,7 @@ import {
   Mail,
   Trash2,
 } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { supabase } from '../lib/supabase';
 
 interface ClientsDataTableProps {
@@ -853,25 +854,61 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         </div>
 
         {/* USER TYPE CARDS */}
-        <div className="flex flex-wrap gap-2">
-          {['Prospect', 'Lead', 'User'].map((type) => (
-            <button
-              key={type}
-              onClick={() => {
-                setSelectedUserType((prev) => (prev === type ? '' : type));
-                setCurrentPage(1);
-              }}
+        <div className="flex flex-wrap items-center gap-2 justify-between">
+          <div className="flex flex-wrap gap-2">
+            {['Prospect', 'Lead', 'User'].map((type) => (
+              <button
+                key={type}
+                onClick={() => {
+                  setSelectedUserType((prev) => (prev === type ? '' : type));
+                  setCurrentPage(1);
+                }}
 
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                selectedUserType === type
-                  ? 'bg-[#348ADC] text-white shadow-md'
-                  : 'bg-gray-100 text-[#072741] hover:bg-gray-200'
-              }`}
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              {type}
-            </button>
-          ))}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                  selectedUserType === type
+                    ? 'bg-[#348ADC] text-white shadow-md'
+                    : 'bg-gray-100 text-[#072741] hover:bg-gray-200'
+                }`}
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+          
+          {/* Download CSV Button */}
+          <button
+            onClick={() => {
+              const hasFilters = selectedUserType || globalSearch.trim() || dateFrom || dateTo;
+              const dataToExport = hasFilters ? filteredData : data;
+              const ws = XLSX.utils.json_to_sheet(dataToExport);
+              
+              // Style headers - bold and blue
+              const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+              for (let C = range.s.c; C <= range.e.c; ++C) {
+                const address = XLSX.utils.encode_col(C) + '1';
+                if (!ws[address]) continue;
+                ws[address].s = {
+                  font: { bold: true, color: { rgb: '348ADC' } },
+                  fill: { fgColor: { rgb: 'E8F4FD' } }
+                };
+              }
+              
+              const wb = XLSX.utils.book_new();
+              XLSX.utils.book_append_sheet(wb, ws, 'Data');
+              XLSX.writeFile(wb, `data_export_${new Date().toISOString().split('T')[0]}.csv`);
+            }}
+            className="px-3 py-1.5 border border-gray-300 text-gray-600 hover:border-[#348ADC] hover:text-[#348ADC] hover:bg-[#348ADC]/5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all duration-200"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+            title="Download filtered data as CSV"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download CSV
+          </button>
         </div>
 
         {/* DATE RANGE FILTER */}
