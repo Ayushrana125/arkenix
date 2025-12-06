@@ -310,6 +310,16 @@ export function WebPortal() {
               {activeMenu === 'Data' && dataSubPage === null && (
                 <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
                   <button
+                    onClick={() => {
+                      // Trigger Add User functionality in Data component
+                      window.dispatchEvent(new CustomEvent('openAddUser'));
+                    }}
+                    className="flex-1 sm:flex-none px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Add User
+                  </button>
+                  <button
                     onClick={() => setIsUploadPageOpen(true)}
                     className="flex-1 sm:flex-none px-3 py-2 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm"
                     style={{ fontFamily: 'Inter, sans-serif' }}
