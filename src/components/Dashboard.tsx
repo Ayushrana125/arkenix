@@ -68,73 +68,71 @@ const ChartCard = ({ title, children, size = 'normal' }: any) => (
 );
 
 const MeetingsTable = () => (
-  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-    <div className="flex justify-between items-center mb-6">
-      <h3 className="text-xl font-semibold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-        Upcoming Meetings
-      </h3>
-      <button className="text-sm text-[#348ADC] hover:text-[#2a6fb0] font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
-        View All Meetings
+  <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+    <div className="flex justify-between items-center mb-8">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-gradient-to-br from-[#348ADC] to-[#65C9D4] rounded-2xl flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <h3 className="text-2xl font-bold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          Upcoming Meetings
+        </h3>
+      </div>
+      <button className="px-4 py-2 text-sm text-[#348ADC] hover:text-white hover:bg-[#348ADC] border border-[#348ADC]/30 hover:border-[#348ADC] rounded-xl font-medium transition-all duration-200" style={{ fontFamily: 'Inter, sans-serif' }}>
+        View All
       </button>
     </div>
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead>
-          <tr className="border-b border-gray-200">
-            <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>Name</th>
-            <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>Email</th>
-            <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>Date</th>
-            <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {mockData.upcomingMeetings.map((meeting, index) => (
-            <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-              <td className="py-4 px-2 text-sm font-medium text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="space-y-3">
+      {mockData.upcomingMeetings.map((meeting, index) => (
+        <div key={index} className="flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-100/50 rounded-2xl transition-all duration-200 group">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-semibold text-sm">
+              {meeting.name.split(' ').map(n => n[0]).join('')}
+            </div>
+            <div>
+              <div className="font-semibold text-[#072741] group-hover:text-[#348ADC] transition-colors" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {meeting.name}
-              </td>
-              <td className="py-4 px-2 text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+              </div>
+              <div className="text-sm text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {meeting.email}
-              </td>
-              <td className="py-4 px-2 text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-                {meeting.date}
-              </td>
-              <td className="py-4 px-2 text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-                {meeting.time}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="font-medium text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
+              {meeting.date}
+            </div>
+            <div className="text-sm text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+              {meeting.time}
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   </div>
 );
 
 const ProgressBar = ({ label, percentage }: any) => (
-  <div className="mb-3">
-    <div className="flex justify-between text-sm mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>
-      <span className="text-gray-600">{label}</span>
-      <span className="text-[#072741] font-medium">{percentage}%</span>
+  <div className="mb-4">
+    <div className="flex justify-between text-sm mb-3" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <span className="text-gray-700 font-medium">{label}</span>
+      <span className="text-[#072741] font-bold">{percentage}%</span>
     </div>
-    <div className="w-full bg-gray-200 rounded-full h-2">
+    <div className="w-full bg-gray-100 rounded-full h-3">
       <div 
-        className="bg-gradient-to-r from-[#348ADC] to-[#65C9D4] h-2 rounded-full transition-all duration-300"
+        className="bg-gradient-to-r from-[#348ADC] to-[#65C9D4] h-3 rounded-full transition-all duration-500 shadow-sm"
         style={{ width: `${percentage}%` }}
       ></div>
     </div>
   </div>
 );
 
-const ActivityItem = ({ text, time }: any) => (
-  <div className="flex justify-between items-start py-3 border-b border-gray-100 last:border-b-0">
-    <p className="text-sm text-[#072741] flex-1" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {text}
-    </p>
-    <span className="text-xs text-gray-500 ml-4 whitespace-nowrap" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {time}
-    </span>
-  </div>
-);
+
 
 export function Dashboard() {
   return (
@@ -270,57 +268,128 @@ export function Dashboard() {
 
       {/* Section 3 - Secondary Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <ChartCard title="Data Completeness Score">
-          <div className="mb-6">
-            <div className="text-3xl font-bold text-[#072741] mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              Data Completeness
+            </h3>
+          </div>
+          <div className="mb-8">
+            <div className="text-5xl font-bold text-[#072741] mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {mockData.dataCompleteness.overall}%
             </div>
-            <p className="text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <p className="text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
               Overall Score
             </p>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-6">
             <ProgressBar label="Contacts with Email" percentage={mockData.dataCompleteness.email} />
             <ProgressBar label="Contacts with Phone" percentage={mockData.dataCompleteness.phone} />
             <ProgressBar label="Contacts with Company" percentage={mockData.dataCompleteness.company} />
           </div>
-        </ChartCard>
+        </div>
 
-        <ChartCard title="Contact Growth">
-          <ResponsiveContainer width="100%" height={200}>
+        <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/>
+                <polyline points="17,6 23,6 23,12"/>
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              Contact Growth
+            </h3>
+          </div>
+          <ResponsiveContainer width="100%" height={240}>
             <LineChart data={mockData.contactGrowth}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="week" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="contacts" stroke="#348ADC" strokeWidth={2} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'white', 
+                  border: 'none', 
+                  borderRadius: '12px', 
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.1)' 
+                }} 
+              />
+              <Line 
+                type="monotone" 
+                dataKey="contacts" 
+                stroke="url(#gradient)" 
+                strokeWidth={3} 
+                dot={{ fill: '#348ADC', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, fill: '#348ADC' }}
+              />
+              <defs>
+                <linearGradient id="gradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#348ADC" />
+                  <stop offset="100%" stopColor="#65C9D4" />
+                </linearGradient>
+              </defs>
             </LineChart>
           </ResponsiveContainer>
-        </ChartCard>
+        </div>
       </div>
 
-      {/* Section 4 - Tertiary Insights (Smallest Widgets) */}
+      {/* Section 4 - Tertiary Insights */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Top 5 Cities" size="small">
-          <ResponsiveContainer width="100%" height={200}>
+        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 bg-orange-100 rounded-xl flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              Top Cities
+            </h3>
+          </div>
+          <ResponsiveContainer width="100%" height={180}>
             <BarChart data={mockData.topCities}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="value" fill="#348ADC" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'white', 
+                  border: 'none', 
+                  borderRadius: '8px', 
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)' 
+                }} 
+              />
+              <Bar dataKey="value" fill="#348ADC" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </ChartCard>
+        </div>
 
-        <ChartCard title="Countries Split" size="small">
-          <ResponsiveContainer width="100%" height={200}>
+        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              Countries
+            </h3>
+          </div>
+          <ResponsiveContainer width="100%" height={180}>
             <PieChart>
               <Pie
                 data={mockData.countrySplit}
                 cx="50%"
                 cy="50%"
-                outerRadius={60}
+                outerRadius={70}
                 dataKey="value"
                 label={({ name, value }) => `${name}: ${value}%`}
               >
@@ -328,20 +397,48 @@ export function Dashboard() {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'white', 
+                  border: 'none', 
+                  borderRadius: '8px', 
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)' 
+                }} 
+              />
             </PieChart>
           </ResponsiveContainer>
-        </ChartCard>
+        </div>
       </div>
 
-      {/* Section 5 - Recent Activity (Full Width) */}
-      <ChartCard title="Recent Activity">
-        <div className="max-h-80 overflow-y-auto">
+      {/* Section 5 - Recent Activity */}
+      <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <polyline points="9,11 12,14 22,4"/>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+          </div>
+          <h3 className="text-2xl font-bold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Recent Activity
+          </h3>
+        </div>
+        <div className="space-y-4 max-h-80 overflow-y-auto">
           {mockData.recentActivity.map((activity) => (
-            <ActivityItem key={activity.id} text={activity.text} time={activity.time} />
+            <div key={activity.id} className="flex items-start gap-4 p-4 bg-gray-50/50 hover:bg-gray-100/50 rounded-2xl transition-all duration-200 group">
+              <div className="w-2 h-2 bg-[#348ADC] rounded-full mt-2 flex-shrink-0"></div>
+              <div className="flex-1">
+                <p className="text-[#072741] group-hover:text-[#348ADC] transition-colors" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  {activity.text}
+                </p>
+                <span className="text-sm text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  {activity.time}
+                </span>
+              </div>
+            </div>
           ))}
         </div>
-      </ChartCard>
+      </div>
     </div>
   );
 }
