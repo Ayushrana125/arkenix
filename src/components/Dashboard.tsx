@@ -264,7 +264,10 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
       }
     };
 
-    fetchContactCounts();
+    // Only fetch if counts are zero (first load)
+    if (contactCounts.total === 0) {
+      fetchContactCounts();
+    }
 
     // Listen for user upload events (triggers animation)
     const handleUserUpload = () => {
@@ -287,7 +290,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
       window.removeEventListener('refreshDataTable', handleRefresh);
       window.removeEventListener('userDataUploaded', handleUserUpload);
     };
-  }, [clientId]);
+  }, [clientId, contactCounts.total]);
 
   // Initialize with fallback data if no clientId
   useEffect(() => {

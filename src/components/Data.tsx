@@ -131,11 +131,10 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       }
     };
 
-    // Initial fetch
-    fetchData();
-
-    // Auto-refresh every 2 minutes
-    const interval = setInterval(fetchData, 120000);
+    // Only fetch if data is empty (first load)
+    if (data.length === 0) {
+      fetchData();
+    }
 
     const handleRefresh = () => fetchData();
     window.addEventListener('refreshDataTable', handleRefresh);
@@ -145,11 +144,10 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     window.addEventListener('openAddUser', handleOpenAddUser);
 
     return () => {
-      clearInterval(interval);
       window.removeEventListener('refreshDataTable', handleRefresh);
       window.removeEventListener('openAddUser', handleOpenAddUser);
     };
-  }, [clientId]);
+  }, [clientId, data.length]);
 
   // ----------------------------------------------------------
   // NORMALIZE ALL COLUMN NAMES SAFELY
