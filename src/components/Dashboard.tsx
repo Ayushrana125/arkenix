@@ -200,6 +200,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
     user: 0
   });
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [shouldAnimateCounters, setShouldAnimateCounters] = useState(false);
   const [hasInitialLoad, setHasInitialLoad] = useState(() => {
     return sessionStorage.getItem('dashboardAnimated') === 'true';
@@ -226,6 +227,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
         setContactCounts(counts);
         setIsDataLoaded(true);
+        setIsLoading(false);
         if (!hasInitialLoad) {
           setShouldAnimateCounters(true);
           setHasInitialLoad(true);
@@ -236,6 +238,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
         // Set fallback data on error
         setContactCounts({ total: 8260, prospect: 3200, lead: 2800, user: 2260 });
         setIsDataLoaded(true);
+        setIsLoading(false);
         if (!hasInitialLoad) {
           setShouldAnimateCounters(true);
           setHasInitialLoad(true);
@@ -274,6 +277,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
     if (!clientId) {
       setContactCounts({ total: 8260, prospect: 3200, lead: 2800, user: 2260 });
       setIsDataLoaded(true);
+      setIsLoading(false);
       setShouldAnimateCounters(true);
       setHasInitialLoad(true);
       sessionStorage.setItem('dashboardAnimated', 'true');
@@ -292,7 +296,11 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
                   Total Contacts
                 </h3>
                 <div className="text-5xl font-bold mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  <AnimatedCounter value={contactCounts.total} shouldAnimate={shouldAnimateCounters} duration={2000} />
+                  {isLoading ? (
+                    <div className="w-32 h-12 bg-white/20 rounded-lg animate-pulse"></div>
+                  ) : (
+                    <AnimatedCounter value={contactCounts.total} shouldAnimate={shouldAnimateCounters} duration={2000} />
+                  )}
                 </div>
               </div>
               <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -307,19 +315,31 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
             <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  <AnimatedCounter value={contactCounts.prospect} shouldAnimate={shouldAnimateCounters} duration={1800} />
+                  {isLoading ? (
+                    <div className="w-16 h-6 bg-white/20 rounded animate-pulse"></div>
+                  ) : (
+                    <AnimatedCounter value={contactCounts.prospect} shouldAnimate={shouldAnimateCounters} duration={1800} />
+                  )}
                 </div>
                 <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Prospects</div>
               </div>
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  <AnimatedCounter value={contactCounts.lead} shouldAnimate={shouldAnimateCounters} duration={1600} />
+                  {isLoading ? (
+                    <div className="w-16 h-6 bg-white/20 rounded animate-pulse"></div>
+                  ) : (
+                    <AnimatedCounter value={contactCounts.lead} shouldAnimate={shouldAnimateCounters} duration={1600} />
+                  )}
                 </div>
                 <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Leads</div>
               </div>
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  <AnimatedCounter value={contactCounts.user} shouldAnimate={shouldAnimateCounters} duration={1400} />
+                  {isLoading ? (
+                    <div className="w-16 h-6 bg-white/20 rounded animate-pulse"></div>
+                  ) : (
+                    <AnimatedCounter value={contactCounts.user} shouldAnimate={shouldAnimateCounters} duration={1400} />
+                  )}
                 </div>
                 <div className="text-sm opacity-80" style={{ fontFamily: 'Inter, sans-serif' }}>Users</div>
               </div>
