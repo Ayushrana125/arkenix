@@ -88,7 +88,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         // Progressive loading: Fetch all data in batches, show first batch immediately
         let allData: any[] = [];
         let from = 0;
-        const batchSize = 1000;
+        const batchSize = 5000;
         let hasMore = true;
         let isFirstBatch = true;
 
@@ -124,12 +124,6 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
         // Final update with all data
         setData(allData);
-        
-        // Cache data in sessionStorage
-        sessionStorage.setItem(`data_table_${clientId}`, JSON.stringify(allData));
-        if (count !== null) {
-          sessionStorage.setItem(`data_count_${clientId}`, JSON.stringify(count));
-        }
       } catch (err: any) {
         console.error('Error fetching data:', err);
         setError(err.message || 'Failed to load data');
@@ -137,25 +131,14 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       }
     };
 
-    // Check if we have cached data
-    const cachedData = sessionStorage.getItem(`data_table_${clientId}`);
-    const cachedCount = sessionStorage.getItem(`data_count_${clientId}`);
-    
-    if (cachedData && cachedCount && data.length === 0) {
-      // Load from cache immediately (no fetch on switch)
-      const parsedData = JSON.parse(cachedData);
-      const parsedCount = JSON.parse(cachedCount);
-      setData(parsedData);
-      setTotalCount(parsedCount);
-      setIsLoading(false);
-    } else if (data.length === 0) {
-      // First load - fetch data
+    // Only fetch if data is empty (first load or after refresh)
+    if (data.length === 0) {
       fetchData();
     }
 
     const handleRefresh = () => {
-      sessionStorage.removeItem(`data_table_${clientId}`);
-      sessionStorage.removeItem(`data_count_${clientId}`);
+      setData([]);
+      setTotalCount(null);
       fetchData();
     };
     window.addEventListener('refreshDataTable', handleRefresh);
