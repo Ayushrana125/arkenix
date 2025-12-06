@@ -560,7 +560,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           <div className="relative" ref={searchColumnDropdownRef}>
             <button
               onClick={() => setIsSearchColumnDropdownOpen(!isSearchColumnDropdownOpen)}
-              className={`px-4 py-2 border border-gray-300 rounded-lg text-sm flex items-center gap-2 hover:bg-gray-50 transition-colors ${
+              className={`px-3 py-1.5 border border-gray-300 rounded-lg text-xs flex items-center gap-2 hover:bg-gray-50 transition-colors ${
                 selectedSearchColumns.length > 0 ? 'bg-[#348ADC]/10 border-[#348ADC] text-[#348ADC]' : 'bg-white text-gray-700'
               }`}
               style={{ fontFamily: 'Inter, sans-serif' }}
@@ -570,7 +570,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
                   ? 'Search in: All' 
                   : `Search in: ${selectedSearchColumns.length}`}
               </span>
-              <ChevronDown size={16} className={`transition-transform ${isSearchColumnDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown size={14} className={`transition-transform ${isSearchColumnDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
             
             {isSearchColumnDropdownOpen && (
@@ -650,7 +650,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
                 setCurrentPage(1);
               }}
 
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                 selectedUserType === type
                   ? 'bg-[#348ADC] text-white shadow-md'
                   : 'bg-gray-100 text-[#072741] hover:bg-gray-200'
