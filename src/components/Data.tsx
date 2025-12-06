@@ -75,11 +75,12 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         setIsLoading(true);
         setError(null);
 
-        // Fetch all data in batches to handle 20K+ rows
+        // Progressive loading: Fetch all data in batches, show first batch immediately
         let allData: any[] = [];
         let from = 0;
         const batchSize = 1000;
         let hasMore = true;
+        let isFirstBatch = true;
 
         while (hasMore) {
           const { data: batchData, error: fetchError } = await supabase
@@ -92,6 +93,18 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
           if (batchData && batchData.length > 0) {
             allData = [...allData, ...batchData];
+            
+            // Show first batch immediately
+            if (isFirstBatch) {
+              setData([...batchData]);
+              setCurrentPage(1);
+              setIsLoading(false);
+              isFirstBatch = false;
+            } else {
+              // Update data progressively as more batches load
+              setData([...allData]);
+            }
+            
             from += batchSize;
             hasMore = batchData.length === batchSize;
           } else {
@@ -99,8 +112,8 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           }
         }
 
+        // Final update with all data
         setData(allData);
-        setCurrentPage(1);
       } catch (err: any) {
         console.error('Error fetching data:', err);
         setError(err.message || 'Failed to load data');

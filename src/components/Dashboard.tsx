@@ -211,11 +211,12 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
     const fetchContactCounts = async () => {
       try {
-        // Fetch all data in batches to handle 20K+ rows
+        // Progressive loading: Fetch all data in batches, show first batch immediately
         let allData: any[] = [];
         let from = 0;
         const batchSize = 1000;
         let hasMore = true;
+        let isFirstBatch = true;
 
         while (hasMore) {
           const { data: batchData, error } = await supabase
@@ -228,6 +229,35 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
           if (batchData && batchData.length > 0) {
             allData = [...allData, ...batchData];
+            
+            // Show first batch immediately
+            if (isFirstBatch) {
+              const counts = {
+                total: batchData.length,
+                prospect: batchData.filter(item => item.user_type?.toLowerCase() === 'prospect').length,
+                lead: batchData.filter(item => item.user_type?.toLowerCase() === 'lead').length,
+                user: batchData.filter(item => item.user_type?.toLowerCase() === 'user').length
+              };
+              setContactCounts(counts);
+              setIsDataLoaded(true);
+              setIsLoading(false);
+              if (!hasInitialLoad) {
+                setShouldAnimateCounters(true);
+                setHasInitialLoad(true);
+                sessionStorage.setItem('dashboardAnimated', 'true');
+              }
+              isFirstBatch = false;
+            } else {
+              // Update counts progressively
+              const counts = {
+                total: allData.length,
+                prospect: allData.filter(item => item.user_type?.toLowerCase() === 'prospect').length,
+                lead: allData.filter(item => item.user_type?.toLowerCase() === 'lead').length,
+                user: allData.filter(item => item.user_type?.toLowerCase() === 'user').length
+              };
+              setContactCounts(counts);
+            }
+            
             from += batchSize;
             hasMore = batchData.length === batchSize;
           } else {
@@ -235,21 +265,14 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
           }
         }
 
-        const counts = {
+        // Final update with all data
+        const finalCounts = {
           total: allData.length,
           prospect: allData.filter(item => item.user_type?.toLowerCase() === 'prospect').length,
           lead: allData.filter(item => item.user_type?.toLowerCase() === 'lead').length,
           user: allData.filter(item => item.user_type?.toLowerCase() === 'user').length
         };
-
-        setContactCounts(counts);
-        setIsDataLoaded(true);
-        setIsLoading(false);
-        if (!hasInitialLoad) {
-          setShouldAnimateCounters(true);
-          setHasInitialLoad(true);
-          sessionStorage.setItem('dashboardAnimated', 'true');
-        }
+        setContactCounts(finalCounts);
       } catch (error) {
         console.error('Error fetching contact counts:', error);
         // Set fallback data on error
