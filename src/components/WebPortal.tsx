@@ -296,7 +296,7 @@ export function WebPortal() {
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   {activeMenu === 'Home' && 'Welcome to your dashboard'}
-                  {activeMenu === 'Data' && dataSubPage !== 'audiences' && 'Manage your data infrastructure'}
+                  {activeMenu === 'Data' && dataSubPage !== 'audiences' && 'Manage your user data and analytics'}
                   {activeMenu === 'Data' && dataSubPage === 'audiences' && 'Upload and create audiences for your campaigns'}
                   {activeMenu === 'Templates' && 'Create and manage templates'}
                   {activeMenu === 'AI Emails' && 'AI-powered email generation'}
@@ -308,60 +308,90 @@ export function WebPortal() {
 
               {/* Action Buttons - Data module main page */}
               {activeMenu === 'Data' && dataSubPage === null && (
-                <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
+                <div className="flex items-center gap-3 flex-shrink-0 w-full sm:w-auto">
                   <button
                     onClick={() => {
                       // Trigger Add User functionality in Data component
                       window.dispatchEvent(new CustomEvent('openAddUser'));
                     }}
-                    className="flex-1 sm:flex-none px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm flex items-center gap-2"
+                    className="group relative flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl transition-all duration-300 font-semibold text-sm whitespace-nowrap shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2.5 overflow-hidden"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="relative z-10">
                       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                       <circle cx="9" cy="7" r="4"></circle>
                       <line x1="19" y1="8" x2="19" y2="14"></line>
                       <line x1="22" y1="11" x2="16" y2="11"></line>
                     </svg>
-                    Add User
+                    <span className="relative z-10">Add User</span>
                   </button>
                   <button
                     onClick={() => setIsUploadPageOpen(true)}
-                    className="flex-1 sm:flex-none px-3 py-2 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm"
+                    className="group relative flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-300 font-semibold text-sm whitespace-nowrap shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2.5 overflow-hidden"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    Upload Data
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="relative z-10">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span className="relative z-10">Add Multiple Users</span>
                   </button>
                   <button
                     onClick={() => setDataSubPage('audiences')}
-                    className="flex-1 sm:flex-none px-3 py-2 border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-lg transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm"
+                    className="group relative flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 font-semibold text-sm whitespace-nowrap shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2.5 overflow-hidden"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    Manage Audiences
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="relative z-10">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                    </svg>
+                    <span className="relative z-10">Manage Audiences</span>
                   </button>
                 </div>
               )}
 
               {/* Action Buttons - Manage Audiences page */}
               {activeMenu === 'Data' && dataSubPage === 'audiences' && (
-                <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
+                <div className="flex items-center gap-3 flex-shrink-0 w-full sm:w-auto">
                   <button
                     onClick={() => {
                       // TODO: Handle Upload Audience action
                     }}
-                    className="flex-1 sm:flex-none px-3 py-2 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm"
+                    className="group relative flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-300 font-semibold text-sm whitespace-nowrap shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2.5 overflow-hidden"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    Upload Audience
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="relative z-10">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14,2 14,8 20,8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10,9 9,9 8,9"></polyline>
+                    </svg>
+                    <span className="relative z-10">Upload Audience</span>
                   </button>
                   <button
                     onClick={() => {
                       // TODO: Handle Create Audience action
                     }}
-                    className="flex-1 sm:flex-none px-3 py-2 border border-[#348ADC] text-[#348ADC] hover:bg-[#348ADC] hover:text-white rounded-lg transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm"
+                    className="group relative flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl transition-all duration-300 font-semibold text-sm whitespace-nowrap shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2.5 overflow-hidden"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    Create Audience
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="relative z-10">
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                    </svg>
+                    <span className="relative z-10">Create Audience</span>
                   </button>
                 </div>
               )}
