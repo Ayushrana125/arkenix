@@ -10,6 +10,13 @@ const mockData = {
     aiEmails: { value: 156, subtitle: "AI Usage" },
     upcomingMeetings: { value: 7, subtitle: "Dec 15, 2024" }
   },
+  upcomingMeetings: [
+    { name: "John Smith", email: "john.smith@company.com", date: "Dec 16, 2024", time: "10:00 AM" },
+    { name: "Sarah Johnson", email: "sarah.j@startup.io", date: "Dec 16, 2024", time: "2:30 PM" },
+    { name: "Michael Chen", email: "m.chen@techcorp.com", date: "Dec 17, 2024", time: "11:15 AM" },
+    { name: "Emily Davis", email: "emily.davis@enterprise.com", date: "Dec 17, 2024", time: "3:45 PM" },
+    { name: "Robert Wilson", email: "r.wilson@business.net", date: "Dec 18, 2024", time: "9:30 AM" }
+  ],
   topCities: [
     { name: 'New York', value: 3200 },
     { name: 'London', value: 1800 },
@@ -46,7 +53,30 @@ const mockData = {
 };
 
 // Reusable Components
-const StatCard = ({ title, value, subtitle, breakdown }: any) => (
+const HeroStatCard = ({ title, value, subtitle, breakdown }: any) => (
+  <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-200">
+    <h3 className="text-lg font-semibold text-gray-700 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+      {title}
+    </h3>
+    <div className="text-4xl font-bold text-[#072741] mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      {typeof value === 'number' ? value.toLocaleString() : value}
+    </div>
+    {subtitle && (
+      <p className="text-sm text-gray-500 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+        {subtitle}
+      </p>
+    )}
+    {breakdown && (
+      <div className="flex gap-6 mt-4 text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <span className="font-medium">Prospect: {breakdown.prospect.toLocaleString()}</span>
+        <span className="font-medium">Lead: {breakdown.lead.toLocaleString()}</span>
+        <span className="font-medium">User: {breakdown.user.toLocaleString()}</span>
+      </div>
+    )}
+  </div>
+);
+
+const SecondaryStatCard = ({ title, value, subtitle }: any) => (
   <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
     <h3 className="text-sm font-medium text-gray-600 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
       {title}
@@ -59,22 +89,62 @@ const StatCard = ({ title, value, subtitle, breakdown }: any) => (
         {subtitle}
       </p>
     )}
-    {breakdown && (
-      <div className="flex gap-4 mt-2 text-xs text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-        <span>Prospect: {breakdown.prospect.toLocaleString()}</span>
-        <span>Lead: {breakdown.lead.toLocaleString()}</span>
-        <span>User: {breakdown.user.toLocaleString()}</span>
-      </div>
-    )}
   </div>
 );
 
-const ChartCard = ({ title, children }: any) => (
-  <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-    <h3 className="text-lg font-semibold text-[#072741] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+const ChartCard = ({ title, children, size = 'normal' }: any) => (
+  <div className={`bg-white rounded-xl shadow-sm border border-gray-200 ${
+    size === 'small' ? 'p-4' : 'p-6'
+  }`}>
+    <h3 className={`font-semibold text-[#072741] mb-4 ${
+      size === 'small' ? 'text-base' : 'text-lg'
+    }`} style={{ fontFamily: 'Poppins, sans-serif' }}>
       {title}
     </h3>
     {children}
+  </div>
+);
+
+const MeetingsTable = () => (
+  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+    <div className="flex justify-between items-center mb-6">
+      <h3 className="text-xl font-semibold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        Upcoming Meetings
+      </h3>
+      <button className="text-sm text-[#348ADC] hover:text-[#2a6fb0] font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+        View All Meetings
+      </button>
+    </div>
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead>
+          <tr className="border-b border-gray-200">
+            <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>Name</th>
+            <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>Email</th>
+            <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>Date</th>
+            <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {mockData.upcomingMeetings.map((meeting, index) => (
+            <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+              <td className="py-4 px-2 text-sm font-medium text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                {meeting.name}
+              </td>
+              <td className="py-4 px-2 text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                {meeting.email}
+              </td>
+              <td className="py-4 px-2 text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                {meeting.date}
+              </td>
+              <td className="py-4 px-2 text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                {meeting.time}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   </div>
 );
 
@@ -106,86 +176,41 @@ const ActivityItem = ({ text, time }: any) => (
 
 export function Dashboard() {
   return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
-      {/* Row 1 - Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <StatCard 
+    <div className="space-y-10 p-6 max-w-7xl mx-auto">
+      {/* Section 1 - Hero Metrics (Large Cards) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <HeroStatCard 
           title="Total Contacts" 
           value={mockData.summaryCards.totalContacts.value}
           breakdown={mockData.summaryCards.totalContacts.breakdown}
         />
-        <StatCard 
+        <HeroStatCard 
           title="Emails Sent" 
           value={mockData.summaryCards.emailsSent.value}
           subtitle={mockData.summaryCards.emailsSent.subtitle}
         />
-        <StatCard 
+        <HeroStatCard 
           title="WhatsApp Messages Sent" 
           value={mockData.summaryCards.whatsappSent.value}
           subtitle={mockData.summaryCards.whatsappSent.subtitle}
         />
-        <StatCard 
+        <HeroStatCard 
           title="AI Emails Generated" 
           value={mockData.summaryCards.aiEmails.value}
           subtitle={mockData.summaryCards.aiEmails.subtitle}
         />
-        <StatCard 
+        <HeroStatCard 
           title="Upcoming Meetings" 
           value={mockData.summaryCards.upcomingMeetings.value}
           subtitle={mockData.summaryCards.upcomingMeetings.subtitle}
         />
       </div>
 
-      {/* Row 2 - Contact Distribution */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Top 5 Cities">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={mockData.topCities}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="value" fill="#348ADC" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
+      {/* Section 2 - Meetings Table */}
+      <MeetingsTable />
 
-        <ChartCard title="Countries Split">
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={mockData.countrySplit}
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                dataKey="value"
-                label={({ name, value }) => `${name}: ${value}%`}
-              >
-                {mockData.countrySplit.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
-
-      {/* Row 3 - Contact Growth Over Time */}
-      <ChartCard title="New Contacts Added Over Time">
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={mockData.contactGrowth}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="week" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="contacts" stroke="#348ADC" strokeWidth={3} />
-          </LineChart>
-        </ResponsiveContainer>
-      </ChartCard>
-
-      {/* Row 4 - Data Completeness Score */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Section 3 - Secondary Analytics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <ChartCard title="Data Completeness Score">
           <div className="mb-6">
             <div className="text-3xl font-bold text-[#072741] mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -202,16 +227,55 @@ export function Dashboard() {
           </div>
         </ChartCard>
 
-        <ChartCard title="Coming Soon">
-          <div className="flex items-center justify-center h-64">
-            <p className="text-gray-400 text-center" style={{ fontFamily: 'Inter, sans-serif' }}>
-              Future analytics widget will be added here
-            </p>
-          </div>
+        <ChartCard title="Contact Growth">
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={mockData.contactGrowth}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="week" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="contacts" stroke="#348ADC" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
         </ChartCard>
       </div>
 
-      {/* Row 5 - Recent Activity Feed */}
+      {/* Section 4 - Tertiary Insights (Smallest Widgets) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard title="Top 5 Cities" size="small">
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={mockData.topCities}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="value" fill="#348ADC" />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Countries Split" size="small">
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie
+                data={mockData.countrySplit}
+                cx="50%"
+                cy="50%"
+                outerRadius={60}
+                dataKey="value"
+                label={({ name, value }) => `${name}: ${value}%`}
+              >
+                {mockData.countrySplit.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+
+      {/* Section 5 - Recent Activity (Full Width) */}
       <ChartCard title="Recent Activity">
         <div className="max-h-80 overflow-y-auto">
           {mockData.recentActivity.map((activity) => (
