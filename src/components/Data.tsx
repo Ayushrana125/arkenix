@@ -216,22 +216,31 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     // Exact substring match (fastest)
     if (val.includes(search)) return true;
 
-    // For short terms (<=3 chars), require exact match to avoid false positives
-    if (search.length <= 3) return false;
+    // For very short terms (<=2 chars), require exact match
+    if (search.length <= 2) return false;
 
     // Split value into words and check fuzzy match against each word
-    const words = val.split(/\s+/);
+    const words = val.split(/[\s,._-]+/).filter(Boolean);
     for (const word of words) {
-      if (word.length < 3) continue;
+      // Skip very short words
+      if (word.length < 2) continue;
       
-      // Calculate allowed distance based on word length
-      const maxDistance = search.length <= 5 ? 1 : 2;
+      // Exact word match
+      if (word === search) return true;
+      
+      // Substring match
+      if (word.includes(search) || search.includes(word)) return true;
+      
+      // Fuzzy match with Levenshtein distance
+      const maxDistance = Math.max(1, Math.floor(search.length * 0.25)); // 25% tolerance
       const distance = levenshteinDistance(search, word);
       
       if (distance <= maxDistance) return true;
       
-      // Also check if search term is a substring of the word (partial match)
-      if (word.includes(search) || search.includes(word)) return true;
+      // Check if search starts with word or word starts with search (prefix matching)
+      if (search.startsWith(word.slice(0, 3)) || word.startsWith(search.slice(0, 3))) {
+        if (distance <= maxDistance + 1) return true;
+      }
     }
 
     return false;
