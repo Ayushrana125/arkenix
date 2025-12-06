@@ -203,16 +203,20 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         });
       }
 
-      // 2) GLOBAL SEARCH
+      // 2) GLOBAL SEARCH - Smart multi-term search
       if (globalSearch.trim()) {
-        const search = globalSearch.toLowerCase();
+        const searchTerms = globalSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
         const columnsToSearch = selectedSearchColumns.length > 0 ? selectedSearchColumns : columns;
-        filtered = filtered.filter((row) =>
-          columnsToSearch.some((col) => {
-            const v = row[col];
-            return v != null && String(v).toLowerCase().includes(search);
-          })
-        );
+        
+        filtered = filtered.filter((row) => {
+          // All search terms must be found somewhere in the row
+          return searchTerms.every((term) =>
+            columnsToSearch.some((col) => {
+              const v = row[col];
+              return v != null && String(v).toLowerCase().includes(term);
+            })
+          );
+        });
       }
 
       // 3) DATE RANGE FILTER - Works with ISO 8601 dates with timezones
