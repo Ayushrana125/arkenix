@@ -658,6 +658,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
             <button
               onClick={handleSendEmail}
               disabled={selectedUserIds.size === 0}
+              title={selectedUserIds.size === 0 ? "Select Users" : ""}
               className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
@@ -669,6 +670,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
             <button
               onClick={handleDeleteSelected}
               disabled={selectedUserIds.size === 0}
+              title={selectedUserIds.size === 0 ? "Select Users" : ""}
               className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-md text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
