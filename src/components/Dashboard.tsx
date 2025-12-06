@@ -181,13 +181,27 @@ const MeetingsTable = ({ meetings }: { meetings: any[] }) => {
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-medium text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    {date}
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <div className="font-medium text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      {date}
+                    </div>
+                    <div className="text-sm text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      {time}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    {time}
-                  </div>
+                  <button
+                    onClick={() => alert(`Send reminder to ${meeting.first_name} ${meeting.last_name}`)}
+                    className="px-3 py-2 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg text-xs font-medium flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all duration-200"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                    title="Send Reminder"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                    Send Reminder
+                  </button>
                 </div>
               </div>
             );
