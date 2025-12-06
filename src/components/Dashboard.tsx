@@ -146,15 +146,6 @@ const MeetingsTable = ({ meetings, showAll, onToggleShowAll, hasMore }: { meetin
             Upcoming Meetings
           </h3>
         </div>
-        {hasMore && (
-          <button
-            onClick={onToggleShowAll}
-            className="px-4 py-2 text-sm text-[#348ADC] hover:text-white hover:bg-[#348ADC] border border-[#348ADC]/30 hover:border-[#348ADC] rounded-xl font-medium transition-all duration-200"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            {showAll ? 'Show Less' : 'View All'}
-          </button>
-        )}
       </div>
       {meetings.length === 0 ? (
         <div className="text-center py-12">
@@ -215,6 +206,17 @@ const MeetingsTable = ({ meetings, showAll, onToggleShowAll, hasMore }: { meetin
               </div>
             );
           })}
+        </div>
+      )}
+      {hasMore && (
+        <div className="mt-4 text-center">
+          <button
+            onClick={onToggleShowAll}
+            className="px-6 py-2.5 text-sm text-[#348ADC] hover:text-white hover:bg-[#348ADC] border border-[#348ADC]/30 hover:border-[#348ADC] rounded-xl font-medium transition-all duration-200"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            {showAll ? 'Show Less' : 'View All'}
+          </button>
         </div>
       )}
     </div>
