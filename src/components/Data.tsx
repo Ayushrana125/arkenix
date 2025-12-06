@@ -75,14 +75,31 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         setIsLoading(true);
         setError(null);
 
-        const { data: tableData, error: fetchError } = await supabase
-          .from('clients_user_data')
-          .select('*')
-          .eq('client_id', clientId);
+        // Fetch all data in batches to handle 20K+ rows
+        let allData: any[] = [];
+        let from = 0;
+        const batchSize = 10000;
+        let hasMore = true;
 
-        if (fetchError) throw fetchError;
+        while (hasMore) {
+          const { data: batchData, error: fetchError } = await supabase
+            .from('clients_user_data')
+            .select('*')
+            .eq('client_id', clientId)
+            .range(from, from + batchSize - 1);
 
-        setData(tableData || []);
+          if (fetchError) throw fetchError;
+
+          if (batchData && batchData.length > 0) {
+            allData = [...allData, ...batchData];
+            from += batchSize;
+            hasMore = batchData.length === batchSize;
+          } else {
+            hasMore = false;
+          }
+        }
+
+        setData(allData);
         setCurrentPage(1);
       } catch (err: any) {
         console.error('Error fetching data:', err);
