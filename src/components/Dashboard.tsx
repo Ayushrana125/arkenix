@@ -262,6 +262,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
     // Listen for user upload events (triggers animation)
     const handleUserUpload = () => {
       sessionStorage.removeItem(`dashboard_counts_${clientId}`);
+      setContactCounts({ total: 0, prospect: 0, lead: 0, user: 0 });
       setIsDataLoaded(false);
       setShouldAnimateCounters(false);
       setTimeout(() => {
@@ -273,6 +274,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
     // Listen for regular refresh events (no animation)
     const handleRefresh = () => {
       sessionStorage.removeItem(`dashboard_counts_${clientId}`);
+      setContactCounts({ total: 0, prospect: 0, lead: 0, user: 0 });
       fetchContactCounts();
     };
     window.addEventListener('refreshDataTable', handleRefresh);
