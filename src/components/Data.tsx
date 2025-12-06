@@ -915,7 +915,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               onClick={handleSendEmail}
               disabled={selectedUserIds.size === 0}
               title={selectedUserIds.size === 0 ? "Select Users" : ""}
-              className="px-3 py-2 bg-gradient-to-r from-[#072741] to-[#0a3d5c] hover:from-[#0a3d5c] hover:to-[#0d4a6b] text-white rounded-full text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200"
+              className="px-3 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white rounded-full text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <Mail size={14} />
@@ -934,7 +934,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               }}
               disabled={selectedUserIds.size === 0}
               title={selectedUserIds.size === 0 ? "Select Users" : ""}
-              className="px-3 py-2 border border-[#348ADC]/30 text-[#348ADC] hover:bg-[#348ADC]/10 hover:border-[#348ADC] rounded-full text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all duration-200"
+              className="px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-full text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
