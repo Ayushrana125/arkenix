@@ -19,14 +19,21 @@ interface ValidatedRow {
 }
 
 const ALLOWED_HEADERS = [
+  'usercode',
   'first_name',
   'last_name',
   'title',
+  'department',
   'official_email',
   'mobile_number',
   'company',
   'industry',
-  'user_type'
+  'user_type',
+  'date_of_birth',
+  'city',
+  'state_province',
+  'country',
+  'meeting_datetime'
 ];
 
 const HEADER_NORMALIZATIONS: { [key: string]: string } = {
@@ -411,34 +418,55 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
   const downloadSampleFile = () => {
     const sampleData = [
       {
+        usercode: 'USR001',
         first_name: 'John',
         last_name: 'Doe',
         title: 'Marketing Manager',
+        department: 'Marketing',
         official_email: 'john.doe@example.com',
         mobile_number: '+1234567890',
         company: 'Acme Corp',
         industry: 'Technology',
-        user_type: 'lead'
+        user_type: 'lead',
+        date_of_birth: '1990-05-15',
+        city: 'New York',
+        state_province: 'NY',
+        country: 'USA',
+        meeting_datetime: '2024-12-20T10:00:00'
       },
       {
+        usercode: 'USR002',
         first_name: 'Jane',
         last_name: 'Smith',
         title: 'Sales Director',
+        department: 'Sales',
         official_email: 'jane.smith@example.com',
         mobile_number: '+1987654321',
         company: 'Tech Solutions',
         industry: 'Software',
-        user_type: 'prospect'
+        user_type: 'prospect',
+        date_of_birth: '1985-08-22',
+        city: 'San Francisco',
+        state_province: 'CA',
+        country: 'USA',
+        meeting_datetime: '2024-12-21T14:30:00'
       },
       {
+        usercode: 'USR003',
         first_name: 'Bob',
         last_name: 'Johnson',
         title: 'CEO',
+        department: 'Executive',
         official_email: 'bob.johnson@example.com',
         mobile_number: '+1555123456',
         company: 'Innovation Labs',
         industry: 'Consulting',
-        user_type: 'user'
+        user_type: 'user',
+        date_of_birth: '1978-03-10',
+        city: 'Boston',
+        state_province: 'MA',
+        country: 'USA',
+        meeting_datetime: '2024-12-22T09:00:00'
       }
     ];
 
@@ -585,10 +613,12 @@ export function UploadDataPage({ onClose, clientId }: UploadDataPageProps) {
                 <div>
                   <p className="font-semibold mb-2">Allowed Headers:</p>
                   <ul className="list-disc list-inside space-y-1 text-gray-600">
-                    <li>first_name, last_name, title</li>
+                    <li>usercode, first_name, last_name, title, department</li>
                     <li>official_email (required)</li>
                     <li>mobile_number (7-15 digits, optional +)</li>
                     <li>company, industry, user_type</li>
+                    <li>date_of_birth, city, state_province, country</li>
+                    <li>meeting_datetime</li>
                   </ul>
                 </div>
 
