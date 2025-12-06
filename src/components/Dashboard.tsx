@@ -264,11 +264,14 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
     // Listen for user upload events (triggers animation)
     const handleUserUpload = () => {
+      console.log('🔄 Dashboard: userDataUploaded event received');
       sessionStorage.removeItem(`dashboard_counts_${clientId}`);
+      console.log('🗑️ Dashboard: Cache cleared');
       setIsDataLoaded(false);
       setShouldAnimateCounters(false);
       // Directly fetch without resetting counts (avoids cache race condition)
       setTimeout(() => {
+        console.log('📊 Dashboard: Fetching fresh counts...');
         fetchContactCounts();
         setShouldAnimateCounters(true);
       }, 100);
@@ -276,7 +279,9 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
     // Listen for regular refresh events (no animation)
     const handleRefresh = () => {
+      console.log('🔄 Dashboard: refreshDataTable event received');
       sessionStorage.removeItem(`dashboard_counts_${clientId}`);
+      console.log('🗑️ Dashboard: Cache cleared');
       // Directly fetch without resetting counts (avoids cache race condition)
       fetchContactCounts();
     };
