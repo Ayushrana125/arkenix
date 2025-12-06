@@ -189,6 +189,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
             .from('clients_user_data')
             .select('*')
             .eq('client_id', clientId)
+            .order('registration_date', { ascending: false })
             .range(from, from + batchSize - 1);
 
           if (fetchError) throw fetchError;

@@ -121,55 +121,82 @@ const ChartCard = ({ title, children, size = 'normal' }: any) => (
   </div>
 );
 
-const MeetingsTable = () => (
-  <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
-    <div className="flex justify-between items-center mb-8">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-[#072741] rounded-2xl flex items-center justify-center">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
+const MeetingsTable = ({ meetings }: { meetings: any[] }) => {
+  const formatDateTime = (datetime: string) => {
+    const date = new Date(datetime);
+    return {
+      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      time: date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+    };
+  };
+
+  return (
+    <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+      <div className="flex justify-between items-center mb-8">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-amber-100 rounded-2xl flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <h3 className="text-2xl font-bold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Upcoming Meetings
+          </h3>
         </div>
-        <h3 className="text-2xl font-bold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          Upcoming Meetings
-        </h3>
       </div>
-      <button className="px-4 py-2 text-sm text-[#348ADC] hover:text-white hover:bg-[#348ADC] border border-[#348ADC]/30 hover:border-[#348ADC] rounded-xl font-medium transition-all duration-200" style={{ fontFamily: 'Inter, sans-serif' }}>
-        View All
-      </button>
-    </div>
-    <div className="space-y-3">
-      {mockData.upcomingMeetings.map((meeting, index) => (
-        <div key={index} className="flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-100/50 rounded-2xl transition-all duration-200 group">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
-              {meeting.name.split(' ').map(n => n[0]).join('')}
-            </div>
-            <div>
-              <div className="font-semibold text-[#072741] group-hover:text-[#348ADC] transition-colors" style={{ fontFamily: 'Inter, sans-serif' }}>
-                {meeting.name}
-              </div>
-              <div className="text-sm text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-                {meeting.email}
-              </div>
-            </div>
+      {meetings.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
           </div>
-          <div className="text-right">
-            <div className="font-medium text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {meeting.date}
-            </div>
-            <div className="text-sm text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {meeting.time}
-            </div>
-          </div>
+          <p className="text-gray-500 text-lg" style={{ fontFamily: 'Inter, sans-serif' }}>No meetings scheduled</p>
         </div>
-      ))}
+      ) : (
+        <div className="space-y-3">
+          {meetings.map((meeting, index) => {
+            const { date, time } = formatDateTime(meeting.meeting_datetime);
+            const initials = `${meeting.first_name?.[0] || ''}${meeting.last_name?.[0] || ''}`;
+            return (
+              <div key={index} className="flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-100/50 rounded-2xl transition-all duration-200 group">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                    {initials}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-[#072741] group-hover:text-[#348ADC] transition-colors" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      {meeting.first_name} {meeting.last_name}
+                    </div>
+                    <div className="text-sm text-gray-500 space-x-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      {meeting.mobile_number && <span>{meeting.mobile_number}</span>}
+                      {meeting.mobile_number && meeting.official_email && <span>•</span>}
+                      {meeting.official_email && <span>{meeting.official_email}</span>}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-medium text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    {date}
+                  </div>
+                  <div className="text-sm text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    {time}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 const ProgressBar = ({ label, percentage }: any) => (
   <div className="mb-4">
@@ -199,6 +226,8 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
     lead: 0,
     user: 0
   });
+  const [upcomingMeetings, setUpcomingMeetings] = useState<any[]>([]);
+  const [meetingsCount, setMeetingsCount] = useState(0);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [shouldAnimateCounters, setShouldAnimateCounters] = useState(false);
@@ -211,12 +240,15 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
     const fetchContactCounts = async () => {
       try {
+        const today = new Date().toISOString().split('T')[0];
+        
         // Use fast COUNT aggregation queries
-        const [totalResult, prospectResult, leadResult, userResult] = await Promise.all([
+        const [totalResult, prospectResult, leadResult, userResult, meetingsResult] = await Promise.all([
           supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId),
           supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId).ilike('user_type', 'prospect'),
           supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId).ilike('user_type', 'lead'),
-          supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId).ilike('user_type', 'user')
+          supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId).ilike('user_type', 'user'),
+          supabase.from('clients_user_data').select('first_name, last_name, mobile_number, official_email, meeting_datetime').eq('client_id', clientId).not('meeting_datetime', 'is', null).gte('meeting_datetime', today).order('meeting_datetime', { ascending: true }).limit(5)
         ]);
 
         const counts = {
@@ -227,6 +259,8 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
         };
 
         setContactCounts(counts);
+        setUpcomingMeetings(meetingsResult.data || []);
+        setMeetingsCount(meetingsResult.data?.length || 0);
         setIsDataLoaded(true);
         setIsLoading(false);
         
@@ -438,14 +472,18 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
             </div>
             <h3 className="text-sm font-medium text-gray-600 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>Upcoming Meetings</h3>
             <div className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              <AnimatedCounter value={mockData.summaryCards.upcomingMeetings.value} shouldAnimate={shouldAnimateCounters} duration={600} />
+              {isLoading ? (
+                <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
+              ) : (
+                <AnimatedCounter value={meetingsCount} shouldAnimate={shouldAnimateCounters} duration={600} />
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Section 2 - Meetings Table */}
-      <MeetingsTable />
+      <MeetingsTable meetings={upcomingMeetings} />
 
       {/* Section 3 - Secondary Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
