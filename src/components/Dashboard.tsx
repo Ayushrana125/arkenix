@@ -230,8 +230,9 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
         setIsDataLoaded(true);
         setIsLoading(false);
         
-        // Cache counts in sessionStorage
+        // Cache counts in sessionStorage with timestamp
         sessionStorage.setItem(`dashboard_counts_${clientId}`, JSON.stringify(counts));
+        sessionStorage.setItem(`dashboard_last_update_${clientId}`, Date.now().toString());
         
         if (!hasInitialLoad) {
           setShouldAnimateCounters(true);
@@ -247,9 +248,13 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
     // Only fetch if counts are zero
     if (contactCounts.total === 0) {
-      // Check if we have cached counts (only for page switches, not after data changes)
+      // Check if we have cached counts
       const cachedCounts = sessionStorage.getItem(`dashboard_counts_${clientId}`);
-      if (cachedCounts) {
+      const lastUpdate = sessionStorage.getItem(`dashboard_last_update_${clientId}`);
+      const now = Date.now();
+      
+      // If cache exists and was updated less than 5 seconds ago, use it
+      if (cachedCounts && lastUpdate && (now - parseInt(lastUpdate)) < 5000) {
         // Load from cache immediately (no animation on switch)
         const counts = JSON.parse(cachedCounts);
         setContactCounts(counts);
@@ -257,7 +262,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
         setIsLoading(false);
         setShouldAnimateCounters(false);
       } else {
-        // First load or after data change - fetch fresh data
+        // First load or cache is stale - fetch fresh data
         fetchContactCounts();
       }
     }
