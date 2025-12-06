@@ -490,8 +490,8 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       });
 
       if (supabaseData?.status === 'success' || supabaseData?.status === 'partial_success') {
-        // Refresh data
-        window.dispatchEvent(new Event('refreshDataTable'));
+        // Refresh data and dashboard
+        window.dispatchEvent(new Event('userDataUploaded'));
         // Clear selection
         setSelectedUserIds(new Set());
         alert(`Successfully deleted ${supabaseData.deleted || userIds.length} user(s).`);
