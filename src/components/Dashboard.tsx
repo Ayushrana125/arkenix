@@ -202,6 +202,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [shouldAnimateCounters, setShouldAnimateCounters] = useState(false);
+  const [forceFetch, setForceFetch] = useState(false);
   const [hasInitialLoad, setHasInitialLoad] = useState(() => {
     return sessionStorage.getItem('dashboardAnimated') === 'true';
   });
@@ -249,7 +250,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
     if (contactCounts.total === 0) {
       // Check if we have cached counts (only for page switches, not after data changes)
       const cachedCounts = sessionStorage.getItem(`dashboard_counts_${clientId}`);
-      if (cachedCounts) {
+      if (cachedCounts && !forceFetch) {
         // Load from cache immediately (no animation on switch)
         const counts = JSON.parse(cachedCounts);
         setContactCounts(counts);
@@ -259,12 +260,14 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
       } else {
         // First load or after data change - fetch fresh data
         fetchContactCounts();
+        setForceFetch(false);
       }
     }
 
     // Listen for user upload events (triggers animation)
     const handleUserUpload = () => {
       sessionStorage.removeItem(`dashboard_counts_${clientId}`);
+      setForceFetch(true);
       setContactCounts({ total: 0, prospect: 0, lead: 0, user: 0 });
       setIsDataLoaded(false);
       setShouldAnimateCounters(false);
@@ -277,6 +280,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
     // Listen for regular refresh events (no animation)
     const handleRefresh = () => {
       sessionStorage.removeItem(`dashboard_counts_${clientId}`);
+      setForceFetch(true);
       setContactCounts({ total: 0, prospect: 0, lead: 0, user: 0 });
       fetchContactCounts();
     };
