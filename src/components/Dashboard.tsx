@@ -146,7 +146,85 @@ const MeetingsTable = ({ meetings, showAll, onToggleShowAll, hasMore }: { meetin
             Upcoming Meetings
           </h3>
         </div>
+        {hasMore && (
+          <button
+            onClick={onToggleShowAll}
+            className="px-4 py-2 text-sm text-[#348ADC] hover:text-white hover:bg-[#348ADC] border border-[#348ADC]/30 hover:border-[#348ADC] rounded-xl font-medium transition-all duration-200"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            View All
+          </button>
+        )}
       </div>
+      {showAll && (
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onToggleShowAll}></div>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[80vh] flex flex-col">
+              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 className="text-2xl font-bold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  All Upcoming Meetings
+                </h3>
+                <button onClick={onToggleShowAll} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="space-y-3">
+                  {meetings.map((meeting, index) => {
+                    const { date, time } = formatDateTime(meeting.meeting_datetime);
+                    const initials = `${meeting.first_name?.[0] || ''}${meeting.last_name?.[0] || ''}`;
+                    return (
+                      <div key={index} className="flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-100/50 rounded-2xl transition-all duration-200 group">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                            {initials}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-[#072741] group-hover:text-[#348ADC] transition-colors" style={{ fontFamily: 'Inter, sans-serif' }}>
+                              {meeting.first_name} {meeting.last_name}
+                            </div>
+                            <div className="text-sm text-gray-500 space-x-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+                              {meeting.mobile_number && <span>{meeting.mobile_number}</span>}
+                              {meeting.mobile_number && meeting.official_email && <span>•</span>}
+                              {meeting.official_email && <span>{meeting.official_email}</span>}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <div className="font-medium text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                              {date}
+                            </div>
+                            <div className="text-sm text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+                              {time}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => alert(`Send reminder to ${meeting.first_name} ${meeting.last_name}`)}
+                            className="px-3 py-2 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg text-xs font-medium flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all duration-200"
+                            style={{ fontFamily: 'Inter, sans-serif' }}
+                            title="Send Reminder"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            Send Reminder
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
       {meetings.length === 0 ? (
         <div className="text-center py-12">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -206,17 +284,6 @@ const MeetingsTable = ({ meetings, showAll, onToggleShowAll, hasMore }: { meetin
               </div>
             );
           })}
-        </div>
-      )}
-      {hasMore && (
-        <div className="mt-4 text-center">
-          <button
-            onClick={onToggleShowAll}
-            className="px-6 py-2.5 text-sm text-[#348ADC] hover:text-white hover:bg-[#348ADC] border border-[#348ADC]/30 hover:border-[#348ADC] rounded-xl font-medium transition-all duration-200"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            {showAll ? 'Show Less' : 'View All'}
-          </button>
         </div>
       )}
     </div>
@@ -529,6 +596,7 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
         onToggleShowAll={() => setShowAllMeetings(!showAllMeetings)}
         hasMore={meetingsCount > 5}
       />
+      {showAllMeetings && <div className="fixed inset-0 z-30" onClick={() => setShowAllMeetings(false)}></div>}
 
       {/* Section 3 - Secondary Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
