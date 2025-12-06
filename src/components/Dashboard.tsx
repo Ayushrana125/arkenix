@@ -121,7 +121,7 @@ const ChartCard = ({ title, children, size = 'normal' }: any) => (
   </div>
 );
 
-const MeetingsTable = ({ meetings }: { meetings: any[] }) => {
+const MeetingsTable = ({ meetings, showAll, onToggleShowAll, hasMore }: { meetings: any[]; showAll: boolean; onToggleShowAll: () => void; hasMore: boolean }) => {
   const formatDateTime = (datetime: string) => {
     const date = new Date(datetime);
     return {
@@ -146,6 +146,15 @@ const MeetingsTable = ({ meetings }: { meetings: any[] }) => {
             Upcoming Meetings
           </h3>
         </div>
+        {hasMore && (
+          <button
+            onClick={onToggleShowAll}
+            className="px-4 py-2 text-sm text-[#348ADC] hover:text-white hover:bg-[#348ADC] border border-[#348ADC]/30 hover:border-[#348ADC] rounded-xl font-medium transition-all duration-200"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            {showAll ? 'Show Less' : 'View All'}
+          </button>
+        )}
       </div>
       {meetings.length === 0 ? (
         <div className="text-center py-12">
@@ -242,6 +251,8 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
   });
   const [upcomingMeetings, setUpcomingMeetings] = useState<any[]>([]);
   const [meetingsCount, setMeetingsCount] = useState(0);
+  const [showAllMeetings, setShowAllMeetings] = useState(false);
+  const [allMeetings, setAllMeetings] = useState<any[]>([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [shouldAnimateCounters, setShouldAnimateCounters] = useState(false);
@@ -257,11 +268,12 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
         const today = new Date().toISOString().split('T')[0];
         
         // Use fast COUNT aggregation queries
-        const [totalResult, prospectResult, leadResult, userResult, meetingsResult] = await Promise.all([
+        const [totalResult, prospectResult, leadResult, userResult, meetingsCountResult, meetingsResult] = await Promise.all([
           supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId),
           supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId).ilike('user_type', 'prospect'),
           supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId).ilike('user_type', 'lead'),
           supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId).ilike('user_type', 'user'),
+          supabase.from('clients_user_data').select('*', { count: 'exact', head: true }).eq('client_id', clientId).not('meeting_datetime', 'is', null).gte('meeting_datetime', today),
           supabase.from('clients_user_data').select('first_name, last_name, mobile_number, official_email, meeting_datetime').eq('client_id', clientId).not('meeting_datetime', 'is', null).gte('meeting_datetime', today).order('meeting_datetime', { ascending: true }).limit(5)
         ]);
 
@@ -274,7 +286,19 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
 
         setContactCounts(counts);
         setUpcomingMeetings(meetingsResult.data || []);
-        setMeetingsCount(meetingsResult.data?.length || 0);
+        setMeetingsCount(meetingsCountResult.count || 0);
+        
+        // Fetch all meetings if count > 5
+        if (meetingsCountResult.count && meetingsCountResult.count > 5) {
+          const { data: allMeetingsData } = await supabase
+            .from('clients_user_data')
+            .select('first_name, last_name, mobile_number, official_email, meeting_datetime')
+            .eq('client_id', clientId)
+            .not('meeting_datetime', 'is', null)
+            .gte('meeting_datetime', today)
+            .order('meeting_datetime', { ascending: true });
+          setAllMeetings(allMeetingsData || []);
+        }
         setIsDataLoaded(true);
         setIsLoading(false);
         
@@ -497,7 +521,12 @@ export function Dashboard({ clientId }: DashboardProps = {}) {
       </div>
 
       {/* Section 2 - Meetings Table */}
-      <MeetingsTable meetings={upcomingMeetings} />
+      <MeetingsTable 
+        meetings={showAllMeetings ? allMeetings : upcomingMeetings} 
+        showAll={showAllMeetings}
+        onToggleShowAll={() => setShowAllMeetings(!showAllMeetings)}
+        hasMore={meetingsCount > 5}
+      />
 
       {/* Section 3 - Secondary Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
