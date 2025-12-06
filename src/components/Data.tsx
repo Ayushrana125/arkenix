@@ -900,7 +900,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               onClick={handleUpdateUser}
               disabled={selectedUserIds.size !== 1}
               title={selectedUserIds.size !== 1 ? "Select a User" : ""}
-              className="px-3 py-1.5 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-md text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              className="px-3 py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] hover:from-[#2a6fb0] hover:to-[#4fb3c7] text-white rounded-full text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -910,16 +910,37 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               Update User
             </button>
 
-            {/* SEND EMAIL — smaller, premium buttons */}
+            {/* SEND EMAIL */}
             <button
               onClick={handleSendEmail}
               disabled={selectedUserIds.size === 0}
               title={selectedUserIds.size === 0 ? "Select Users" : ""}
-              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              className="px-3 py-2 bg-gradient-to-r from-[#072741] to-[#0a3d5c] hover:from-[#0a3d5c] hover:to-[#0d4a6b] text-white rounded-full text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <Mail size={14} />
               Send Emails
+            </button>
+
+            {/* SEND WHATSAPP */}
+            <button
+              onClick={() => {
+                if (selectedUserIds.size === 0) {
+                  alert('Please select at least one user to send WhatsApp message to.');
+                  return;
+                }
+                // TODO: Implement WhatsApp functionality
+                alert(`Send WhatsApp to ${selectedUserIds.size} selected user(s) - Feature coming soon!`);
+              }}
+              disabled={selectedUserIds.size === 0}
+              title={selectedUserIds.size === 0 ? "Select Users" : ""}
+              className="px-3 py-2 border border-[#348ADC]/30 text-[#348ADC] hover:bg-[#348ADC]/10 hover:border-[#348ADC] rounded-full text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all duration-200"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+              </svg>
+              Send WhatsApp
             </button>
 
             {/* DELETE USER */}
@@ -927,7 +948,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               onClick={handleDeleteSelected}
               disabled={selectedUserIds.size === 0}
               title={selectedUserIds.size === 0 ? "Select Users" : ""}
-              className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-md text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              className="px-3 py-2 border border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 rounded-full text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all duration-200"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <Trash2 size={14} />
