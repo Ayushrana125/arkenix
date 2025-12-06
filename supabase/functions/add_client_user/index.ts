@@ -61,13 +61,21 @@ serve(async (req) => {
     const insertData = {
       ...user_data,
       client_id: client_id, // Ensure client_id is set
-      created_at: new Date().toISOString(),
     };
 
-    // Remove id if present (will be auto-generated)
+    // Remove auto-generated fields
     delete insertData.id;
+    delete insertData.created_at;
+    delete insertData.registration_date;
+    
+    // Remove any date fields that should be auto-generated
+    Object.keys(insertData).forEach(key => {
+      if (key.toLowerCase().includes('date') && key !== 'birth_date' && key !== 'dob') {
+        delete insertData[key];
+      }
+    });
 
-    if (Object.keys(insertData).length <= 2) { // Only client_id and created_at
+    if (Object.keys(insertData).length <= 1) { // Only client_id
       return new Response(
         JSON.stringify({
           status: 'error',

@@ -48,6 +48,11 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
   
+  // Add user state
+  const [isAddPanelOpen, setIsAddPanelOpen] = useState(false);
+  const [newUserData, setNewUserData] = useState<any>({});
+  const [isAdding, setIsAdding] = useState(false);
+  
   // Update user state
   const [isUpdatePanelOpen, setIsUpdatePanelOpen] = useState(false);
   const [editedUserData, setEditedUserData] = useState<any>({});
@@ -96,9 +101,14 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     const handleRefresh = () => fetchData();
     window.addEventListener('refreshDataTable', handleRefresh);
 
+    // Add User event listener
+    const handleOpenAddUser = () => handleAddUser();
+    window.addEventListener('openAddUser', handleOpenAddUser);
+
     return () => {
       clearInterval(interval);
       window.removeEventListener('refreshDataTable', handleRefresh);
+      window.removeEventListener('openAddUser', handleOpenAddUser);
     };
   }, [clientId]);
 
@@ -535,6 +545,82 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       alert(`Error updating user: ${error.message || 'Unknown error'}`);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // ----------------------------------------------------------
+  // ADD USER FUNCTIONALITY
+  // ----------------------------------------------------------
+  const getEditableColumns = () => {
+    return columns.filter(col => {
+      const lower = col.toLowerCase();
+      return !['id', 'client_id', 'created_at'].includes(col) &&
+             !lower.includes('registration') &&
+             !(lower.includes('date') && !lower.includes('birth') && !lower.includes('dob'));
+    });
+  };
+
+  const handleAddUser = () => {
+    const editableColumns = getEditableColumns();
+    const emptyUserData: any = {};
+    editableColumns.forEach(column => {
+      emptyUserData[column] = '';
+    });
+    setNewUserData(emptyUserData);
+    setIsAddPanelOpen(true);
+  };
+
+  const handleNewUserFieldChange = (field: string, value: string) => {
+    setNewUserData((prev: any) => ({ ...prev, [field]: value }));
+  };
+
+  const hasNewUserData = () => {
+    const editableColumns = getEditableColumns();
+    return editableColumns.some(col => newUserData[col] && newUserData[col].trim() !== '');
+  };
+
+  const handleDiscardNewUser = () => {
+    if (hasNewUserData()) {
+      if (confirm('Are you sure you want to discard the new user data?')) {
+        setIsAddPanelOpen(false);
+        setNewUserData({});
+      }
+    } else {
+      setIsAddPanelOpen(false);
+      setNewUserData({});
+    }
+  };
+
+  const handleSaveNewUser = async () => {
+    if (!hasNewUserData()) {
+      alert('Please fill in at least one field.');
+      return;
+    }
+
+    setIsAdding(true);
+    try {
+      const { data: supabaseData, error } = await supabase.functions.invoke('add_client_user', {
+        body: {
+          client_id: clientId,
+          user_data: newUserData,
+        },
+      });
+
+      if (error) throw error;
+
+      if (supabaseData?.status === 'success') {
+        window.dispatchEvent(new Event('refreshDataTable'));
+        setIsAddPanelOpen(false);
+        setNewUserData({});
+        alert('User added successfully!');
+      } else {
+        throw new Error(supabaseData?.message || 'Failed to add user');
+      }
+    } catch (error: any) {
+      console.error('Add user error:', error);
+      alert(`Error adding user: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -1102,7 +1188,100 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         </>
       )}
 
+      {/* ------------------------------
+          ADD USER SLIDE-OVER PANEL
+      ------------------------------ */}
+      {isAddPanelOpen && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
+            onClick={handleDiscardNewUser}
+          ></div>
 
+          <div className="fixed inset-y-0 right-0 w-full sm:w-[480px] bg-white shadow-2xl z-50 flex flex-col animate-slide-in">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+              <div>
+                <h2 className="text-lg font-semibold text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Add New User
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Create a new user in the database
+                </p>
+              </div>
+              <button
+                onClick={handleDiscardNewUser}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              <div className="space-y-4">
+                {getEditableColumns().map((column) => {
+                  const hasValue = newUserData[column] && newUserData[column].trim() !== '';
+                  return (
+                    <div key={column} className="space-y-1.5">
+                      <label 
+                        className="text-xs font-medium text-[#072741] flex items-center gap-2"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        {hasValue && (
+                          <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">Filled</span>
+                        )}
+                      </label>
+                      <input
+                        type="text"
+                        value={newUserData[column] || ''}
+                        onChange={(e) => handleNewUserFieldChange(column, e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#348ADC] transition-all ${
+                          hasValue ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-white'
+                        }`}
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                        placeholder={`Enter ${column.replace(/_/g, ' ').toLowerCase()}...`}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+              <button
+                onClick={handleDiscardNewUser}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveNewUser}
+                disabled={!hasNewUserData() || isAdding}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                {isAdding ? (
+                  <>
+                    <Loader className="animate-spin" size={14} />
+                    Adding...
+                  </>
+                ) : (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <line x1="19" y1="8" x2="19" y2="14"></line>
+                      <line x1="22" y1="11" x2="16" y2="11"></line>
+                    </svg>
+                    Add User
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
