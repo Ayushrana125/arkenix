@@ -908,8 +908,8 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   }
 
   return (
-    <>
-      {/* Module Header */}
+    <div className="py-3">
+      {/* Module Header */>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3 flex-shrink-0">
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-semibold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -957,7 +957,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       </div>
 
       {/* Data Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 flex flex-col h-full">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-3 pt-3 pb-2 flex flex-col h-full">
       {/* ------------------------------
           FILTERS SECTION
       ------------------------------ */}
@@ -1615,6 +1615,6 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         clientId={clientId}
       />
     )}
-    </>
+    </div>
   );
 }
