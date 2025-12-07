@@ -10,9 +10,7 @@ import {
   Mail,
   Trash2,
 } from 'lucide-react';
-import * as XLSX from 'xlsx';
 import { supabase } from '../lib/supabase';
-import { UploadDataPage } from './UploadDataPage';
 
 interface ClientsDataTableProps {
   clientId: string;
@@ -26,11 +24,8 @@ interface ColumnFilter {
 
 export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const [data, setData] = useState<any[]>([]);
-  const [totalCount, setTotalCount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFullyLoaded, setIsFullyLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isUploadPageOpen, setIsUploadPageOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 100;
@@ -45,116 +40,13 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const [selectedUserType, setSelectedUserType] = useState<string>('');  // Default
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-
+ 
   // columnFilters kept for future extension (sorting / filtering)
   const [columnFiltersVersion, setColumnFiltersVersion] = useState(0);
 
   // Selection state
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
-  
-  // Add user state
-  const [isAddPanelOpen, setIsAddPanelOpen] = useState(false);
-  const [newUserData, setNewUserData] = useState<any>({});
-  const [isAdding, setIsAdding] = useState(false);
-  
-  // Update user state
-  const [isUpdatePanelOpen, setIsUpdatePanelOpen] = useState(false);
-  const [editedUserData, setEditedUserData] = useState<any>({});
-  const [originalUserData, setOriginalUserData] = useState<any>({});
-  const [isSaving, setIsSaving] = useState(false);
-
-  // Loading quotes - initialize with random quote
-  const quotes = [
-    "Every outreach is a new opportunity.",
-    "Momentum closes more deals than talent.",
-    "Follow-ups create fortunes.",
-    "Pipeline is built, not found.",
-    "People buy clarity.",
-    "Sales is trust at scale.",
-    "Rejection is data, not failure.",
-    "Great salespeople listen more than they talk.",
-    "Speed matters. Consistency matters more.",
-    "A simple offer converts faster.",
-    "Conversations create conversions.",
-    "Outreach rewards discipline.",
-    "The next 'yes' is closer than you think.",
-    "Small actions build big pipelines.",
-    "You can't control results—only effort.",
-    "Sell solutions, not features.",
-    "Every 'no' sharpens the next pitch.",
-    "Confidence is your closing tool.",
-    "Clear value wins meetings.",
-    "Know your customer better than they do.",
-    "Follow-up is where trust is built.",
-    "Good sales feel like guidance.",
-    "Persistence beats perfection.",
-    "Sales success is a daily practice.",
-    "Start with the problem, not the product.",
-    "Clarity cuts through noise.",
-    "The message is the strategy.",
-    "Relevance beats reach every time.",
-    "People buy stories, not stats.",
-    "Marketing is compounding trust.",
-    "Speak to problems, not products.",
-    "Emotion drives action.",
-    "Simple messages spread faster.",
-    "Content is your digital handshake.",
-    "Positioning creates demand.",
-    "Consistency builds brand memory.",
-    "Intent > impressions.",
-    "Creativity with data wins.",
-    "Right audience, right moment.",
-    "Brand is the promise you keep.",
-    "Good marketing feels like help.",
-    "Show outcomes, not features.",
-    "Your story is your differentiator.",
-    "Marketing is psychology at scale.",
-    "Unique beats perfect.",
-    "People remember how you made them feel.",
-    "Speak their language, not yours.",
-    "Insight drives powerful messaging.",
-    "Awareness starts. Experience converts.",
-    "A clear brand attracts the right customers.",
-    "Clients value ease above everything.",
-    "Clear communication is a service.",
-    "Trust is built in small moments.",
-    "Serve like a partner, not a vendor.",
-    "Responsiveness shows respect.",
-    "Clients remember experiences, not deliverables.",
-    "Under-promise. Over-deliver.",
-    "Be reliable enough to recommend.",
-    "Solve fast, communicate faster.",
-    "Consistency builds loyalty.",
-    "Clients buy confidence, not complexity.",
-    "Great relationships scale revenue.",
-    "Set expectations. Then exceed them.",
-    "Make working with you feel effortless.",
-    "Your attitude becomes your reputation.",
-    "Value builds trust. Trust builds business.",
-    "Partnerships grow when communication flows.",
-    "Good service is remembered long after the invoice.",
-    "Empathy strengthens relationships.",
-    "Clients want clarity, not jargon.",
-    "Keep promises small and delivery strong.",
-    "Professionalism is a competitive edge.",
-    "Happy clients bring new clients.",
-    "Consistency beats brilliance.",
-    "Treat every client as long-term, not transactional."
-  ];
-
-  const [currentQuote, setCurrentQuote] = useState(() => Math.floor(Math.random() * quotes.length));
-
-  // Rotate quotes while loading - random selection
-  useEffect(() => {
-    if (isLoading) {
-      setCurrentQuote(Math.floor(Math.random() * quotes.length));
-      const interval = setInterval(() => {
-        setCurrentQuote(Math.floor(Math.random() * quotes.length));
-      }, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [isLoading]);
 
   // ----------------------------------------------------------
   // FETCH DATA FROM SUPABASE
@@ -170,110 +62,41 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         setIsLoading(true);
         setError(null);
 
-        // First, get total count quickly
-        const { count, error: countError } = await supabase
+        const { data: tableData, error: fetchError } = await supabase
           .from('clients_user_data')
-          .select('*', { count: 'exact', head: true })
+          .select('*')
           .eq('client_id', clientId);
 
-        if (countError) throw countError;
-        setTotalCount(count || 0);
+        if (fetchError) throw fetchError;
 
-        // Progressive loading: Fetch all data in batches, show first batch immediately
-        let allData: any[] = [];
-        let from = 0;
-        const batchSize = 5000;
-        let hasMore = true;
-        let isFirstBatch = true;
-
-        while (hasMore) {
-          const { data: batchData, error: fetchError } = await supabase
-            .from('clients_user_data')
-            .select('*')
-            .eq('client_id', clientId)
-            .order('registration_date', { ascending: false })
-            .range(from, from + batchSize - 1);
-
-          if (fetchError) throw fetchError;
-
-          if (batchData && batchData.length > 0) {
-            allData = [...allData, ...batchData];
-            
-            // Show first batch immediately
-            if (isFirstBatch) {
-              setData([...batchData]);
-              setCurrentPage(1);
-              setIsLoading(false);
-              isFirstBatch = false;
-            } else {
-              // Update data progressively as more batches load
-              setData([...allData]);
-            }
-            
-            from += batchSize;
-            hasMore = batchData.length === batchSize;
-          } else {
-            hasMore = false;
-          }
-        }
-
-        // Final update with all data
-        setData(allData);
-        setIsFullyLoaded(true);
+        setData(tableData || []);
+        setCurrentPage(1);
       } catch (err: any) {
         console.error('Error fetching data:', err);
         setError(err.message || 'Failed to load data');
+      } finally {
         setIsLoading(false);
       }
     };
 
-    // Only fetch if data is empty (first load or after refresh)
-    if (data.length === 0) {
-      fetchData();
-    }
+    // Initial fetch
+    fetchData();
 
-    const handleRefresh = () => {
-      setData([]);
-      setTotalCount(null);
-      setIsFullyLoaded(false);
-      fetchData();
-    };
+    // Auto-refresh every 2 minutes
+    const interval = setInterval(fetchData, 120000);
+
+    const handleRefresh = () => fetchData();
     window.addEventListener('refreshDataTable', handleRefresh);
-    window.addEventListener('userDataUploaded', handleRefresh);
-
-    // Add User event listener
-    const handleOpenAddUser = () => handleAddUser();
-    window.addEventListener('openAddUser', handleOpenAddUser);
 
     return () => {
+      clearInterval(interval);
       window.removeEventListener('refreshDataTable', handleRefresh);
-      window.removeEventListener('userDataUploaded', handleRefresh);
-      window.removeEventListener('openAddUser', handleOpenAddUser);
     };
-  }, [clientId, data.length]);
+  }, [clientId]);
 
   // ----------------------------------------------------------
-  // NORMALIZE ALL COLUMN NAMES SAFELY WITH ORDERING
+  // NORMALIZE ALL COLUMN NAMES SAFELY
   // ----------------------------------------------------------
-  const columnOrder = [
-    "usercode",
-    "first_name",
-    "last_name",
-    "title",
-    "department",
-    "official_email",
-    "mobile_number",
-    "company",
-    "industry",
-    "user_type",
-    "date_of_birth",
-    "city",
-    "state_province",
-    "country",
-    "meeting_datetime",
-    "registration_date",
-  ];
-
   const getAllColumns = () => {
     try {
       if (!Array.isArray(data) || data.length === 0) return [];
@@ -282,32 +105,17 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       for (const row of data) {
         if (row && typeof row === 'object') {
           for (const key of Object.keys(row)) {
-            if (key !== 'id' && key !== 'client_id') {
-              colSet.add(key);
-            }
+            colSet.add(key);
           }
         }
       }
 
       const allColumns = Array.from(colSet);
-      const ordered: string[] = [];
-      const remaining: string[] = [];
 
-      // Add columns in specified order
-      columnOrder.forEach(col => {
-        if (allColumns.includes(col)) {
-          ordered.push(col);
-        }
-      });
-
-      // Add any remaining columns not in the order list
-      allColumns.forEach(col => {
-        if (!columnOrder.includes(col)) {
-          remaining.push(col);
-        }
-      });
-
-      return [...ordered, ...remaining];
+      // remove internal fields
+      return allColumns.filter(
+        (c) => c !== 'id' && c !== 'client_id'
+      );
     } catch (err) {
       console.error('Column generation failed:', err);
       return [];
@@ -374,71 +182,6 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   };
 
   // ----------------------------------------------------------
-  // FUZZY MATCH HELPER - Levenshtein distance for typo tolerance
-  // ----------------------------------------------------------
-  const levenshteinDistance = (str1: string, str2: string): number => {
-    const len1 = str1.length;
-    const len2 = str2.length;
-    const matrix: number[][] = [];
-
-    for (let i = 0; i <= len1; i++) {
-      matrix[i] = [i];
-    }
-    for (let j = 0; j <= len2; j++) {
-      matrix[0][j] = j;
-    }
-
-    for (let i = 1; i <= len1; i++) {
-      for (let j = 1; j <= len2; j++) {
-        const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j - 1] + cost
-        );
-      }
-    }
-    return matrix[len1][len2];
-  };
-
-  const fuzzyMatch = (searchTerm: string, value: string): boolean => {
-    const search = searchTerm.toLowerCase();
-    const val = value.toLowerCase();
-
-    // Exact substring match (fastest)
-    if (val.includes(search)) return true;
-
-    // For very short terms (<=2 chars), require exact match
-    if (search.length <= 2) return false;
-
-    // Split value into words and check fuzzy match against each word
-    const words = val.split(/[\s,._-]+/).filter(Boolean);
-    for (const word of words) {
-      // Skip very short words
-      if (word.length < 2) continue;
-      
-      // Exact word match
-      if (word === search) return true;
-      
-      // Substring match
-      if (word.includes(search) || search.includes(word)) return true;
-      
-      // Fuzzy match with Levenshtein distance
-      const maxDistance = Math.max(1, Math.floor(search.length * 0.25)); // 25% tolerance
-      const distance = levenshteinDistance(search, word);
-      
-      if (distance <= maxDistance) return true;
-      
-      // Check if search starts with word or word starts with search (prefix matching)
-      if (search.startsWith(word.slice(0, 3)) || word.startsWith(search.slice(0, 3))) {
-        if (distance <= maxDistance + 1) return true;
-      }
-    }
-
-    return false;
-  };
-
-  // ----------------------------------------------------------
   // APPLY ALL FILTERS SAFELY
   // ----------------------------------------------------------
   const filteredData = useMemo(() => {
@@ -460,21 +203,16 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         });
       }
 
-      // 2) GLOBAL SEARCH - Smart multi-term search with fuzzy matching
+      // 2) GLOBAL SEARCH
       if (globalSearch.trim()) {
-        const searchTerms = globalSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
+        const search = globalSearch.toLowerCase();
         const columnsToSearch = selectedSearchColumns.length > 0 ? selectedSearchColumns : columns;
-        
-        filtered = filtered.filter((row) => {
-          // All search terms must be found somewhere in the row
-          return searchTerms.every((term) =>
-            columnsToSearch.some((col) => {
-              const v = row[col];
-              if (v == null) return false;
-              return fuzzyMatch(term, String(v));
-            })
-          );
-        });
+        filtered = filtered.filter((row) =>
+          columnsToSearch.some((col) => {
+            const v = row[col];
+            return v != null && String(v).toLowerCase().includes(search);
+          })
+        );
       }
 
       // 3) DATE RANGE FILTER - Works with ISO 8601 dates with timezones
@@ -621,8 +359,8 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
       });
 
       if (supabaseData?.status === 'success' || supabaseData?.status === 'partial_success') {
-        // Refresh data and dashboard
-        window.dispatchEvent(new Event('userDataUploaded'));
+        // Refresh data
+        window.dispatchEvent(new Event('refreshDataTable'));
         // Clear selection
         setSelectedUserIds(new Set());
         alert(`Successfully deleted ${supabaseData.deleted || userIds.length} user(s).`);
@@ -648,157 +386,6 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
     // TODO: Implement email functionality
     alert(`Send email to ${selectedUserIds.size} selected user(s) - Feature coming soon!`);
   };
-
-  // ----------------------------------------------------------
-  // UPDATE USER FUNCTIONALITY
-  // ----------------------------------------------------------
-  const handleUpdateUser = () => {
-    const userId = Array.from(selectedUserIds)[0];
-    const user = data.find(row => String(row.id) === userId);
-    if (user) {
-      setOriginalUserData({ ...user });
-      setEditedUserData({ ...user });
-      setIsUpdatePanelOpen(true);
-    }
-  };
-
-  const handleFieldChange = (field: string, value: string) => {
-    setEditedUserData((prev: any) => ({ ...prev, [field]: value }));
-  };
-
-  const hasChanges = () => {
-    return columns.some(col => editedUserData[col] !== originalUserData[col]);
-  };
-
-  const handleDiscardChanges = () => {
-    if (hasChanges()) {
-      if (confirm('Are you sure you want to discard all changes?')) {
-        setIsUpdatePanelOpen(false);
-        setEditedUserData({});
-        setOriginalUserData({});
-      }
-    } else {
-      setIsUpdatePanelOpen(false);
-      setEditedUserData({});
-      setOriginalUserData({});
-    }
-  };
-
-  const handleSaveChanges = async () => {
-    if (!hasChanges()) {
-      alert('No changes to save.');
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      // Call Supabase Edge Function
-      const { data: supabaseData, error } = await supabase.functions.invoke('update_client_user', {
-        body: {
-          client_id: clientId,
-          user_id: editedUserData.id,
-          user_data: editedUserData,
-        },
-      });
-
-      if (error) throw error;
-
-      if (supabaseData?.status === 'success') {
-        // Refresh data
-        window.dispatchEvent(new Event('userDataUploaded'));
-        setIsUpdatePanelOpen(false);
-        setEditedUserData({});
-        setOriginalUserData({});
-        setSelectedUserIds(new Set());
-        alert('User updated successfully!');
-      } else {
-        throw new Error(supabaseData?.message || 'Failed to update user');
-      }
-    } catch (error: any) {
-      console.error('Update error:', error);
-      alert(`Error updating user: ${error.message || 'Unknown error'}`);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  // ----------------------------------------------------------
-  // ADD USER FUNCTIONALITY
-  // ----------------------------------------------------------
-  const getEditableColumns = () => {
-    return columns.filter(col => {
-      const lower = col.toLowerCase();
-      return !['id', 'client_id', 'created_at'].includes(col) &&
-             !lower.includes('registration') &&
-             !(lower.includes('date') && !lower.includes('birth') && !lower.includes('dob'));
-    });
-  };
-
-  const handleAddUser = () => {
-    const editableColumns = getEditableColumns();
-    const emptyUserData: any = {};
-    editableColumns.forEach(column => {
-      emptyUserData[column] = '';
-    });
-    setNewUserData(emptyUserData);
-    setIsAddPanelOpen(true);
-  };
-
-  const handleNewUserFieldChange = (field: string, value: string) => {
-    setNewUserData((prev: any) => ({ ...prev, [field]: value }));
-  };
-
-  const hasNewUserData = () => {
-    const editableColumns = getEditableColumns();
-    return editableColumns.some(col => newUserData[col] && newUserData[col].trim() !== '');
-  };
-
-  const handleDiscardNewUser = () => {
-    if (hasNewUserData()) {
-      if (confirm('Are you sure you want to discard the new user data?')) {
-        setIsAddPanelOpen(false);
-        setNewUserData({});
-      }
-    } else {
-      setIsAddPanelOpen(false);
-      setNewUserData({});
-    }
-  };
-
-  const handleSaveNewUser = async () => {
-    if (!hasNewUserData()) {
-      alert('Please fill in at least one field.');
-      return;
-    }
-
-    setIsAdding(true);
-    try {
-      const { data: supabaseData, error } = await supabase.functions.invoke('add_client_user', {
-        body: {
-          client_id: clientId,
-          user_data: newUserData,
-        },
-      });
-
-      if (error) throw error;
-
-      if (supabaseData?.status === 'success') {
-        window.dispatchEvent(new Event('userDataUploaded'));
-        setIsAddPanelOpen(false);
-        setNewUserData({});
-        alert('User added successfully!');
-      } else {
-        throw new Error(supabaseData?.message || 'Failed to add user');
-      }
-    } catch (error: any) {
-      console.error('Add user error:', error);
-      alert(`Error adding user: ${error.message || 'Unknown error'}`);
-    } finally {
-      setIsAdding(false);
-    }
-  };
-
-
 
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
@@ -841,43 +428,9 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[500px] flex items-center justify-center relative overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#348ADC]/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#65C9D4]/5 rounded-full blur-3xl"></div>
-        
-        <div className="text-center space-y-8 max-w-xl relative z-10">
-          {/* Animated loader with glow effect */}
-          <div className="relative inline-block">
-            <div className="absolute inset-0 bg-[#348ADC]/20 rounded-full blur-xl animate-pulse"></div>
-            <Loader className="animate-spin text-[#348ADC] relative" size={48} strokeWidth={2.5} />
-          </div>
-          
-          {/* Quote section */}
-          <div className="space-y-4 px-6">
-            <div className="relative">
-              <svg className="absolute -top-2 -left-4 w-8 h-8 text-[#348ADC]/20" fill="currentColor" viewBox="0 0 32 32">
-                <path d="M10 8c-3.3 0-6 2.7-6 6v10h10V14H8c0-1.1.9-2 2-2V8zm12 0c-3.3 0-6 2.7-6 6v10h10V14h-6c0-1.1.9-2 2-2V8z"/>
-              </svg>
-              <p 
-                className="text-[#072741] text-xl font-semibold leading-relaxed transition-all duration-700 ease-in-out"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-                key={currentQuote}
-              >
-                {quotes[currentQuote]}
-              </p>
-            </div>
-            
-            {/* Loading text with animated dots */}
-            <div className="flex items-center justify-center gap-2 text-gray-500 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-              <span>Loading your data</span>
-              <span className="flex gap-1">
-                <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
-                <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
-                <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
-              </span>
-            </div>
-          </div>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
+        <div className="flex items-center justify-center h-full">
+          <Loader className="animate-spin text-[#348ADC]" size={32} />
         </div>
       </div>
     );
@@ -908,56 +461,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   }
 
   return (
-    <div className="pt-4 pb-3">
-      {/* Module Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3 flex-shrink-0">
-        <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-semibold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Data
-          </h1>
-          <p className="text-xs text-[#072741] opacity-50" style={{ fontFamily: 'Inter, sans-serif' }}>
-            Manage your user data and analytics
-          </p>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
-          <button
-            onClick={handleAddUser}
-            className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] hover:from-[#2a6fb0] hover:to-[#4fb3c7] text-white rounded-full transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-md hover:shadow-lg flex items-center gap-2"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <line x1="19" y1="8" x2="19" y2="14"></line>
-              <line x1="22" y1="11" x2="16" y2="11"></line>
-            </svg>
-            Add User
-          </button>
-          <button
-            onClick={() => setIsUploadPageOpen(true)}
-            className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-[#072741] to-[#0a3d5c] hover:from-[#0a3d5c] hover:to-[#0d4a6b] text-white rounded-full transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-md hover:shadow-lg flex items-center gap-2"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            Add Multiple Users
-          </button>
-          <button
-            onClick={() => alert('Manage Audiences - Coming soon!')}
-            className="flex-1 sm:flex-none px-3 py-2 border border-[#348ADC]/30 text-[#348ADC] hover:bg-[#348ADC]/10 hover:border-[#348ADC] rounded-full transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            Manage Audiences
-          </button>
-        </div>
-      </div>
-
-      {/* Data Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-3 pt-3 pb-1 flex flex-col h-full">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 flex flex-col h-full">
       {/* ------------------------------
           FILTERS SECTION
       ------------------------------ */}
@@ -986,7 +490,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           <div className="relative" ref={searchColumnDropdownRef}>
             <button
               onClick={() => setIsSearchColumnDropdownOpen(!isSearchColumnDropdownOpen)}
-              className={`px-3 py-1.5 border border-gray-300 rounded-lg text-xs flex items-center gap-2 hover:bg-gray-50 transition-colors ${
+              className={`px-4 py-2 border border-gray-300 rounded-lg text-sm flex items-center gap-2 hover:bg-gray-50 transition-colors ${
                 selectedSearchColumns.length > 0 ? 'bg-[#348ADC]/10 border-[#348ADC] text-[#348ADC]' : 'bg-white text-gray-700'
               }`}
               style={{ fontFamily: 'Inter, sans-serif' }}
@@ -996,7 +500,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
                   ? 'Search in: All' 
                   : `Search in: ${selectedSearchColumns.length}`}
               </span>
-              <ChevronDown size={14} className={`transition-transform ${isSearchColumnDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown size={16} className={`transition-transform ${isSearchColumnDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
             
             {isSearchColumnDropdownOpen && (
@@ -1067,68 +571,25 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         </div>
 
         {/* USER TYPE CARDS */}
-        <div className="flex flex-wrap items-center gap-2 justify-between">
-          <div className="flex flex-wrap gap-2">
-            {['Prospect', 'Lead', 'User'].map((type) => (
-              <button
-                key={type}
-                onClick={() => {
-                  setSelectedUserType((prev) => (prev === type ? '' : type));
-                  setCurrentPage(1);
-                }}
+        <div className="flex flex-wrap gap-2">
+          {['Prospect', 'Lead', 'User'].map((type) => (
+            <button
+              key={type}
+              onClick={() => {
+                setSelectedUserType((prev) => (prev === type ? '' : type));
+                setCurrentPage(1);
+              }}
 
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                  selectedUserType === type
-                    ? 'bg-[#348ADC] text-white shadow-md'
-                    : 'bg-gray-100 text-[#072741] hover:bg-gray-200'
-                }`}
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-          
-          {/* Download CSV Button */}
-          <button
-            onClick={() => {
-              const hasFilters = selectedUserType || globalSearch.trim() || dateFrom || dateTo;
-              const dataToExport = (hasFilters ? filteredData : data).map(row => {
-                const cleanRow: any = {};
-                columns.forEach(col => {
-                  cleanRow[col] = row[col];
-                });
-                return cleanRow;
-              });
-              const ws = XLSX.utils.json_to_sheet(dataToExport);
-              
-              // Style headers - bold and blue
-              const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
-              for (let C = range.s.c; C <= range.e.c; ++C) {
-                const address = XLSX.utils.encode_col(C) + '1';
-                if (!ws[address]) continue;
-                ws[address].s = {
-                  font: { bold: true, color: { rgb: '348ADC' } },
-                  fill: { fgColor: { rgb: 'E8F4FD' } }
-                };
-              }
-              
-              const wb = XLSX.utils.book_new();
-              XLSX.utils.book_append_sheet(wb, ws, 'Data');
-              XLSX.writeFile(wb, `data_export_${new Date().toISOString().split('T')[0]}.csv`);
-            }}
-            disabled={!isFullyLoaded}
-            className="px-3 py-1.5 border border-gray-300 text-gray-600 hover:border-[#348ADC] hover:text-[#348ADC] hover:bg-[#348ADC]/5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-            title={!isFullyLoaded ? "Loading data..." : "Download filtered data as CSV"}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Download CSV
-          </button>
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                selectedUserType === type
+                  ? 'bg-[#348ADC] text-white shadow-md'
+                  : 'bg-gray-100 text-[#072741] hover:bg-gray-200'
+              }`}
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              {type}
+            </button>
+          ))}
         </div>
 
         {/* DATE RANGE FILTER */}
@@ -1193,62 +654,22 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
               </span>
             )}
 
-
-
-            {/* UPDATE USER */}
-            <button
-              onClick={handleUpdateUser}
-              disabled={selectedUserIds.size !== 1}
-              title={selectedUserIds.size !== 1 ? "Select a User" : ""}
-              className="px-3 py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] hover:from-[#2a6fb0] hover:to-[#4fb3c7] text-white rounded-full text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-              Update User
-            </button>
-
-            {/* SEND EMAIL */}
+            {/* SEND EMAIL — smaller, premium buttons */}
             <button
               onClick={handleSendEmail}
               disabled={selectedUserIds.size === 0}
-              title={selectedUserIds.size === 0 ? "Select Users" : ""}
-              className="px-3 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white rounded-full text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200"
+              className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-md text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <Mail size={14} />
               Send Emails
             </button>
 
-            {/* SEND WHATSAPP */}
-            <button
-              onClick={() => {
-                if (selectedUserIds.size === 0) {
-                  alert('Please select at least one user to send WhatsApp message to.');
-                  return;
-                }
-                // TODO: Implement WhatsApp functionality
-                alert(`Send WhatsApp to ${selectedUserIds.size} selected user(s) - Feature coming soon!`);
-              }}
-              disabled={selectedUserIds.size === 0}
-              title={selectedUserIds.size === 0 ? "Select Users" : ""}
-              className="px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-full text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-              </svg>
-              Send WhatsApp
-            </button>
-
             {/* DELETE USER */}
             <button
               onClick={handleDeleteSelected}
               disabled={selectedUserIds.size === 0}
-              title={selectedUserIds.size === 0 ? "Select Users" : ""}
-              className="px-3 py-2 border border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 rounded-full text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all duration-200"
+              className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md text-xs font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <Trash2 size={14} />
@@ -1354,10 +775,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           <div className="text-xs text-[#072741] opacity-50" style={{ fontFamily: 'Inter, sans-serif' }}>
             Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} rows
             {filteredData.length !== data.length && (
-              <span className="ml-2 text-gray-400">(filtered from {totalCount !== null ? totalCount : data.length} total)</span>
-            )}
-            {totalCount !== null && data.length < totalCount && filteredData.length === data.length && (
-              <span className="ml-2 text-gray-400">(loading {totalCount} total...)</span>
+              <span className="ml-2 text-gray-400">(filtered from {data.length} total)</span>
             )}
           </div>
 
@@ -1415,206 +833,6 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
           )}
         </div>
       )}
-
-      {/* ------------------------------
-          UPDATE USER SLIDE-OVER PANEL
-      ------------------------------ */}
-      {isUpdatePanelOpen && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
-            onClick={handleDiscardChanges}
-          ></div>
-
-          {/* Slide-over Panel */}
-          <div className="fixed inset-y-0 right-0 w-full sm:w-[480px] bg-white shadow-2xl z-50 flex flex-col animate-slide-in">
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-              <div>
-                <h2 className="text-lg font-semibold text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  Update User
-                </h2>
-                <p className="text-xs text-gray-500 mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  Make changes to user information
-                </p>
-              </div>
-              <button
-                onClick={handleDiscardChanges}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Form Fields - Scrollable */}
-            <div className="flex-1 overflow-y-auto px-6 py-4">
-              <div className="space-y-4">
-                {columns.map((column) => {
-                  const isChanged = editedUserData[column] !== originalUserData[column];
-                  return (
-                    <div key={column} className="space-y-1.5">
-                      <label 
-                        className="text-xs font-medium text-[#072741] flex items-center gap-2"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        {column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        {isChanged && (
-                          <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">Modified</span>
-                        )}
-                      </label>
-                      <input
-                        type="text"
-                        value={editedUserData[column] || ''}
-                        onChange={(e) => handleFieldChange(column, e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#348ADC] transition-all ${
-                          isChanged ? 'border-amber-300 bg-amber-50' : 'border-gray-300 bg-white'
-                        }`}
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Footer - Action Buttons */}
-            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
-              <button
-                onClick={handleDiscardChanges}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                Discard Changes
-              </button>
-              <button
-                onClick={handleSaveChanges}
-                disabled={!hasChanges() || isSaving}
-                className="px-4 py-2 bg-[#348ADC] hover:bg-[#2a6fb0] text-white rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                {isSaving ? (
-                  <>
-                    <Loader className="animate-spin" size={14} />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Save Changes
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ------------------------------
-          ADD USER SLIDE-OVER PANEL
-      ------------------------------ */}
-      {isAddPanelOpen && (
-        <>
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
-            onClick={handleDiscardNewUser}
-          ></div>
-
-          <div className="fixed inset-y-0 right-0 w-full sm:w-[480px] bg-white shadow-2xl z-50 flex flex-col animate-slide-in">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-              <div>
-                <h2 className="text-lg font-semibold text-[#072741]" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  Add New User
-                </h2>
-                <p className="text-xs text-gray-500 mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  Create a new user in the database
-                </p>
-              </div>
-              <button
-                onClick={handleDiscardNewUser}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto px-6 py-4">
-              <div className="space-y-4">
-                {getEditableColumns().map((column) => {
-                  const hasValue = newUserData[column] && newUserData[column].trim() !== '';
-                  return (
-                    <div key={column} className="space-y-1.5">
-                      <label 
-                        className="text-xs font-medium text-[#072741] flex items-center gap-2"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        {column.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        {hasValue && (
-                          <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">Filled</span>
-                        )}
-                      </label>
-                      <input
-                        type="text"
-                        value={newUserData[column] || ''}
-                        onChange={(e) => handleNewUserFieldChange(column, e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#348ADC] transition-all ${
-                          hasValue ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-white'
-                        }`}
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                        placeholder={`Enter ${column.replace(/_/g, ' ').toLowerCase()}...`}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
-              <button
-                onClick={handleDiscardNewUser}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveNewUser}
-                disabled={!hasNewUserData() || isAdding}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                {isAdding ? (
-                  <>
-                    <Loader className="animate-spin" size={14} />
-                    Adding...
-                  </>
-                ) : (
-                  <>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <line x1="19" y1="8" x2="19" y2="14"></line>
-                      <line x1="22" y1="11" x2="16" y2="11"></line>
-                    </svg>
-                    Add User
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-
-    {/* Upload Data Page */}
-    {isUploadPageOpen && (
-      <UploadDataPage
-        onClose={() => setIsUploadPageOpen(false)}
-        clientId={clientId}
-      />
-    )}
     </div>
   );
 }
