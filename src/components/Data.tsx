@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { supabase } from '../lib/supabase';
+import { UploadDataPage } from './UploadDataPage';
 
 interface ClientsDataTableProps {
   clientId: string;
@@ -29,6 +30,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isFullyLoaded, setIsFullyLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isUploadPageOpen, setIsUploadPageOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 100;
@@ -906,7 +908,56 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 flex flex-col h-full">
+    <>
+      {/* Module Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3 flex-shrink-0">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl font-semibold text-[#072741]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Data
+          </h1>
+          <p className="text-xs text-[#072741] opacity-50" style={{ fontFamily: 'Inter, sans-serif' }}>
+            Manage your user data and analytics
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
+          <button
+            onClick={handleAddUser}
+            className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] hover:from-[#2a6fb0] hover:to-[#4fb3c7] text-white rounded-full transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-md hover:shadow-lg flex items-center gap-2"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <line x1="19" y1="8" x2="19" y2="14"></line>
+              <line x1="22" y1="11" x2="16" y2="11"></line>
+            </svg>
+            Add User
+          </button>
+          <button
+            onClick={() => setIsUploadPageOpen(true)}
+            className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-[#072741] to-[#0a3d5c] hover:from-[#0a3d5c] hover:to-[#0d4a6b] text-white rounded-full transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-md hover:shadow-lg flex items-center gap-2"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            Add Multiple Users
+          </button>
+          <button
+            onClick={() => alert('Manage Audiences - Coming soon!')}
+            className="flex-1 sm:flex-none px-3 py-2 border border-[#348ADC]/30 text-[#348ADC] hover:bg-[#348ADC]/10 hover:border-[#348ADC] rounded-full transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            Manage Audiences
+          </button>
+        </div>
+      </div>
+
+      {/* Data Table */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 flex flex-col h-full">
       {/* ------------------------------
           FILTERS SECTION
       ------------------------------ */}
@@ -1556,5 +1607,14 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         </>
       )}
     </div>
+
+    {/* Upload Data Page */}
+    {isUploadPageOpen && (
+      <UploadDataPage
+        onClose={() => setIsUploadPageOpen(false)}
+        clientId={clientId}
+      />
+    )}
+    </>
   );
 }
