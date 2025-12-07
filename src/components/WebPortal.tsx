@@ -279,47 +279,125 @@ export function WebPortal() {
         {/* Main Content */}
         <main className="flex-1 pt-14 pb-4 px-4 sm:px-5 overflow-hidden">
         <div className="max-w-full mx-auto h-full flex flex-col min-h-0 overflow-hidden">
-            {/* Header Section - Only for non-Data modules */}
-            {activeMenu !== 'Data' && (
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3 flex-shrink-0 pt-4">
-                <div className="flex-1 min-w-0">
-                  {activeMenu === 'Home' && (
-                    <h1
-                      className="text-xl font-semibold text-[#072741] mb-1"
-                      style={{ fontFamily: 'Poppins, sans-serif' }}
-                    >
-                      Hello {getFirstName()}!
-                    </h1>
-                  )}
-                  {activeMenu !== 'Home' && (
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3 flex-shrink-0 pt-4">
+              <div className="flex-1 min-w-0">
+                {activeMenu === 'Home' && (
+                  <h1
+                    className="text-xl font-semibold text-[#072741] mb-1"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    Hello {getFirstName()}!
+                  </h1>
+                )}
+                {activeMenu !== 'Home' && (
+                  <div className="flex items-center gap-2">
+                    {dataSubPage === 'audiences' && (
+                      <button
+                        onClick={() => setDataSubPage(null)}
+                        className="text-[#072741] hover:text-[#348ADC] transition-colors flex-shrink-0"
+                      >
+                        <ArrowLeft size={18} />
+                      </button>
+                    )}
                     <h1
                       className="text-xl font-semibold text-[#072741]"
                       style={{ fontFamily: 'Poppins, sans-serif' }}
                     >
-                      {activeMenu}
+                      {dataSubPage === 'audiences' ? 'Manage Audiences' : activeMenu}
                     </h1>
-                  )}
-                  <p
-                    className="text-xs text-[#072741] opacity-50"
+                  </div>
+                )}
+                <p
+                  className="text-xs text-[#072741] opacity-50"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  {activeMenu === 'Home' && 'Welcome to your dashboard'}
+                  {activeMenu === 'Data' && dataSubPage !== 'audiences' && 'Manage your user data and analytics'}
+                  {activeMenu === 'Data' && dataSubPage === 'audiences' && 'Upload and create audiences for your campaigns'}
+                  {activeMenu === 'Templates' && 'Create and manage templates'}
+                  {activeMenu === 'AI Emails' && 'AI-powered email generation'}
+                  {activeMenu === 'Campaigns' && 'Manage your marketing campaigns'}
+                  {activeMenu === 'Domains' && 'Manage your domains'}
+                  {activeMenu === 'Settings' && 'Configure your account settings'}
+                </p>
+              </div>
+
+              {/* Action Buttons - Data module main page */}
+              {activeMenu === 'Data' && dataSubPage === null && (
+                <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
+                  <button
+                    onClick={() => {
+                      // Trigger Add User functionality in Data component
+                      window.dispatchEvent(new CustomEvent('openAddUser'));
+                    }}
+                    className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] hover:from-[#2a6fb0] hover:to-[#4fb3c7] text-white rounded-full transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-md hover:shadow-lg flex items-center gap-2"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    {activeMenu === 'Home' && 'Welcome to your dashboard'}
-                    {activeMenu === 'Templates' && 'Create and manage templates'}
-                    {activeMenu === 'AI Emails' && 'AI-powered email generation'}
-                    {activeMenu === 'Campaigns' && 'Manage your marketing campaigns'}
-                    {activeMenu === 'Domains' && 'Manage your domains'}
-                    {activeMenu === 'Settings' && 'Configure your account settings'}
-                  </p>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <line x1="19" y1="8" x2="19" y2="14"></line>
+                      <line x1="22" y1="11" x2="16" y2="11"></line>
+                    </svg>
+                    Add User
+                  </button>
+                  <button
+                    onClick={() => setIsUploadPageOpen(true)}
+                    className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-[#072741] to-[#0a3d5c] hover:from-[#0a3d5c] hover:to-[#0d4a6b] text-white rounded-full transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-md hover:shadow-lg flex items-center gap-2"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Add Multiple Users
+                  </button>
+                  <button
+                    onClick={() => setDataSubPage('audiences')}
+                    className="flex-1 sm:flex-none px-3 py-2 border border-[#348ADC]/30 text-[#348ADC] hover:bg-[#348ADC]/10 hover:border-[#348ADC] rounded-full transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Manage Audiences
+                  </button>
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* Action Buttons - Manage Audiences page */}
+              {activeMenu === 'Data' && dataSubPage === 'audiences' && (
+                <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
+                  <button
+                    onClick={() => {
+                      // TODO: Handle Upload Audience action
+                    }}
+                    className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-[#348ADC] to-[#65C9D4] hover:from-[#2a6fb0] hover:to-[#4fb3c7] text-white rounded-full transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-md hover:shadow-lg"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Upload Audience
+                  </button>
+                  <button
+                    onClick={() => {
+                      // TODO: Handle Create Audience action
+                    }}
+                    className="flex-1 sm:flex-none px-3 py-2 border border-[#348ADC]/30 text-[#348ADC] hover:bg-[#348ADC]/10 hover:border-[#348ADC] rounded-full transition-all duration-200 font-medium text-xs whitespace-nowrap shadow-sm"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Create Audience
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Content Area - Scrollable table container */}
             <div className="flex-1 min-h-0 relative">
               <div className="absolute inset-0 overflow-auto">
                 {activeMenu === 'Home' ? (
                   <Dashboard clientId={getClientId()} />
-                ) : activeMenu === 'Data' ? (
+                ) : activeMenu === 'Data' && dataSubPage === 'audiences' ? (
+                  <ManageAudiencesView />
+                ) : activeMenu === 'Data' && dataSubPage === null ? (
                   <ClientsDataTable clientId={getClientId()} />
                 ) : (
                   <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 min-h-[400px]">
@@ -339,7 +417,13 @@ export function WebPortal() {
           </div>
         </main>
 
-
+        {/* Upload Data Page */}
+        {isUploadPageOpen && (
+          <UploadDataPage
+            onClose={() => setIsUploadPageOpen(false)}
+            clientId={getClientId()}
+          />
+        )}
       </div>
     </div>
   );
@@ -355,4 +439,3 @@ function ManageAudiencesView() {
     </div>
   );
 }
-
