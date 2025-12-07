@@ -908,7 +908,7 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
   }
 
   return (
-    <>
+    <div className="py-3">
       {/* Module Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3 flex-shrink-0">
         <div className="flex-1 min-w-0">
@@ -1615,6 +1615,6 @@ export function ClientsDataTable({ clientId }: ClientsDataTableProps) {
         clientId={clientId}
       />
     )}
-    </>
+    </div>
   );
 }
