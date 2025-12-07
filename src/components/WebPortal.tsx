@@ -277,8 +277,8 @@ export function WebPortal() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 pt-14 pb-4 px-4 sm:px-5 overflow-hidden">
-        <div className="max-w-full mx-auto h-full flex flex-col min-h-0 overflow-hidden">
+        <main className="flex-1 pt-14 px-4 sm:px-5 overflow-hidden">
+        <div className="max-w-full mx-auto h-full flex flex-col min-h-0 overflow-hidden py-6">
             {/* Header Section - Only for non-Data modules */}
             {activeMenu !== 'Data' && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3 flex-shrink-0 pt-4">
